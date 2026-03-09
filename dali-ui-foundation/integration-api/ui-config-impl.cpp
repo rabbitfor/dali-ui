@@ -22,6 +22,9 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
 
+// INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/default-theme-loader.h>
+
 namespace
 {
 
@@ -157,6 +160,11 @@ void UiConfigImpl::SetTapRecognizerTime(uint32_t timeMs)
 uint32_t UiConfigImpl::GetTapRecognizerTime() const
 {
   return mTapRecognizerTime;
+}
+
+ThemeLoaderInterface* UiConfigImpl::CreateThemeLoader()
+{
+  return new DefaultThemeLoader();
 }
 
 void UiConfigImpl::OnInitialized()
