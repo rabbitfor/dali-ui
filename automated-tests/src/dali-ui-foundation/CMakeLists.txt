@@ -8,6 +8,8 @@ SET(CAPI_LIB "dali-ui-foundation")
 SET(TC_SOURCES
         utc-Dali-Unit.cpp
         utc-Dali-View.cpp
+        utc-Dali-ClickableTrait.cpp
+        utc-Dali-SelectableTrait.cpp
         utc-Dali-Layout.cpp
         utc-Dali-StackLayout.cpp
         utc-Dali-FlexLayout.cpp

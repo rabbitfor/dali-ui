@@ -26,6 +26,7 @@
 #include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <dali-ui-foundation/public-api/layout-params.h>
 #include <dali-ui-foundation/public-api/layout-types.h>
+#include <dali-ui-foundation/public-api/selectable-trait.h>
 #include <dali-ui-foundation/public-api/trait.h>
 
 namespace Dali
@@ -506,6 +507,69 @@ public: // Properties
 
   // @CHAIN_MANUAL
   /**
+   * @brief Attaches the selectable trait to this View and optionally configures it.
+   *
+   * A View can have at most one selectable trait. If the View already has a
+   * SelectableTrait (e.g. from a previous AsSelectable call), the existing trait is
+   * used and the configure callback is invoked with it.
+   *
+   * @param[in] configure Optional callback to configure the SelectableTrait (e.g. connect signals).
+   *                     Can be null or omitted to only attach the trait.
+   * @return Reference to this View for fluent chaining
+   */
+  View& AsSelectable(std::function<void(SelectableTrait&)> configure = nullptr)
+  {
+    SelectableTrait trait = GetOrAttachSelectableTrait();
+    if(configure && trait)
+    {
+      configure(trait);
+    }
+    return *this;
+  }
+
+  // @CHAIN_MANUAL
+  /**
+   * @brief Attaches the selectable trait and connects a member function to the SelectionChanged signal.
+   *
+   * Equivalent to AsSelectable() then SelectionChangedSignal().Connect(obj, func).
+   * @param[in] obj Object that implements ConnectionTrackerInterface (e.g. ConnectionTracker subclass); used for
+   * automatic disconnection
+   * @param[in] func Member function with signature void (View, bool)
+   * @return Reference to this View for fluent chaining
+   */
+  template<class X>
+  View& AsSelectable(X* obj, void (X::*func)(View, bool))
+  {
+    SelectableTrait trait = GetOrAttachSelectableTrait();
+    if(trait && obj && func)
+    {
+      trait.SelectionChangedSignal().Connect(obj, func);
+    }
+    return *this;
+  }
+
+  // @CHAIN_MANUAL
+  /**
+   * @brief Attaches the selectable trait and connects a callable to the SelectionChanged signal.
+   *
+   * Equivalent to AsSelectable() then SelectionChangedSignal().Connect(connectionTracker, func).
+   * @param[in] connectionTracker Used for automatic disconnection when the tracker is destroyed
+   * @param[in] func Callable with signature void (View, bool) (e.g. lambda)
+   * @return Reference to this View for fluent chaining
+   */
+  template<typename F>
+  View& AsSelectable(Dali::ConnectionTrackerInterface* connectionTracker, F&& func)
+  {
+    SelectableTrait trait = GetOrAttachSelectableTrait();
+    if(trait && connectionTracker)
+    {
+      trait.SelectionChangedSignal().Connect(connectionTracker, std::forward<F>(func));
+    }
+    return *this;
+  }
+
+  // @CHAIN_MANUAL
+  /**
    * @brief Assigns this View instance to a target variable.
    * This method is useful for capturing a reference to a View created within
    * a declarative UI tree for later use.
@@ -611,6 +675,28 @@ public: // Clickable role accessors (non-chaining)
    * @return ClickableTrait handle if this View has a clickable trait; otherwise an uninitialized handle
    */
   ClickableTrait GetClickableTrait() const;
+
+public: // Selectable trait accessors (non-chaining)
+  /**
+   * @brief Ensures this View has a selectable trait and returns it.
+   *
+   * If no selectable trait is set, a SelectableTrait is attached and returned.
+   * If a SelectableTrait is already attached, it is returned. If a different
+   * selectable trait type is set, an assertion may fire and an empty handle is returned.
+   *
+   * @return SelectableTrait handle, or an uninitialized handle on error
+   */
+  SelectableTrait GetOrAttachSelectableTrait();
+
+  /**
+   * @brief Returns the selectable trait if this View has one.
+   *
+   * Use this in non-fluent code paths to obtain the trait after AsSelectable(), or when
+   * the View was made selectable by other means.
+   *
+   * @return SelectableTrait handle if this View has a selectable trait; otherwise an uninitialized handle
+   */
+  SelectableTrait GetSelectableTrait() const;
 
 public: // Not intended for application developers
   /// @cond internal

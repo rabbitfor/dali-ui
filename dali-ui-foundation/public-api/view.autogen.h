@@ -151,6 +151,39 @@
   template<typename F> \
   ChildClass& AsClickable(Dali::ConnectionTrackerInterface* connectionTracker, F&& func) { View::AsClickable(connectionTracker, func); return *this; } \
   /** \
+  * @brief Attaches the selectable trait to this View and optionally configures it. \
+  * \
+  * A View can have at most one selectable trait. If the View already has a \
+  * SelectableTrait (e.g. from a previous AsSelectable call), the existing trait is \
+  * used and the configure callback is invoked with it. \
+  * \
+  * @param[in] configure Optional callback to configure the SelectableTrait (e.g. connect signals). \
+  *                     Can be null or omitted to only attach the trait. \
+  * @return Reference to this View for fluent chaining \
+  */ \
+  ChildClass& AsSelectable(std::function<void(SelectableTrait&)> configure = nullptr) { View::AsSelectable(configure); return *this; } \
+  /** \
+  * @brief Attaches the selectable trait and connects a member function to the SelectionChanged signal. \
+  * \
+  * Equivalent to AsSelectable() then SelectionChangedSignal().Connect(obj, func). \
+  * @param[in] obj Object that implements ConnectionTrackerInterface (e.g. ConnectionTracker subclass); used for \
+  * automatic disconnection \
+  * @param[in] func Member function with signature void (View, bool) \
+  * @return Reference to this View for fluent chaining \
+  */ \
+  template<class X> \
+  ChildClass& AsSelectable(X* obj, void (X::*func)(View, bool)) { View::AsSelectable(obj, func); return *this; } \
+  /** \
+  * @brief Attaches the selectable trait and connects a callable to the SelectionChanged signal. \
+  * \
+  * Equivalent to AsSelectable() then SelectionChangedSignal().Connect(connectionTracker, func). \
+  * @param[in] connectionTracker Used for automatic disconnection when the tracker is destroyed \
+  * @param[in] func Callable with signature void (View, bool) (e.g. lambda) \
+  * @return Reference to this View for fluent chaining \
+  */ \
+  template<typename F> \
+  ChildClass& AsSelectable(Dali::ConnectionTrackerInterface* connectionTracker, F&& func) { View::AsSelectable(connectionTracker, func); return *this; } \
+  /** \
   * @brief Assigns this View instance to a target variable. \
   * This method is useful for capturing a reference to a View created within \
   * a declarative UI tree for later use. \

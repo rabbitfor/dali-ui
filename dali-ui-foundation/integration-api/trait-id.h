@@ -43,12 +43,21 @@ enum class ReservedTraitId : uint32_t
   /**
    * @brief Interaction trait attached to a View.
    *
-   * This is used for "interaction traits" such as clickable, selectable,
-   * or group-selectable behavior that define how a View reacts to input.
+   * This is used for "interaction traits" such as clickable behavior
+   * that define how a View reacts to input focus and key events.
    * A View may have at most one interaction trait, which is attached via
    * ViewImpl::SetTrait(ReservedTraitId::INTERACTION_TRAIT, ...).
    */
   INTERACTION_TRAIT = 0,
+
+  /**
+   * @brief Selectable trait attached to a View.
+   *
+   * This is used for "selectable traits" such as selectable or
+   * group-selectable behavior that manage selection state on a View.
+   * A View may have at most one selectable trait.
+   */
+  SELECTABLE_TRAIT = 1,
 
   /**
    * @brief Layout parameter traits for each layout type.

@@ -25,6 +25,7 @@
 #include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/public-api/clickable-trait.h>
 #include <dali-ui-foundation/public-api/layout.h>
+#include <dali-ui-foundation/public-api/selectable-trait.h>
 
 namespace Dali
 {
@@ -352,6 +353,36 @@ ClickableTrait View::GetClickableTrait() const
   const auto& impl  = Integration::GetImpl(*this);
   Trait       trait = impl.GetTrait(Integration::TraitId(Integration::ReservedTraitId::INTERACTION_TRAIT));
   return ClickableTrait::DownCast(trait);
+}
+
+SelectableTrait View::GetOrAttachSelectableTrait()
+{
+  auto&                      impl = Integration::GetImpl(*this);
+  const Integration::TraitId selectableTraitId(Integration::ReservedTraitId::SELECTABLE_TRAIT);
+  Trait                      existing = impl.GetTrait(selectableTraitId);
+
+  if(!existing)
+  {
+    SelectableTrait selectable = SelectableTrait::New();
+    impl.SetTrait(selectableTraitId, selectable);
+    return selectable;
+  }
+
+  SelectableTrait selectable = SelectableTrait::DownCast(existing);
+  if(!selectable)
+  {
+    DALI_ASSERT_ALWAYS(false && "View already has a different selectable trait; cannot attach SelectableTrait");
+    return SelectableTrait();
+  }
+
+  return selectable;
+}
+
+SelectableTrait View::GetSelectableTrait() const
+{
+  const auto& impl  = Integration::GetImpl(*this);
+  Trait       trait = impl.GetTrait(Integration::TraitId(Integration::ReservedTraitId::SELECTABLE_TRAIT));
+  return SelectableTrait::DownCast(trait);
 }
 
 BaseHandle View::GetLayoutParamsTrait(LayoutParamsType type) const
