@@ -45,22 +45,21 @@ const char* const UICONFIG_NOT_INITIALIZED_MESSAGE =
   "Do NOT access UiConfig-dependent features in static/global variable initializers.";
 } // unnamed namespace
 
-void UiConfigManager::Initialize(UiConfig config)
+void UiConfigManager::Initialize(const UiConfig& config)
 {
   DALI_ASSERT_ALWAYS(!mInitialized && "UiConfigManager::Init() must be called only once");
-  mConfig = std::move(config);
+  mConfig = config;
   GetImpl(mConfig).Freeze();
 
   const auto& impl             = GetImpl(mConfig);
-  mCachedScalingFactor         = impl.GetScalingFactor();
-  mCachedDpiFactor             = impl.GetDpiFactor();
-  mCachedScaledDpiFactor       = impl.GetScaledDpiFactor();
-  mCachedDpi                   = impl.GetDpi();
-  mCachedBaselineDpi           = impl.GetBaselineDpi();
-  mCachedKeyClickPolicy        = impl.GetKeyClickPolicy();
-  mCachedExecutionKeyPredicate = impl.GetExecutionKeyPredicate();
-  mCachedMinLongPressKeyCount  = impl.GetMinLongPressKeyCount();
-  mCachedTapRecognizerTime     = impl.GetTapRecognizerTime();
+  // Cache derived unit factors once at initialization time.
+  // Unit literals (_spx/_dp/_sdp) and layout scaling paths query these frequently.
+  // UiConfig is frozen after Initialize(), so caching these derived values is safe.
+  mCachedScalingFactor   = impl.GetScalingFactor();
+  const int dpi          = impl.GetDpi();
+  const int baselineDpi  = impl.GetBaselineDpi();
+  mCachedDpiFactor       = static_cast<float>(dpi) / static_cast<float>(baselineDpi);
+  mCachedScaledDpiFactor = mCachedDpiFactor * mCachedScalingFactor;
   mInitialized                 = true;
 
   GetImpl(mConfig).OnInitialized();
@@ -92,37 +91,37 @@ float UiConfigManager::GetScaledDpiFactor() const
 int UiConfigManager::GetDpi() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedDpi;
+  return GetImpl(mConfig).GetDpi();
 }
 
 int UiConfigManager::GetBaselineDpi() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedBaselineDpi;
+  return GetImpl(mConfig).GetBaselineDpi();
 }
 
 KeyClickPolicy UiConfigManager::GetKeyClickPolicy() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedKeyClickPolicy;
+  return GetImpl(mConfig).GetKeyClickPolicy();
 }
 
 ExecutionKeyPredicate UiConfigManager::GetExecutionKeyPredicate() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedExecutionKeyPredicate;
+  return GetImpl(mConfig).GetExecutionKeyPredicate();
 }
 
 uint32_t UiConfigManager::GetMinLongPressKeyCount() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedMinLongPressKeyCount;
+  return GetImpl(mConfig).GetMinLongPressKeyCount();
 }
 
 uint32_t UiConfigManager::GetTapRecognizerTime() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
-  return mCachedTapRecognizerTime;
+  return GetImpl(mConfig).GetTapRecognizerTime();
 }
 
 std::vector<std::string> UiConfigManager::GetBrokenImageUrlList() const
