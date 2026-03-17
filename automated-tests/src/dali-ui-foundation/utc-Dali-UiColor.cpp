@@ -575,8 +575,8 @@ int UtcDaliUiColorSizeP(void)
 {
   TestApplication application;
 
-  // UiColor should be exactly 20 bytes for ABI stability
-  DALI_TEST_EQUALS(sizeof(UiColor), 20u, TEST_LOCATION);
+  // UiColor should be exactly 24 bytes for ABI stability
+  DALI_TEST_EQUALS(sizeof(UiColor), 24u, TEST_LOCATION);
 
   END_TEST;
 }

@@ -194,7 +194,7 @@ private:
   void      SetTokenAlpha(float alpha);
 
 private:
-  alignas(4) unsigned char mData[20]{};
+  alignas(8) uint8_t mData[24]{};
 };
 
 } // namespace Ui

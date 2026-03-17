@@ -116,16 +116,16 @@ TokenRegistry& GetTokenRegistry()
 }
 
 /**
- * mData[20] layout
+ * mData[24] layout (alignas(8))
  * ┌──────────┬───────────┬──────────┬─────────────────────────────────┐
- * │ [0]      │ [1]       │ [2-3]    │ [4 .. 19]  (payload)            │
+ * │ [0]      │ [1]       │ [2-7]    │ [8 .. 23]  (payload)            │
  * │ Type     │ AlphaMode │ reserved │  Rgba : r g b a  (4 floats)     │
  * │          │           │          │  Token: tokenId(u32) alpha(f32) │
  * └──────────┴───────────┴──────────┴─────────────────────────────────┘
  */
 constexpr size_t OFFSET_TYPE       = 0;
 constexpr size_t OFFSET_ALPHA_MODE = 1;
-constexpr size_t OFFSET_PAYLOAD    = 4;
+constexpr size_t OFFSET_PAYLOAD    = 8;
 
 // Rgba payload offsets (from mData base)
 constexpr size_t OFFSET_RGBA_R = OFFSET_PAYLOAD;
@@ -138,28 +138,28 @@ constexpr size_t OFFSET_TOKEN_ID    = OFFSET_PAYLOAD;
 constexpr size_t OFFSET_TOKEN_ALPHA = OFFSET_PAYLOAD + sizeof(uint32_t);
 
 static_assert(sizeof(float) == 4, "UiColor layout assumes 32-bit IEEE 754 float");
-static_assert(sizeof(UiColor) == 20, "UiColor must be exactly 20 bytes for ABI stability");
+static_assert(sizeof(UiColor) == 24, "UiColor must be exactly 24 bytes for ABI stability");
 
-inline float ReadFloat(const unsigned char* data, size_t offset)
+inline float ReadFloat(const uint8_t* data, size_t offset)
 {
   float value;
   std::memcpy(&value, data + offset, sizeof(float));
   return value;
 }
 
-inline void WriteFloat(unsigned char* data, size_t offset, float value)
+inline void WriteFloat(uint8_t* data, size_t offset, float value)
 {
   std::memcpy(data + offset, &value, sizeof(float));
 }
 
-inline uint32_t ReadU32(const unsigned char* data, size_t offset)
+inline uint32_t ReadU32(const uint8_t* data, size_t offset)
 {
   uint32_t v;
   std::memcpy(&v, data + offset, sizeof(uint32_t));
   return v;
 }
 
-inline void WriteU32(unsigned char* data, size_t offset, uint32_t v)
+inline void WriteU32(uint8_t* data, size_t offset, uint32_t v)
 {
   std::memcpy(data + offset, &v, sizeof(uint32_t));
 }
@@ -332,7 +332,7 @@ UiColor::Type UiColor::GetType() const
 
 void UiColor::SetType(Type type)
 {
-  mData[OFFSET_TYPE] = static_cast<unsigned char>(type);
+  mData[OFFSET_TYPE] = static_cast<uint8_t>(type);
 }
 
 UiColor::AlphaMode UiColor::GetAlphaMode() const
@@ -342,7 +342,7 @@ UiColor::AlphaMode UiColor::GetAlphaMode() const
 
 void UiColor::SetAlphaMode(AlphaMode mode)
 {
-  mData[OFFSET_ALPHA_MODE] = static_cast<unsigned char>(mode);
+  mData[OFFSET_ALPHA_MODE] = static_cast<uint8_t>(mode);
 }
 
 Vector4 UiColor::GetRgba() const
