@@ -61,6 +61,8 @@ void UiConfigManager::Initialize(UiConfig config)
   mCachedExecutionKeyPredicate = impl.GetExecutionKeyPredicate();
   mCachedMinLongPressKeyCount  = impl.GetMinLongPressKeyCount();
   mCachedTapRecognizerTime     = impl.GetTapRecognizerTime();
+  mCachedDefaultFontSize       = impl.GetDefaultFontSize();
+  mCachedDefaultTextColor      = impl.GetDefaultTextColor();
   mInitialized                 = true;
 
   GetImpl(mConfig).OnInitialized();
@@ -141,6 +143,18 @@ bool UiConfigManager::IsFocusIndicatorAlwaysShown() const
 {
   DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
   return GetImpl(mConfig).IsFocusIndicatorAlwaysShown();
+}
+
+float UiConfigManager::GetDefaultFontSize() const
+{
+  DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
+  return mCachedDefaultFontSize;
+}
+
+Vector4 UiConfigManager::GetDefaultTextColor() const
+{
+  DALI_ASSERT_ALWAYS(mInitialized && UICONFIG_NOT_INITIALIZED_MESSAGE);
+  return mCachedDefaultTextColor;
 }
 
 } // namespace Integration

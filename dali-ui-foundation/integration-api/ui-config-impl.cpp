@@ -47,7 +47,9 @@ namespace Integration
 
 UiConfigImpl::UiConfigImpl()
 : mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
+  mDefaultTextColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f)),
   mScalingFactor(1.0f),
+  mDefaultFontSize(16.0f),
   mDpi(160),
   mBaselineDpi(160),
   mKeyClickPolicy(KeyClickPolicy::ON_RELEASE),
@@ -216,6 +218,28 @@ void UiConfigImpl::SetAlwaysShowFocus(bool alwaysShow)
 bool UiConfigImpl::IsFocusIndicatorAlwaysShown() const
 {
   return mAlwaysShowFocus;
+}
+
+void UiConfigImpl::SetDefaultFontSize(float fontSize)
+{
+  DALI_ASSERT_ALWAYS(!mFrozen && "UiConfig is frozen after  UiConfig::Apply()");
+  mDefaultFontSize = fontSize;
+}
+
+float UiConfigImpl::GetDefaultFontSize() const
+{
+  return mDefaultFontSize;
+}
+
+void UiConfigImpl::SetDefaultTextColor(const Vector4& color)
+{
+  DALI_ASSERT_ALWAYS(!mFrozen && "UiConfig is frozen after  UiConfig::Apply()");
+  mDefaultTextColor = color;
+}
+
+Vector4 UiConfigImpl::GetDefaultTextColor() const
+{
+  return mDefaultTextColor;
 }
 
 void UiConfigImpl::OnInitialized()
