@@ -242,7 +242,9 @@ void ViewImpl::SetPivotPoint(const Vector3& point)
 
 void ViewImpl::SetBackgroundColor(const UiColor& color)
 {
-  UiColorManager::Get().ApplyColor(color, View::DownCast(Self()), MakeCallback(ApplyBackgroundColor));
+  auto view = View::DownCast(Self());
+  UiColorManager::Get().UpdateBinding(color, view, MakeCallback(ApplyBackgroundColor));
+  ApplyBackgroundColor(view, color.Resolve());
 }
 
 bool ViewImpl::IsFocusable() const

@@ -53,19 +53,24 @@ bool UiColorManager::GetColor(const std::string& colorId, Vector4& outColor) con
   return GetImpl(*this).GetColor(colorId, outColor);
 }
 
-void UiColorManager::ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc)
+void UiColorManager::UpdateBinding(const UiColor& color, View view, CallbackBase* applyFunc)
 {
-  GetImpl(*this).ApplyColor(color, view, applyFunc);
+  GetImpl(*this).UpdateBinding(color, view, applyFunc);
 }
 
-void UiColorManager::UnregisterBinding(View view, CallbackBase* applyFunc)
+bool UiColorManager::GetBindingColor(View view, CallbackBase* applyFunc, UiColor& outColor) const
 {
-  GetImpl(*this).UnregisterBinding(view, applyFunc);
+  return GetImpl(*this).GetBindingColor(view, applyFunc, outColor);
 }
 
-void UiColorManager::UnregisterBindings(View view)
+void UiColorManager::RemoveBinding(View view, CallbackBase* applyFunc)
 {
-  GetImpl(*this).UnregisterBindings(view);
+  GetImpl(*this).RemoveBinding(view, applyFunc);
+}
+
+void UiColorManager::RemoveBindings(View view)
+{
+  GetImpl(*this).RemoveBindings(view);
 }
 
 void UiColorManager::SetColorOverride(ColorOverrideFunc func)

@@ -142,18 +142,28 @@ public:
   bool GetColor(const std::string& colorId, Vector4& outColor) const;
 
   /**
-   * @brief Resolves a UiColor and applies it to a View, managing bindings automatically.
+   * @brief Updates color binding for a View.
    *
-   * If the UiColor has a color ID, the color is resolved from the current theme,
-   * applied via applyFunc, and a binding is registered so the View is refreshed
-   * when the theme changes. If the UiColor has direct RGBA values, the color is
-   * applied and any previous binding for this View+applyFunc pair is removed.
+   * If the UiColor has a color ID, registers or updates the binding so the
+   * View is refreshed when the theme changes. If the UiColor has direct RGBA
+   * values, removes any existing binding for this View+applyFunc pair.
+   * Does not execute the callback immediately.
    *
-   * @param[in] color The UiColor to apply
+   * @param[in] color The UiColor to bind
    * @param[in] view The target View
-   * @param[in] applyFunc Callback to apply the color to the View (ownership transferred)
+   * @param[in] applyFunc Callback for theme-change refresh (ownership transferred)
    */
-  void ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc);
+  void UpdateBinding(const UiColor& color, View view, CallbackBase* applyFunc);
+
+  /**
+   * @brief Retrieves the UiColor associated with a specific View+applyFunc binding.
+   *
+   * @param[in] view The target View
+   * @param[in] applyFunc Callback matching the one used in UpdateBinding (ownership transferred)
+   * @param[out] outColor The bound UiColor if found
+   * @return @c true if a binding was found, @c false otherwise
+   */
+  bool GetBindingColor(View view, CallbackBase* applyFunc, UiColor& outColor) const;
 
   /**
    * @brief Removes a specific binding for a View+applyFunc pair.
@@ -162,16 +172,16 @@ public:
    * with a direct RGBA value while other bindings on the same View are preserved.
    *
    * @param[in] view The View to unbind
-   * @param[in] applyFunc Callback matching the one used in ApplyColor (ownership transferred)
+   * @param[in] applyFunc Callback matching the one used in UpdateBinding (ownership transferred)
    */
-  void UnregisterBinding(View view, CallbackBase* applyFunc);
+  void RemoveBinding(View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes all bindings associated with a given View.
    *
    * @param[in] view The View to unbind completely
    */
-  void UnregisterBindings(View view);
+  void RemoveBindings(View view);
 
   /**
    * @brief Sets a function that overrides theme color lookups.

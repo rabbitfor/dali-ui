@@ -79,29 +79,43 @@ public:
   bool GetColor(const std::string& colorId, Vector4& outColor) const;
 
   /**
-   * @brief Resolves a UiColor and applies it to a View, managing
-   * bindings automatically.
+   * @brief Updates color binding for a View.
    *
-   * @param[in] color The UiColor to apply
+   * If the UiColor has a color ID, registers or updates the binding so the
+   * View is refreshed when the theme changes. If the UiColor has direct RGBA
+   * values, removes any existing binding for this View+applyFunc pair.
+   * Does not execute the callback immediately.
+   *
+   * @param[in] color The UiColor to bind
    * @param[in] view The target View
-   * @param[in] applyFunc Function to apply the color to the View
+   * @param[in] applyFunc Callback for theme-change refresh (ownership transferred)
    */
-  void ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc);
+  void UpdateBinding(const UiColor& color, View view, CallbackBase* applyFunc);
+
+  /**
+   * @brief Retrieves the UiColor associated with a specific View+applyFunc binding.
+   *
+   * @param[in] view The target View
+   * @param[in] applyFunc Callback matching the one used in UpdateBinding (ownership transferred)
+   * @param[out] outColor The bound UiColor if found
+   * @return @c true if a binding was found, @c false otherwise
+   */
+  bool GetBindingColor(View view, CallbackBase* applyFunc, UiColor& outColor) const;
 
   /**
    * @brief Removes a specific binding for a View+applyFunc pair.
    *
    * @param[in] view The View to unbind
-   * @param[in] applyFunc Callback matching the one used in ApplyColor (ownership transferred)
+   * @param[in] applyFunc Callback matching the one used in UpdateBinding (ownership transferred)
    */
-  void UnregisterBinding(View view, CallbackBase* applyFunc);
+  void RemoveBinding(View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes all bindings associated with a given View.
    *
    * @param[in] view The View to unbind completely
    */
-  void UnregisterBindings(View view);
+  void RemoveBindings(View view);
 
   /**
    * @brief Sets a function that overrides theme color lookups.
@@ -125,9 +139,10 @@ private:
   UiColorManagerImpl& operator=(const UiColorManagerImpl&) = delete;
   UiColorManagerImpl& operator=(UiColorManagerImpl&&)      = delete;
 
-  void OnThemeChanged();
-  void RefreshBindings();
-  void RemoveBinding(View view, const CallbackBase& callback);
+  void               OnThemeChanged();
+  void               RefreshBindings();
+  void               EraseBinding(View view, const CallbackBase& callback);
+  const BindingInfo* FindBinding(View view, const CallbackBase& callback) const;
 
 private:
   struct BindingInfo
