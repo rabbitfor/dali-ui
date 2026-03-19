@@ -18,8 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/signals/callback.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -36,18 +37,6 @@ namespace Integration
 {
 class UiColorManagerImpl;
 }
-
-/**
- * @brief Function pointer type for applying a resolved color to a View.
- *
- * Each call site (e.g. BackgroundColor, TextColor) provides its own
- * apply function, so the color manager does not need to know about
- * specific View properties.
- *
- * @param[in] view The target View
- * @param[in] color The resolved RGBA color
- */
-using ColorApplyFunc = void (*)(View, const Vector4&);
 
 /**
  * @brief Function pointer type for overriding theme color lookups.
@@ -162,9 +151,9 @@ public:
    *
    * @param[in] color The UiColor to apply
    * @param[in] view The target View
-   * @param[in] applyFunc Function to apply the color to the View
+   * @param[in] applyFunc Callback to apply the color to the View (ownership transferred)
    */
-  void ApplyColor(const UiColor& color, View view, ColorApplyFunc applyFunc);
+  void ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes a specific binding for a View+applyFunc pair.
@@ -173,9 +162,9 @@ public:
    * with a direct RGBA value while other bindings on the same View are preserved.
    *
    * @param[in] view The View to unbind
-   * @param[in] applyFunc The specific apply function to unbind
+   * @param[in] applyFunc Callback matching the one used in ApplyColor (ownership transferred)
    */
-  void UnregisterBinding(View view, ColorApplyFunc applyFunc);
+  void UnregisterBinding(View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes all bindings associated with a given View.
@@ -227,7 +216,6 @@ public:
   void ClearColorOverride();
 
 public: // Not intended for Application developers
-
   /**
    * @brief This constructor is used internally to wrap an implementation object.
    *

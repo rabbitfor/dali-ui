@@ -29,7 +29,7 @@ namespace Ui
 UiColorManager::UiColorManager() = default;
 
 UiColorManager::UiColorManager(Integration::UiColorManagerImpl* impl)
-  : BaseHandle(impl)
+: BaseHandle(impl)
 {
 }
 
@@ -53,12 +53,12 @@ bool UiColorManager::GetColor(const std::string& colorId, Vector4& outColor) con
   return GetImpl(*this).GetColor(colorId, outColor);
 }
 
-void UiColorManager::ApplyColor(const UiColor& color, View view, ColorApplyFunc applyFunc)
+void UiColorManager::ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc)
 {
   GetImpl(*this).ApplyColor(color, view, applyFunc);
 }
 
-void UiColorManager::UnregisterBinding(View view, ColorApplyFunc applyFunc)
+void UiColorManager::UnregisterBinding(View view, CallbackBase* applyFunc)
 {
   GetImpl(*this).UnregisterBinding(view, applyFunc);
 }

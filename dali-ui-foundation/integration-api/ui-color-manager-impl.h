@@ -19,10 +19,12 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/slot-delegate.h>
-#include <dali/public-api/math/vector4.h>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -84,15 +86,15 @@ public:
    * @param[in] view The target View
    * @param[in] applyFunc Function to apply the color to the View
    */
-  void ApplyColor(const UiColor& color, View view, ColorApplyFunc applyFunc);
+  void ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes a specific binding for a View+applyFunc pair.
    *
    * @param[in] view The View to unbind
-   * @param[in] applyFunc The specific apply function to unbind
+   * @param[in] applyFunc Callback matching the one used in ApplyColor (ownership transferred)
    */
-  void UnregisterBinding(View view, ColorApplyFunc applyFunc);
+  void UnregisterBinding(View view, CallbackBase* applyFunc);
 
   /**
    * @brief Removes all bindings associated with a given View.
@@ -118,32 +120,33 @@ protected:
   ~UiColorManagerImpl() override;
 
 private:
-  UiColorManagerImpl(const UiColorManagerImpl&) = delete;
-  UiColorManagerImpl(UiColorManagerImpl&&) = delete;
+  UiColorManagerImpl(const UiColorManagerImpl&)            = delete;
+  UiColorManagerImpl(UiColorManagerImpl&&)                 = delete;
   UiColorManagerImpl& operator=(const UiColorManagerImpl&) = delete;
-  UiColorManagerImpl& operator=(UiColorManagerImpl&&) = delete;
+  UiColorManagerImpl& operator=(UiColorManagerImpl&&)      = delete;
 
   void OnThemeChanged();
   void RefreshBindings();
+  void RemoveBinding(View view, const CallbackBase& callback);
 
 private:
   struct BindingInfo
   {
-    ColorApplyFunc applyFunc;
-    UiColor       color;
+    std::unique_ptr<CallbackBase> applyFunc;
+    UiColor                       color;
   };
 
   struct ViewBinding
   {
-    WeakHandle<View> weakView;
+    WeakHandle<View>         weakView;
     std::vector<BindingInfo> bindings;
   };
 
   std::unordered_map<void*, ViewBinding> mBindings;
   ColorOverrideFunc                      mColorOverride{nullptr};
   SlotDelegate<UiColorManagerImpl>       mSlotDelegate{this};
-  bool mIsApplying{false};
-  bool mConnected{false};
+  bool                                   mIsApplying{false};
+  bool                                   mConnected{false};
 };
 
 } // namespace Integration

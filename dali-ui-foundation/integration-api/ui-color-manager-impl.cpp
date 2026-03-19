@@ -38,8 +38,15 @@ namespace
 struct ApplyingGuard
 {
   bool& mFlag;
-  explicit ApplyingGuard(bool& flag) : mFlag(flag) { mFlag = true; }
-  ~ApplyingGuard() { mFlag = false; }
+  explicit ApplyingGuard(bool& flag)
+  : mFlag(flag)
+  {
+    mFlag = true;
+  }
+  ~ApplyingGuard()
+  {
+    mFlag = false;
+  }
 };
 
 } // namespace
@@ -80,8 +87,10 @@ bool UiColorManagerImpl::GetColor(const std::string& colorId, Vector4& outColor)
   return GetImpl(themeManager).GetLoader().GetColor(colorId, outColor);
 }
 
-void UiColorManagerImpl::ApplyColor(const UiColor& color, View view, ColorApplyFunc applyFunc)
+void UiColorManagerImpl::ApplyColor(const UiColor& color, View view, CallbackBase* applyFunc)
 {
+  std::unique_ptr<CallbackBase> callback(applyFunc);
+
   if(mIsApplying)
   {
     return;
@@ -99,7 +108,7 @@ void UiColorManagerImpl::ApplyColor(const UiColor& color, View view, ColorApplyF
   {
     {
       ApplyingGuard guard(mIsApplying);
-      applyFunc(view, color.Resolve());
+      CallbackBase::Execute<View, const Vector4&>(*callback, view, color.Resolve());
     }
 
     // Register the binding even if the color was not found in the current theme.
@@ -113,26 +122,32 @@ void UiColorManagerImpl::ApplyColor(const UiColor& color, View view, ColorApplyF
     auto& bindings = viewBinding.bindings;
     for(auto& info : bindings)
     {
-      if(info.applyFunc == applyFunc)
+      if(*info.applyFunc == *callback)
       {
         info.color = color;
         return;
       }
     }
-    bindings.push_back({applyFunc, color});
+    bindings.push_back({std::move(callback), color});
   }
   else
   {
-    UnregisterBinding(view, applyFunc);
+    RemoveBinding(view, *callback);
 
     {
       ApplyingGuard guard(mIsApplying);
-      applyFunc(view, color.Resolve());
+      CallbackBase::Execute<View, const Vector4&>(*callback, view, color.Resolve());
     }
   }
 }
 
-void UiColorManagerImpl::UnregisterBinding(View view, ColorApplyFunc applyFunc)
+void UiColorManagerImpl::UnregisterBinding(View view, CallbackBase* applyFunc)
+{
+  std::unique_ptr<CallbackBase> callback(applyFunc);
+  RemoveBinding(view, *callback);
+}
+
+void UiColorManagerImpl::RemoveBinding(View view, const CallbackBase& callback)
 {
   void* viewPtr = static_cast<void*>(view.GetObjectPtr());
 
@@ -144,7 +159,8 @@ void UiColorManagerImpl::UnregisterBinding(View view, ColorApplyFunc applyFunc)
 
   auto& bindings = it->second.bindings;
   bindings.erase(std::remove_if(bindings.begin(), bindings.end(),
-                                [applyFunc](const BindingInfo& info) { return info.applyFunc == applyFunc; }),
+                                [&callback](const BindingInfo& info)
+  { return *info.applyFunc == callback; }),
                  bindings.end());
 
   if(bindings.empty())
@@ -190,8 +206,8 @@ void UiColorManagerImpl::RefreshBindings()
   auto it = mBindings.begin();
   while(it != mBindings.end())
   {
-    auto& viewBinding = it->second;
-    BaseHandle handle = viewBinding.weakView.GetBaseHandle();
+    auto&      viewBinding = it->second;
+    BaseHandle handle      = viewBinding.weakView.GetBaseHandle();
     if(!handle)
     {
       it = mBindings.erase(it);
@@ -201,7 +217,7 @@ void UiColorManagerImpl::RefreshBindings()
     View view = View::DownCast(handle);
     for(auto& info : viewBinding.bindings)
     {
-      info.applyFunc(view, info.color.Resolve());
+      CallbackBase::Execute<View, const Vector4&>(*info.applyFunc, view, info.color.Resolve());
     }
 
     ++it;

@@ -52,7 +52,7 @@ namespace Integration
 namespace
 {
 
-void ApplyBackgroundColor(Ui::View view, const Vector4& color)
+void ApplyBackgroundColor(View view, const Vector4& color)
 {
   view.Ui::Control::SetBackgroundColor(color);
 }
@@ -242,7 +242,7 @@ void ViewImpl::SetPivotPoint(const Vector3& point)
 
 void ViewImpl::SetBackgroundColor(const UiColor& color)
 {
-  UiColorManager::Get().ApplyColor(color, View::DownCast(Self()), ApplyBackgroundColor);
+  UiColorManager::Get().ApplyColor(color, View::DownCast(Self()), MakeCallback(ApplyBackgroundColor));
 }
 
 bool ViewImpl::IsFocusable() const

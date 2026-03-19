@@ -286,7 +286,7 @@ int UtcDaliUiColorManagerApplyColorRgbaP(void)
 
   UiColor color(1.0f, 0.0f, 0.0f, 1.0f);
   gApplyCallCount = 0;
-  manager.ApplyColor(color, view, TestApplyFunc);
+  manager.ApplyColor(color, view, MakeCallback(TestApplyFunc));
 
   DALI_TEST_EQUALS(gApplyCallCount, 1, TEST_LOCATION);
   DALI_TEST_EQUALS(gLastAppliedColor, Vector4(1.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION);
@@ -303,7 +303,7 @@ int UtcDaliUiColorManagerApplyColorTokenP(void)
 
   UiColor color(std::string("Primary"));
   gApplyCallCount = 0;
-  manager.ApplyColor(color, view, TestApplyFunc);
+  manager.ApplyColor(color, view, MakeCallback(TestApplyFunc));
 
   DALI_TEST_EQUALS(gApplyCallCount, 1, TEST_LOCATION);
   DALI_TEST_CHECK(gLastAppliedColor != Vector4::ZERO);
@@ -321,9 +321,9 @@ int UtcDaliUiColorManagerUnregisterBindingP(void)
   View view = View::New();
 
   UiColor color(std::string("Primary"));
-  manager.ApplyColor(color, view, TestApplyFunc);
+  manager.ApplyColor(color, view, MakeCallback(TestApplyFunc));
 
-  manager.UnregisterBinding(view, TestApplyFunc);
+  manager.UnregisterBinding(view, MakeCallback(TestApplyFunc));
 
   // Should not throw
   DALI_TEST_CHECK(true);
@@ -343,8 +343,8 @@ int UtcDaliUiColorManagerUnregisterBindingsP(void)
   UiColor color1(std::string("Primary"));
   UiColor color2(std::string("Background"));
 
-  manager.ApplyColor(color1, view, TestApplyFunc);
-  manager.ApplyColor(color2, view, TestApplyFunc2);
+  manager.ApplyColor(color1, view, MakeCallback(TestApplyFunc));
+  manager.ApplyColor(color2, view, MakeCallback(TestApplyFunc2));
 
   // Remove all bindings for this view
   manager.UnregisterBindings(view);
@@ -442,7 +442,7 @@ int UtcDaliUiColorManagerSetColorOverrideRefreshP(void)
   // Bind view to "Primary" token color
   UiColor color(std::string("Primary"));
   gApplyCallCount = 0;
-  manager.ApplyColor(color, view, TestApplyFunc);
+  manager.ApplyColor(color, view, MakeCallback(TestApplyFunc));
   DALI_TEST_EQUALS(gApplyCallCount, 1, TEST_LOCATION);
 
   // Set override → should immediately refresh and call apply func again
