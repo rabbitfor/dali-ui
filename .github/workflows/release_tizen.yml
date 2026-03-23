@@ -10,6 +10,10 @@ on:
       dali_version:
         description: 'Dali version (e.g. 2.0)'
         required: true
+      destination_branch:
+        description: 'Destination branch'
+        required: true
+        default: 'tizen'
 
 jobs:
   deploy:
@@ -73,11 +77,11 @@ jobs:
         git commit -m "Release $VERSION"
         git push
 
-        # Sync to tizen branch
-        git checkout -B tizen
+        # Sync to destination branch
+        git checkout -B ${{ github.event.inputs.destination_branch }}
         git merge ${{ github.event.inputs.source_branch }}
         git tag -fa "v$VERSION" -m "Release $VERSION"
-        git push origin tizen --follow-tags
+        git push origin ${{ github.event.inputs.destination_branch }} --follow-tags
         echo v${{ steps.version.outputs.version }} >> $GITHUB_STEP_SUMMARY
 
     - name: Create Release
