@@ -7,6 +7,9 @@ on:
         description: 'Source branch'
         required: true
         default: 'devel'
+      dali_version:
+        description: 'Dali version (e.g. 2.0)'
+        required: true
 
 jobs:
   deploy:
@@ -38,8 +41,7 @@ jobs:
       id: version
       shell: bash
       run: |
-        source ./packaging/version.txt
-        VERSION=$RPM_VERSION.$((10000+$(git rev-list --count HEAD)))
+        VERSION=${{ github.event.inputs.dali_version }}.$((10000+$(git rev-list --count HEAD)))
         echo VERSION=$VERSION
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         ./packaging/makespec.sh -r $VERSION
