@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="370" font-family="sans-serif" font-size="13">
+  <rect width="480" height="370" fill="#f8f9fa" rx="8"/>
+
+  <!-- Title -->
+  <text x="240" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">dali-ui Library Structure</text>
+
+  <!-- Layer: Application -->
+  <rect x="60" y="44" width="360" height="48" rx="6" fill="#d6eaf8" stroke="#85c1e9" stroke-width="1.5"/>
+  <text x="240" y="74" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">Application</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="92" x2="240" y2="106" stroke="#aaa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Layer: dali-ui-components -->
+  <rect x="60" y="108" width="360" height="48" rx="6" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+  <text x="240" y="130" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5276">dali-ui-components</text>
+  <text x="240" y="147" text-anchor="middle" font-size="11" fill="#2471a3">UI Components</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="156" x2="240" y2="170" stroke="#aaa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Layer: dali-ui-foundation -->
+  <rect x="60" y="172" width="360" height="48" rx="6" fill="#aed6f1" stroke="#5dade2" stroke-width="1.5"/>
+  <text x="240" y="194" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5276">dali-ui-foundation</text>
+  <text x="240" y="211" text-anchor="middle" font-size="11" fill="#2471a3">UI Foundation</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="220" x2="240" y2="234" stroke="#aaa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Layer: DALi (dali-core + dali-adaptor grouped) -->
+  <rect x="60" y="236" width="360" height="68" rx="6" fill="#e8f8f5" stroke="#76d7c4" stroke-width="1.5"/>
+  <text x="240" y="256" text-anchor="middle" font-size="11" fill="#1a7a64">DALi</text>
+  <rect x="80" y="262" width="148" height="30" rx="4" fill="#a9dfbf" stroke="#52be80" stroke-width="1.2"/>
+  <text x="154" y="282" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a5e37">dali-core</text>
+  <rect x="252" y="262" width="148" height="30" rx="4" fill="#a9dfbf" stroke="#52be80" stroke-width="1.2"/>
+  <text x="326" y="282" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a5e37">dali-adaptor</text>
+
+  <!-- Arrow -->
+  <line x1="240" y1="304" x2="240" y2="318" stroke="#aaa" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Layer: Platform -->
+  <rect x="60" y="320" width="360" height="36" rx="6" fill="#d5d8dc" stroke="#aab" stroke-width="1"/>
+  <text x="240" y="343" text-anchor="middle" font-size="13" font-weight="bold" fill="#555">Platform</text>
+
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#aaa"/>
+    </marker>
+  </defs>
+</svg>

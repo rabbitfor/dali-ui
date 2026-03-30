@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="420" font-family="monospace, sans-serif" font-size="12">
+  <rect width="700" height="420" fill="#f8f9fa" rx="8"/>
+
+  <!-- Title -->
+  <text x="350" y="26" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">View Handle / Impl Class Diagram</text>
+
+  <!-- ══ Left column header ══ -->
+  <text x="175" y="52" text-anchor="middle" font-size="11" fill="#888">public-api  (Handle)</text>
+  <!-- ══ Right column header ══ -->
+  <text x="525" y="52" text-anchor="middle" font-size="11" fill="#888">integration-api  (Implementation)</text>
+
+  <!-- dividing line -->
+  <line x1="350" y1="40" x2="350" y2="410" stroke="#ddd" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- ────────────────────────────────────────
+       DALi base classes (grayed out)
+       ──────────────────────────────────────── -->
+  <!-- CustomActor -->
+  <rect x="90" y="62" width="170" height="36" rx="4" fill="#e8e8e8" stroke="#bbb" stroke-width="1"/>
+  <text x="175" y="76" text-anchor="middle" font-size="11" font-style="italic" fill="#777">Dali::CustomActor</text>
+  <text x="175" y="91" text-anchor="middle" font-size="10" fill="#999">(DALi)</text>
+
+  <!-- CustomActorImpl -->
+  <rect x="440" y="62" width="170" height="36" rx="4" fill="#e8e8e8" stroke="#bbb" stroke-width="1"/>
+  <text x="525" y="76" text-anchor="middle" font-size="11" font-style="italic" fill="#777">Dali::CustomActorImpl</text>
+  <text x="525" y="91" text-anchor="middle" font-size="10" fill="#999">(DALi)</text>
+
+  <!-- ────────────────────────────────────────
+       View / ViewImpl
+       ──────────────────────────────────────── -->
+  <!-- View box -->
+  <rect x="75" y="148" width="200" height="76" rx="5" fill="#d6eaf8" stroke="#5dade2" stroke-width="1.5"/>
+  <text x="175" y="166" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5276">View</text>
+  <line x1="75" y1="172" x2="275" y2="172" stroke="#5dade2" stroke-width="1"/>
+  <text x="90" y="186" font-size="10" fill="#2471a3">+ New() : View</text>
+  <text x="90" y="200" font-size="10" fill="#2471a3">+ DownCast(handle) : View</text>
+  <text x="90" y="214" font-size="10" fill="#2471a3">+ GetState() : UiState</text>
+
+  <!-- ViewImpl box -->
+  <rect x="425" y="148" width="200" height="76" rx="5" fill="#d5f5e3" stroke="#52be80" stroke-width="1.5"/>
+  <text x="525" y="166" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5e37">ViewImpl</text>
+  <line x1="425" y1="172" x2="625" y2="172" stroke="#52be80" stroke-width="1"/>
+  <text x="440" y="186" font-size="10" fill="#1a5e37">+ New() : ViewImplPtr*</text>
+  <text x="440" y="200" font-size="10" fill="#1a5e37">+ OnMeasure() [virtual]</text>
+  <text x="440" y="214" font-size="10" fill="#1a5e37">+ OnArrange() [virtual]</text>
+
+  <!-- ────────────────────────────────────────
+       Label / LabelImpl
+       ──────────────────────────────────────── -->
+  <!-- Label box -->
+  <rect x="75" y="310" width="200" height="60" rx="5" fill="#aed6f1" stroke="#2980b9" stroke-width="1.5"/>
+  <text x="175" y="328" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5276">Label</text>
+  <line x1="75" y1="334" x2="275" y2="334" stroke="#2980b9" stroke-width="1"/>
+  <text x="90" y="348" font-size="10" fill="#1a5276">+ New() : Label</text>
+  <text x="90" y="362" font-size="10" fill="#1a5276">+ SetText(text)</text>
+
+  <!-- LabelImpl box -->
+  <rect x="425" y="310" width="200" height="60" rx="5" fill="#a9dfbf" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="525" y="328" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a5e37">LabelImpl</text>
+  <line x1="425" y1="334" x2="625" y2="334" stroke="#27ae60" stroke-width="1"/>
+  <text x="440" y="348" font-size="10" fill="#1a5e37">+ OnMeasure() override</text>
+  <text x="440" y="362" font-size="10" fill="#1a5e37">+ OnArrange() override</text>
+
+  <!-- ════ Inheritance arrows (open triangle) ════ -->
+  <!-- View → CustomActor (View inherits CustomActor, arrowhead at parent) -->
+  <line x1="175" y1="148" x2="175" y2="98" stroke="#888" stroke-width="1.5"/>
+  <polygon points="175,98 169,110 181,110" fill="none" stroke="#888" stroke-width="1.5"/>
+
+  <!-- ViewImpl → CustomActorImpl -->
+  <line x1="525" y1="148" x2="525" y2="98" stroke="#888" stroke-width="1.5"/>
+  <polygon points="525,98 519,110 531,110" fill="none" stroke="#888" stroke-width="1.5"/>
+
+  <!-- Label → View (Label inherits View, arrowhead at parent) -->
+  <line x1="175" y1="310" x2="175" y2="224" stroke="#888" stroke-width="1.5"/>
+  <polygon points="175,224 169,236 181,236" fill="none" stroke="#888" stroke-width="1.5"/>
+
+  <!-- LabelImpl → ViewImpl -->
+  <line x1="525" y1="310" x2="525" y2="224" stroke="#888" stroke-width="1.5"/>
+  <polygon points="525,224 519,236 531,236" fill="none" stroke="#888" stroke-width="1.5"/>
+
+  <!-- ════ Handle→Impl reference (dashed arrow) ════ -->
+  <!-- View ──► ViewImpl -->
+  <line x1="275" y1="186" x2="425" y2="186" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ref)"/>
+  <text x="350" y="180" text-anchor="middle" font-size="10" fill="#e67e22">ref-count</text>
+
+  <!-- Label ──► LabelImpl -->
+  <line x1="275" y1="340" x2="425" y2="340" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ref)"/>
+
+  <!-- ════ GetImpl() helper ════ -->
+  <rect x="278" y="198" width="144" height="22" rx="3" fill="#fef9e7" stroke="#f0d060" stroke-width="1"/>
+  <text x="350" y="213" text-anchor="middle" font-size="10" fill="#7d6608">GetImpl(View&amp;) &#x2192; ViewImpl&amp;</text>
+
+  <!-- Legend -->
+  <rect x="30" y="388" width="640" height="22" rx="3" fill="#fff" stroke="#ddd" stroke-width="1"/>
+  <line x1="68" y1="399" x2="44" y2="399" stroke="#888" stroke-width="1.5"/>
+  <polygon points="44,399 56,395 56,403" fill="none" stroke="#888" stroke-width="1.5"/>
+  <text x="74" y="403" font-size="10" fill="#555">inheritance</text>
+  <line x1="160" y1="399" x2="184" y2="399" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ref)"/>
+  <text x="190" y="403" font-size="10" fill="#555">ref-count (handle holds impl)</text>
+  <text x="430" y="403" font-size="10" fill="#aaa">namespace: Dali::Ui / Dali::Ui::Integration</text>
+
+  <defs>
+    <marker id="ref" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#e67e22"/>
+    </marker>
+  </defs>
+</svg>
