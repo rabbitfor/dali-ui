@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="320" font-family="monospace, sans-serif">
+  <rect width="620" height="320" fill="#f8f9fa" rx="8"/>
+
+  <text x="310" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">FlexLayout</text>
+
+  <!-- ── Row, JustifyContent: SPACE_BETWEEN ── -->
+  <text x="50" y="58" font-size="12" fill="#555">Direction: ROW  /  JustifyContent: SPACE_BETWEEN  /  AlignItems: CENTER</text>
+
+  <rect x="40" y="68" width="540" height="80" rx="4" fill="#fff" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <rect x="56"  y="82" width="80"  height="52" rx="4" fill="#4C9BE8" opacity="0.9"/>
+  <text x="96"  y="113" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item A</text>
+
+  <rect x="270" y="90" width="80" height="36" rx="4" fill="#56C271" opacity="0.9"/>
+  <text x="310" y="113" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item B</text>
+
+  <rect x="484" y="78" width="80" height="60" rx="4" fill="#E8854C" opacity="0.9"/>
+  <text x="524" y="113" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item C</text>
+
+  <!-- space arrows -->
+  <line x1="138" y1="108" x2="268" y2="108" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="203" y="102" text-anchor="middle" font-size="10" fill="#aaa">space</text>
+  <line x1="352" y1="108" x2="482" y2="108" stroke="#aaa" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="417" y="102" text-anchor="middle" font-size="10" fill="#aaa">space</text>
+
+  <!-- ── Row, Wrap: WRAP ── -->
+  <text x="50" y="175" font-size="12" fill="#555">Direction: ROW  /  Wrap: WRAP  /  JustifyContent: FLEX_START</text>
+
+  <rect x="40" y="185" width="540" height="118" rx="4" fill="#fff" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,3"/>
+
+  <!-- line 1 -->
+  <rect x="54"  y="197" width="90"  height="44" rx="4" fill="#4C9BE8" opacity="0.9"/>
+  <text x="99"  y="224" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item A</text>
+
+  <rect x="152" y="197" width="130" height="44" rx="4" fill="#56C271" opacity="0.9"/>
+  <text x="217" y="224" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item B</text>
+
+  <rect x="290" y="197" width="100" height="44" rx="4" fill="#E8854C" opacity="0.9"/>
+  <text x="340" y="224" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item C</text>
+
+  <rect x="398" y="197" width="172" height="44" rx="4" fill="#9B7FE8" opacity="0.9"/>
+  <text x="484" y="224" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item D</text>
+
+  <!-- wrap line -->
+  <line x1="40" y1="249" x2="580" y2="249" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="590" y="253" font-size="10" fill="#aaa">↵</text>
+
+  <!-- line 2 -->
+  <rect x="54"  y="253" width="120" height="40" rx="4" fill="#E8C44C" opacity="0.9"/>
+  <text x="114" y="278" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Item E</text>
+
+  <!-- FlexLayoutParams box -->
+  <rect x="40" y="312" width="540" height="0" rx="4" fill="#f0f4ff"/>
+</svg>
