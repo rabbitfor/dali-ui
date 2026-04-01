@@ -150,6 +150,39 @@
   */ \
   ChildClass& SetEnabled(bool enabled) { View::SetEnabled(enabled); return *this; } \
   /** \
+  * @brief Sets a uniform corner radius for all four corners. \
+  * \
+  * @param[in] radius The corner radius to apply to all corners \
+  */ \
+  ChildClass& SetCornerRadius(float radius) { View::SetCornerRadius(radius); return *this; } \
+  /** \
+  * @brief Sets individual corner radii for all four corners. \
+  * \
+  * @param[in] topLeft     The radius for the top-left corner \
+  * @param[in] topRight    The radius for the top-right corner \
+  * @param[in] bottomRight The radius for the bottom-right corner \
+  * @param[in] bottomLeft  The radius for the bottom-left corner \
+  */ \
+  ChildClass& SetCornerRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) { View::SetCornerRadius(topLeft, topRight, bottomRight, bottomLeft); return *this; } \
+  /** \
+  * @brief Sets corner radii from a Vector4. \
+  * \
+  * @param[in] radius Corner radii as Vector4 (x=topLeft, y=topRight, z=bottomRight, w=bottomLeft) \
+  */ \
+  ChildClass& SetCornerRadius(const Vector4& radius) { View::SetCornerRadius(radius); return *this; } \
+  /** \
+  * @brief Sets the corner radius policy. \
+  * \
+  * @param[in] policy ABSOLUTE for world-unit values (default), RELATIVE for percentage [0.0, 0.5] of the shorter side \
+  */ \
+  ChildClass& SetCornerRadiusPolicy(CornerRadiusPolicy policy) { View::SetCornerRadiusPolicy(policy); return *this; } \
+  /** \
+  * @brief Shortcut to set the corner radius policy to RELATIVE. \
+  * \
+  * Equivalent to SetCornerRadiusPolicy(CornerRadiusPolicy::RELATIVE). \
+  */ \
+  ChildClass& SetCornerRadiusPolicyRelative() { View::SetCornerRadiusPolicyRelative(); return *this; } \
+  /** \
   * @brief Attaches the interaction trait to this View and optionally configures it. \
   * \
   * A View can have at most one interaction trait for its lifetime; attaching interactive \
