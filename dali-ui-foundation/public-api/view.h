@@ -671,7 +671,23 @@ public: // Properties
 
   // @CHAIN_MANUAL
   /**
-   * @brief Attaches the interaction trait to this View and optionally configures it.
+   * @brief Attaches the interaction trait to this View.
+   *
+   * A View can have at most one interaction trait for its lifetime; attaching interactive
+   * succeeds only if no other interaction trait is set. If the View already has an
+   * InteractiveTrait (e.g. from a previous AsInteractive call), the existing trait is reused.
+   *
+   * @return Reference to this View for fluent chaining
+   */
+  View& AsInteractive()
+  {
+    EnsureInteractiveTrait();
+    return *this;
+  }
+
+  // @CHAIN_MANUAL
+  /**
+   * @brief Attaches the interaction trait to this View and configures it.
    *
    * A View can have at most one interaction trait for its lifetime; attaching interactive
    * succeeds only if no other interaction trait is set. If the View already has an
@@ -681,14 +697,14 @@ public: // Properties
    * The callback is invoked in the caller's translation unit, so no std::function
    * crosses the library ABI boundary; this preserves ABI stability across toolchains.
    *
-   * @param[in] configure Optional callback to configure the InteractiveTrait (e.g. connect signals).
-   *                     Can be null or omitted to only attach the trait.
+   * @param[in] configure Callback to configure the InteractiveTrait (e.g. connect signals).
    * @return Reference to this View for fluent chaining
    */
-  View& AsInteractive(std::function<void(InteractiveTrait&)> configure = nullptr)
+  template<typename F>
+  View& AsInteractive(F&& configure)
   {
     InteractiveTrait trait = EnsureInteractiveTrait();
-    if(configure && trait)
+    if(trait)
     {
       configure(trait);
     }
@@ -697,20 +713,35 @@ public: // Properties
 
   // @CHAIN_MANUAL
   /**
-   * @brief Attaches the selectable trait to this View and optionally configures it.
+   * @brief Attaches the selectable trait to this View.
+   *
+   * A View can have at most one selectable trait. If the View already has a
+   * SelectableTrait (e.g. from a previous AsSelectable call), the existing trait is reused.
+   *
+   * @return Reference to this View for fluent chaining
+   */
+  View& AsSelectable()
+  {
+    EnsureSelectableTrait();
+    return *this;
+  }
+
+  // @CHAIN_MANUAL
+  /**
+   * @brief Attaches the selectable trait to this View and configures it.
    *
    * A View can have at most one selectable trait. If the View already has a
    * SelectableTrait (e.g. from a previous AsSelectable call), the existing trait is
    * used and the configure callback is invoked with it.
    *
-   * @param[in] configure Optional callback to configure the SelectableTrait (e.g. connect signals).
-   *                     Can be null or omitted to only attach the trait.
+   * @param[in] configure Callback to configure the SelectableTrait (e.g. connect signals).
    * @return Reference to this View for fluent chaining
    */
-  View& AsSelectable(std::function<void(SelectableTrait&)> configure = nullptr)
+  template<typename F>
+  View& AsSelectable(F&& configure)
   {
     SelectableTrait trait = EnsureSelectableTrait();
-    if(configure && trait)
+    if(trait)
     {
       configure(trait);
     }
@@ -729,19 +760,40 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_FUNCTOR
+  // @CHAIN_MANUAL_SELF
   /**
    * @brief Executes a custom action on this View instance.
-   * Use this method to perform additional initialization or logic on a View
-   * without breaking the declarative method chaining.
-   * @param[in] action A function or lambda to be executed with this instance.
+   *
+   * Useful for performing additional setup (e.g. signal connections,
+   * predefined style application) without breaking the method chain.
+   *
+   * @param[in] action A callable (lambda or free function) invoked with
+   *                   a reference to this instance.
+   * @return Reference to this View for fluent chaining.
+   *
+   * @note Each subclass overrides With() so that @a action receives the
+   * concrete subclass type, not View. The lambda or function parameter
+   * type must be compatible with the actual constructed type.
+   *
+   * @code
+   *   // Lambda receives Label& — can call Label-specific methods
+   *   Label::New()
+   *     .SetText("Hello")
+   *     .With([](Label& l) { l.SetFontSize(20); });
+   *
+   *   // Free function style
+   *   void ApplyStyle(Label& l) { l.SetFontFamily("Sans"); }
+   *   Label::New().With(ApplyStyle);
+   *
+   *   // Compile error: action must accept Label& (or a compatible base),
+   *   // not an unrelated type
+   *   Label::New().With([](Button& b) { });
+   * @endcode
    */
-  View& With(std::function<void(View&)> action)
+  template<typename F>
+  View& With(F&& action)
   {
-    if(action)
-    {
-      action(*this);
-    }
+    action(*this);
     return *this;
   }
 

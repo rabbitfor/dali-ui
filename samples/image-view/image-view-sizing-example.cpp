@@ -250,7 +250,7 @@ private:
     mSynchronousSizing      = !mSynchronousSizing;
     mSyncResourceReadyCount = 0;
     mSyncImage.SetSynchronousSizing(mSynchronousSizing);
-    Label::DownCast(mSyncSizeLabel).SetText(mSynchronousSizing ? "SYNC_SIZE: ON" : "SYNC_SIZE: OFF");
+    mSyncSizeLabel.SetText(mSynchronousSizing ? "SYNC_SIZE: ON" : "SYNC_SIZE: OFF");
     mSyncSizeInfoLabel.SetText(MakeSyncSizeInfoText());
     DALI_LOG_RELEASE_INFO("[SyncSizing] SynchronousSizing toggled → %s\n", mSynchronousSizing ? "ON" : "OFF");
   }
@@ -284,7 +284,7 @@ private:
     mOrientationCorrection = !mOrientationCorrection;
     mOrientationImage.SetOrientationCorrection(mOrientationCorrection);
     mOrientationImage.Reload();
-    Label::DownCast(mOrientationLabel).SetText(mOrientationCorrection ? "ORIENTATION CORRECTION: ON" : "ORIENTATION CORRECTION: OFF");
+    mOrientationLabel.SetText(mOrientationCorrection ? "ORIENTATION CORRECTION: ON" : "ORIENTATION CORRECTION: OFF");
     mOrientationInfoLabel.SetText(MakeOrientationInfoText());
     DALI_LOG_RELEASE_INFO("[Sizing] OrientationCorrection=%d\n", mOrientationCorrection);
   }
@@ -321,8 +321,8 @@ private:
   Ui::ImageView mOrientationImage;
   Label         mSyncSizeInfoLabel;
   Label         mOrientationInfoLabel;
-  View          mSyncSizeLabel;
-  View          mOrientationLabel;
+  Label         mSyncSizeLabel;
+  Label         mOrientationLabel;
   bool          mSynchronousSizing;
   bool          mOrientationCorrection;
   int           mSyncResourceReadyCount;
