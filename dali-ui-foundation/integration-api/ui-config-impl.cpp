@@ -28,6 +28,7 @@
 #include <dali-ui-foundation/integration-api/default-theme-loader.h>
 #include <dali-ui-foundation/integration-api/ui-config-impl.h>
 #include <dali-ui-foundation/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-ui-foundation/public-api/interaction-effects/dim-effect.h>
 
 namespace
 {
@@ -53,7 +54,8 @@ namespace Integration
 {
 
 UiConfigImpl::UiConfigImpl()
-: mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
+: mDefaultInteractionEffect(DimEffect::Default()),
+  mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
   mDefaultTextColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f)),
   mScalingFactor(1.0f),
   mDefaultFontSize(16.0f),
@@ -237,6 +239,17 @@ void UiConfigImpl::SetDefaultTextColor(const Vector4& color)
 Vector4 UiConfigImpl::GetDefaultTextColor() const
 {
   return mDefaultTextColor;
+}
+
+void UiConfigImpl::SetDefaultInteractionEffect(Trait effect)
+{
+  DALI_ASSERT_ALWAYS(!mFrozen && "UiConfig is frozen after UiConfig::Apply()");
+  mDefaultInteractionEffect = effect;
+}
+
+Trait UiConfigImpl::GetDefaultInteractionEffect() const
+{
+  return mDefaultInteractionEffect;
 }
 
 void UiConfigImpl::OnApplied()

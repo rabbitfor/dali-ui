@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <dali-ui-foundation/public-api/key-click-policy.h>
+#include <dali-ui-foundation/public-api/trait.h>
 
 namespace Dali
 {
@@ -383,6 +384,26 @@ public: // Properties
    * @return The default text color
    */
   Vector4 GetDefaultTextColor() const;
+
+  /**
+   * @brief Sets the default interaction effect applied to views when AsInteractive() is called.
+   *
+   * The framework default is DimEffect::Default(). Pass Trait{} to disable the default effect
+   * globally (interactive views will have no visual feedback unless SetInteractionEffect() is
+   * called on each view explicitly).
+   *
+   * @pre The config must not be frozen.
+   * @param[in] effect A Trait implementing IInteractionEffect, or Trait{} to disable the default
+   * @return Reference to this for method chaining
+   */
+  UiConfig& SetDefaultInteractionEffect(Trait effect);
+
+  /**
+   * @brief Returns the default interaction effect.
+   *
+   * @return The default interaction effect handle, or an uninitialized Trait if none is set
+   */
+  Trait GetDefaultInteractionEffect() const;
 
   // @CHAIN_END
 

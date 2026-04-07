@@ -282,12 +282,38 @@ Ui::InteractiveTrait ViewImpl::EnsureInteractiveTrait()
   {
     Ui::InteractiveTrait interaction = Ui::InteractiveTrait::New();
     SetTrait(interactiveTraitId, interaction);
+
+    // Apply interaction effect only if the user has not already set one explicitly.
+    const TraitId effectId(ReservedTraitId::INTERACTION_EFFECT);
+    if(!GetTrait(effectId))
+    {
+      Trait defaultEffect = UiConfigManager::Get().GetDefaultInteractionEffect();
+      if(defaultEffect)
+      {
+        SetTrait(effectId, defaultEffect);
+      }
+    }
+
     return interaction;
   }
 
   Ui::InteractiveTrait interaction = Ui::InteractiveTrait::DownCast(existing);
   DALI_ASSERT_ALWAYS(interaction && "View already has a different interaction trait; cannot attach InteractiveTrait");
   return interaction;
+}
+
+void ViewImpl::SetInteractionEffect(Trait effect)
+{
+  // Delegates to the trait slot — OnAttached/OnDetached on DimEffectImpl handle lifecycle.
+  const TraitId effectId(ReservedTraitId::INTERACTION_EFFECT);
+  if(effect)
+  {
+    SetTrait(effectId, effect);
+  }
+  else
+  {
+    RemoveTrait(effectId);
+  }
 }
 
 bool ViewImpl::IsInteractive() const
