@@ -44,7 +44,7 @@ using InteractiveViewImplPtr = IntrusivePtr<InteractiveViewImpl>;
  *
  * @see Dali::Ui::InteractiveView
  */
-class DALI_UI_API InteractiveViewImpl : public ViewImpl, public IInteractiveEventReceiver
+class DALI_UI_API InteractiveViewImpl : public ViewImpl, public InteractiveEventReceiverInterface
 {
 public:
   /**
@@ -83,7 +83,7 @@ protected:
    */
   ~InteractiveViewImpl() override;
 
-  // --- IInteractiveEventReceiver ---
+  // --- InteractiveEventReceiverInterface ---
 
   /**
    * @brief Called when the view is clicked.
