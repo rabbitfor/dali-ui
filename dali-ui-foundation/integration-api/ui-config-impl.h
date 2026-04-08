@@ -313,7 +313,7 @@ private:
 private:
   Dali::String mBrokenImageUrls[3]{}; ///< Broken image URLs for SMALL, NORMAL, LARGE
 
-  Trait                 mDefaultInteractionEffect; ///< Default effect for interactive views (DimEffect::Default() if not overridden)
+  Trait                 mDefaultInteractionEffect; ///< Default effect for interactive views (ScaleEffect::Default() if not overridden)
   ExecutionKeyPredicate mExecutionKeyPredicate;
   Vector4               mDefaultTextColor;
   float                 mScalingFactor;

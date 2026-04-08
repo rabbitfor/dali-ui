@@ -275,22 +275,20 @@ ViewImpl::StateChangedSignalType& ViewImpl::StateChangedSignal()
 
 Ui::InteractiveTrait ViewImpl::EnsureInteractiveTrait()
 {
-  const TraitId interactiveTraitId(ReservedTraitId::INTERACTION_TRAIT);
-  Trait         existing = GetTrait(interactiveTraitId);
+  Trait existing = GetTrait(ReservedTraitId::INTERACTION_TRAIT);
 
   if(!existing)
   {
     Ui::InteractiveTrait interaction = Ui::InteractiveTrait::New();
-    SetTrait(interactiveTraitId, interaction);
+    SetTrait(ReservedTraitId::INTERACTION_TRAIT, interaction);
 
     // Apply interaction effect only if the user has not already set one explicitly.
-    const TraitId effectId(ReservedTraitId::INTERACTION_EFFECT);
-    if(!GetTrait(effectId))
+    if(!GetTrait(ReservedTraitId::INTERACTION_EFFECT))
     {
       Trait defaultEffect = UiConfigManager::Get().GetDefaultInteractionEffect();
       if(defaultEffect)
       {
-        SetTrait(effectId, defaultEffect);
+        SetTrait(ReservedTraitId::INTERACTION_EFFECT, defaultEffect);
       }
     }
 
@@ -304,32 +302,29 @@ Ui::InteractiveTrait ViewImpl::EnsureInteractiveTrait()
 
 void ViewImpl::SetInteractionEffect(Trait effect)
 {
-  // Delegates to the trait slot — OnAttached/OnDetached on DimEffectImpl handle lifecycle.
-  const TraitId effectId(ReservedTraitId::INTERACTION_EFFECT);
   if(effect)
   {
-    SetTrait(effectId, effect);
+    SetTrait(ReservedTraitId::INTERACTION_EFFECT, effect);
   }
   else
   {
-    RemoveTrait(effectId);
+    RemoveTrait(ReservedTraitId::INTERACTION_EFFECT);
   }
 }
 
 bool ViewImpl::IsInteractive() const
 {
-  return !!GetTrait(TraitId(ReservedTraitId::INTERACTION_TRAIT));
+  return !!GetTrait(ReservedTraitId::INTERACTION_TRAIT);
 }
 
 Ui::SelectableTrait ViewImpl::EnsureSelectableTrait()
 {
-  const TraitId selectableTraitId(ReservedTraitId::SELECTABLE_TRAIT);
-  Trait         existing = GetTrait(selectableTraitId);
+  Trait existing = GetTrait(ReservedTraitId::SELECTABLE_TRAIT);
 
   if(!existing)
   {
     Ui::SelectableTrait selectable = Ui::SelectableTrait::New();
-    SetTrait(selectableTraitId, selectable);
+    SetTrait(ReservedTraitId::SELECTABLE_TRAIT, selectable);
     return selectable;
   }
 
@@ -340,18 +335,17 @@ Ui::SelectableTrait ViewImpl::EnsureSelectableTrait()
 
 bool ViewImpl::IsSelectable() const
 {
-  return !!GetTrait(TraitId(ReservedTraitId::SELECTABLE_TRAIT));
+  return !!GetTrait(ReservedTraitId::SELECTABLE_TRAIT);
 }
 
 void ViewImpl::SetNamedStateHandler(const Dali::String& id, Dali::ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
-  const TraitId stateHandlerTraitId(ReservedTraitId::STATE_HANDLER_TRAIT);
-  Trait         existing = GetTrait(stateHandlerTraitId);
+  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
 
   if(!existing)
   {
     Internal::StateHandlerTrait stateHandlerTrait = Internal::StateHandlerTrait::New();
-    SetTrait(stateHandlerTraitId, stateHandlerTrait);
+    SetTrait(ReservedTraitId::STATE_HANDLER_TRAIT, stateHandlerTrait);
     existing = stateHandlerTrait;
   }
 
@@ -360,7 +354,7 @@ void ViewImpl::SetNamedStateHandler(const Dali::String& id, Dali::ConnectionTrac
 
 bool ViewImpl::UnsetStateHandler(const Dali::String& id)
 {
-  Trait existing = GetTrait(TraitId(ReservedTraitId::STATE_HANDLER_TRAIT));
+  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
   if(!existing)
   {
     return false;
@@ -371,7 +365,7 @@ bool ViewImpl::UnsetStateHandler(const Dali::String& id)
 
 bool ViewImpl::UnsetStateHandlerWhenNotProcessing(const Dali::String& id)
 {
-  Trait existing = GetTrait(TraitId(ReservedTraitId::STATE_HANDLER_TRAIT));
+  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
   if(!existing)
   {
     return false;
@@ -1285,16 +1279,16 @@ TraitId ToTraitId(LayoutParamsType type)
   switch(type)
   {
     case LayoutParamsType::ABSOLUTE:
-      return TraitId(ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS);
+      return ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
     case LayoutParamsType::STACK:
-      return TraitId(ReservedTraitId::STACK_LAYOUT_PARAMS);
+      return ReservedTraitId::STACK_LAYOUT_PARAMS;
     case LayoutParamsType::GRID:
-      return TraitId(ReservedTraitId::GRID_LAYOUT_PARAMS);
+      return ReservedTraitId::GRID_LAYOUT_PARAMS;
     case LayoutParamsType::FLEX:
-      return TraitId(ReservedTraitId::FLEX_LAYOUT_PARAMS);
+      return ReservedTraitId::FLEX_LAYOUT_PARAMS;
   }
   DALI_ASSERT_ALWAYS(false && "Unknown LayoutParamsType");
-  return TraitId(ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS);
+  return ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
 }
 
 } // unnamed namespace

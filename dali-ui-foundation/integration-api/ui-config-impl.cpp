@@ -28,7 +28,7 @@
 #include <dali-ui-foundation/integration-api/default-theme-loader.h>
 #include <dali-ui-foundation/integration-api/ui-config-impl.h>
 #include <dali-ui-foundation/internal/focus-manager/keyboard-focus-manager-impl.h>
-#include <dali-ui-foundation/public-api/interaction-effects/dim-effect.h>
+#include <dali-ui-foundation/public-api/interaction-effects/scale-effect.h>
 
 namespace
 {
@@ -54,7 +54,7 @@ namespace Integration
 {
 
 UiConfigImpl::UiConfigImpl()
-: mDefaultInteractionEffect(DimEffect::Default()),
+: mDefaultInteractionEffect(ScaleEffect::Default()),
   mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
   mDefaultTextColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f)),
   mScalingFactor(1.0f),
@@ -259,8 +259,12 @@ void UiConfigImpl::OnApplied()
 void UiConfigImpl::OnApplicationCreated()
 {
   Dali::TextAbstraction::EnableDesignCompatibility();
-  auto handle = KeyboardFocusManager::Get();
-  GetImpl(handle).EnableDefaultAlgorithm(true);
+
+  auto  handle           = KeyboardFocusManager::Get();
+  auto& focusManagerImpl = GetImpl(handle);
+  focusManagerImpl.EnableDefaultAlgorithm(true);
+  focusManagerImpl.EnableFocusIndicator(false);
+
   Dali::DevelWindowSystem::SetGeometryHittestEnabled(true);
 }
 

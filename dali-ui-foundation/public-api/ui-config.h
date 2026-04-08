@@ -388,7 +388,7 @@ public: // Properties
   /**
    * @brief Sets the default interaction effect applied to views when AsInteractive() is called.
    *
-   * The framework default is DimEffect::Default(). Pass Trait{} to disable the default effect
+   * The framework default is ScaleEffect::Default(). Pass Trait{} to disable the default effect
    * globally (interactive views will have no visual feedback unless SetInteractionEffect() is
    * called on each view explicitly).
    *
