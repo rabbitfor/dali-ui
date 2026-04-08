@@ -34,6 +34,7 @@ namespace Integration
 class StackLayoutImpl;
 }
 
+#include "stack-layout.macro.autogen.h"
 /**
  * @brief StackLayout arranges its children in a single row or column.
  *
@@ -62,6 +63,7 @@ class StackLayoutImpl;
 class DALI_UI_API StackLayout : public Layout
 {
 public:
+  // @CHAIN_CLASS(StackLayout, Layout)
   /**
    * @brief Creates an uninitialized StackLayout handle.
    */
@@ -148,8 +150,6 @@ public: // API
   float GetSpacing() const;
 
 public: // Chaining methods
-  DALI_UI_CHAIN_LAYOUT_METHODS(StackLayout)
-
   /**
    * @brief Sets the orientation (chaining).
    */
@@ -184,6 +184,9 @@ public: // Not intended for application developers
    */
   explicit DALI_INTERNAL StackLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
+
+public:
+#include "stack-layout.autogen.h"
 };
 
 } // namespace Ui

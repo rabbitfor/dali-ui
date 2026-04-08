@@ -36,7 +36,7 @@ namespace Integration
 class ScrollViewImpl;
 }
 
-#include "scroll-view.autogen.h"
+#include "scroll-view.macro.autogen.h"
 /**
  * @brief ScrollView is a scrollable container that displays content larger than its viewport.
  *
@@ -121,7 +121,8 @@ public: // Static Methods
   static ScrollView DownCast(BaseHandle handle);
 
 public: // Setters for chaining
-  // @CHAIN_START(ScrollView, View)
+  // @CHAIN_CLASS(ScrollView, View)
+  // @CHAIN
   /**
    * @brief Sets the content view to be scrolled.
    *
@@ -136,6 +137,7 @@ public: // Setters for chaining
    */
   View GetContent() const;
 
+  // @CHAIN
   /**
    * @brief Sets the scroll position.
    *
@@ -150,6 +152,7 @@ public: // Setters for chaining
    */
   Vector2 GetScrollPosition() const;
 
+  // @CHAIN
   /**
    * @brief Sets the direction of the scroll.
    *
@@ -164,6 +167,7 @@ public: // Setters for chaining
    */
   ScrollDirection GetScrollDirection() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum distance by fling action.
    *
@@ -178,6 +182,7 @@ public: // Setters for chaining
    */
   float GetMaxFlingDistance() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum duration of fling scroll animation.
    *
@@ -192,6 +197,7 @@ public: // Setters for chaining
    */
   int GetMinimumFlingDuration() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum duration of fling scroll animation.
    *
@@ -206,6 +212,7 @@ public: // Setters for chaining
    */
   int GetMaximumFlingDuration() const;
 
+  // @CHAIN
   /**
    * @brief Sets the sensitivity of fling action.
    *
@@ -220,6 +227,7 @@ public: // Setters for chaining
    */
   float GetFlingSensitivity() const;
 
+  // @CHAIN
   /**
    * @brief Sets the deceleration rate of fling.
    *
@@ -234,6 +242,7 @@ public: // Setters for chaining
    */
   float GetDecelerationRate() const;
 
+  // @CHAIN
   /**
    * @brief Sets the over scroll mode.
    *
@@ -249,6 +258,7 @@ public: // Setters for chaining
   OverScrollMode GetOverScrollMode() const;
 
 public: // Scroll Bar Visibility
+  // @CHAIN
   /**
    * @brief Sets the visibility of the vertical scroll bar.
    *
@@ -263,6 +273,7 @@ public: // Scroll Bar Visibility
    */
   ScrollBarVisibility GetVerticalScrollBarVisibility() const;
 
+  // @CHAIN
   /**
    * @brief Sets the visibility of the horizontal scroll bar.
    *
@@ -276,8 +287,6 @@ public: // Scroll Bar Visibility
    * @return The horizontal scroll bar visibility
    */
   ScrollBarVisibility GetHorizontalScrollBarVisibility() const;
-
-  // @CHAIN_END
 
 public: // Non-Chainable Methods
   /**
@@ -399,7 +408,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(ScrollView)
+#include "scroll-view.autogen.h"
 };
 
 } // namespace Ui

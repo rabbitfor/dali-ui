@@ -218,7 +218,6 @@ public: // API
     ClickedSignal().Connect(obj, func);
   }
 
-  // @CHAIN_MANUAL
   /**
    * @brief Connects a handler to PressedChangedSignal.
    *
@@ -236,7 +235,6 @@ public: // API
     PressedChangedSignal().Connect(obj, func);
   }
 
-  // @CHAIN_MANUAL
   /**
    * @brief Connects a handler to LongPressedSignal.
    *

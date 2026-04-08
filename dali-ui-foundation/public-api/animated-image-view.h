@@ -33,6 +33,7 @@ namespace Integration DALI_INTERNAL
 class AnimatedImageViewImpl;
 }
 
+#include "animated-image-view.macro.autogen.h"
 /**
  * @brief AnimatedImageView is a View for displaying animated image resources such as GIF files.
  *
@@ -47,7 +48,7 @@ class AnimatedImageViewImpl;
  */
 class DALI_UI_API AnimatedImageView : public View
 {
-public:
+  // @CHAIN_CLASS(AnimatedImageView, View)
 public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized AnimatedImageView handle.
@@ -221,7 +222,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(AnimatedImageView)
+#include "animated-image-view.autogen.h"
 };
 
 } // namespace Ui

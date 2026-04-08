@@ -7,58 +7,58 @@
 *
 * @param[in] scaleX The X scale factor to set
 */
-InteractiveView& SetScaleX(float scaleX) { View::SetScaleX(scaleX); return *this; }
+FlexLayout& SetScaleX(float scaleX) { View::SetScaleX(scaleX); return *this; }
 /**
 * @brief Sets the y scale factor applied to the view.
 *
 * @param[in] scaleY The Y scale factor to set
 */
-InteractiveView& SetScaleY(float scaleY) { View::SetScaleY(scaleY); return *this; }
+FlexLayout& SetScaleY(float scaleY) { View::SetScaleY(scaleY); return *this; }
 /**
 * @brief Sets the y scale factor applied to the view.
 *
 * @param[in] scaleX The X scale factor to set
 * @param[in] scaleY The Y scale factor to set
 */
-InteractiveView& SetScale(float scaleX, float scaleY) { View::SetScale(scaleX, scaleY); return *this; }
+FlexLayout& SetScale(float scaleX, float scaleY) { View::SetScale(scaleX, scaleY); return *this; }
 /**
 * @brief Sets the visibility of the view.
 *
 * @param[in] visibility True to make the view visible, false to hide it
 * @return Reference to this View for fluent chaining
 */
-InteractiveView& SetVisibility(bool visibility) { View::SetVisibility(visibility); return *this; }
+FlexLayout& SetVisibility(bool visibility) { View::SetVisibility(visibility); return *this; }
 /**
 * @brief Sets the opacity of the view.
 *
 * @param[in] opacity The opacity value to set (0.0 to 1.0)
 * @return Reference to this View for fluent chaining
 */
-InteractiveView& SetOpacity(float opacity) { View::SetOpacity(opacity); return *this; }
+FlexLayout& SetOpacity(float opacity) { View::SetOpacity(opacity); return *this; }
 /**
 * @brief Sets the X position of the View.
 *
 * @param[in] x The X position to set
 */
-InteractiveView& SetPositionX(float x) { View::SetPositionX(x); return *this; }
+FlexLayout& SetPositionX(float x) { View::SetPositionX(x); return *this; }
 /**
 * @brief Sets the Y position of the View.
 *
 * @param[in] y The Y position to set
 */
-InteractiveView& SetPositionY(float y) { View::SetPositionY(y); return *this; }
+FlexLayout& SetPositionY(float y) { View::SetPositionY(y); return *this; }
 /**
 * @brief Sets the parent origin of the View.
 *
 * @param[in] point The parent origin to set
 */
-InteractiveView& SetParentOrigin(const Vector3& point) { View::SetParentOrigin(point); return *this; }
+FlexLayout& SetParentOrigin(const Vector3& point) { View::SetParentOrigin(point); return *this; }
 /**
 * @brief Sets the pivot point of the View.
 *
 * @param[in] point The pivot point to set
 */
-InteractiveView& SetPivotPoint(const Vector3& point) { View::SetPivotPoint(point); return *this; }
+FlexLayout& SetPivotPoint(const Vector3& point) { View::SetPivotPoint(point); return *this; }
 /**
 * @brief Sets the requested width.
 *
@@ -68,7 +68,7 @@ InteractiveView& SetPivotPoint(const Vector3& point) { View::SetPivotPoint(point
 *
 * @param[in] width The requested width
 */
-InteractiveView& SetRequestedWidth(float width) { View::SetRequestedWidth(width); return *this; }
+FlexLayout& SetRequestedWidth(float width) { View::SetRequestedWidth(width); return *this; }
 /**
 * @brief Sets the requested height.
 *
@@ -78,55 +78,55 @@ InteractiveView& SetRequestedWidth(float width) { View::SetRequestedWidth(width)
 *
 * @param[in] height The requested height
 */
-InteractiveView& SetRequestedHeight(float height) { View::SetRequestedHeight(height); return *this; }
+FlexLayout& SetRequestedHeight(float height) { View::SetRequestedHeight(height); return *this; }
 /**
 * @brief Sets the minimum width.
 *
 * @param[in] width The minimum width
 */
-InteractiveView& SetMinimumWidth(float width) { View::SetMinimumWidth(width); return *this; }
+FlexLayout& SetMinimumWidth(float width) { View::SetMinimumWidth(width); return *this; }
 /**
 * @brief Sets the minimum height.
 *
 * @param[in] height The minimum height
 */
-InteractiveView& SetMinimumHeight(float height) { View::SetMinimumHeight(height); return *this; }
+FlexLayout& SetMinimumHeight(float height) { View::SetMinimumHeight(height); return *this; }
 /**
 * @brief Sets the maximum width.
 *
 * @param[in] width The maximum width
 */
-InteractiveView& SetMaximumWidth(float width) { View::SetMaximumWidth(width); return *this; }
+FlexLayout& SetMaximumWidth(float width) { View::SetMaximumWidth(width); return *this; }
 /**
 * @brief Sets the maximum height.
 *
 * @param[in] height The maximum height
 */
-InteractiveView& SetMaximumHeight(float height) { View::SetMaximumHeight(height); return *this; }
+FlexLayout& SetMaximumHeight(float height) { View::SetMaximumHeight(height); return *this; }
 /**
 * @brief Sets the view margin.
 *
 * @param[in] margin The margin to set
 */
-InteractiveView& SetViewMargin(const Extents& margin) { View::SetViewMargin(margin); return *this; }
+FlexLayout& SetViewMargin(const Extents& margin) { View::SetViewMargin(margin); return *this; }
 /**
 * @brief Sets the view padding.
 *
 * @param[in] padding The padding to set
 */
-InteractiveView& SetViewPadding(const Extents& padding) { View::SetViewPadding(padding); return *this; }
+FlexLayout& SetViewPadding(const Extents& padding) { View::SetViewPadding(padding); return *this; }
 /**
 * @brief Sets whether the actor should be focusable by keyboard navigation.
 *
 * @param[in] focusable True if it is focusable
 */
-InteractiveView& SetFocusable(bool focusable) { View::SetFocusable(focusable); return *this; }
+FlexLayout& SetFocusable(bool focusable) { View::SetFocusable(focusable); return *this; }
 /**
 * @brief Sets whether the actor should be focused when touched.
 *
 * @param[in] touchFocusable True if it gets focused when touched
 */
-InteractiveView& SetTouchFocusable(bool touchFocusable) { View::SetTouchFocusable(touchFocusable); return *this; }
+FlexLayout& SetTouchFocusable(bool touchFocusable) { View::SetTouchFocusable(touchFocusable); return *this; }
 /**
 * @brief Sets the background color.
 *
@@ -139,7 +139,7 @@ InteractiveView& SetTouchFocusable(bool touchFocusable) { View::SetTouchFocusabl
 *
 * @param[in] color The UiColor to apply
 */
-InteractiveView& SetBackgroundColor(const UiColor& color) { View::SetBackgroundColor(color); return *this; }
+FlexLayout& SetBackgroundColor(const UiColor& color) { View::SetBackgroundColor(color); return *this; }
 /**
 * @brief Sets whether the view is enabled.
 *
@@ -148,13 +148,13 @@ InteractiveView& SetBackgroundColor(const UiColor& color) { View::SetBackgroundC
 *
 * @param[in] enabled True to enable, false to disable
 */
-InteractiveView& SetEnabled(bool enabled) { View::SetEnabled(enabled); return *this; }
+FlexLayout& SetEnabled(bool enabled) { View::SetEnabled(enabled); return *this; }
 /**
 * @brief Sets a uniform corner radius for all four corners.
 *
 * @param[in] radius The corner radius to apply to all corners
 */
-InteractiveView& SetCornerRadius(float radius) { View::SetCornerRadius(radius); return *this; }
+FlexLayout& SetCornerRadius(float radius) { View::SetCornerRadius(radius); return *this; }
 /**
 * @brief Sets individual corner radii for all four corners.
 *
@@ -163,31 +163,31 @@ InteractiveView& SetCornerRadius(float radius) { View::SetCornerRadius(radius); 
 * @param[in] bottomRight The radius for the bottom-right corner
 * @param[in] bottomLeft  The radius for the bottom-left corner
 */
-InteractiveView& SetCornerRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) { View::SetCornerRadius(topLeft, topRight, bottomRight, bottomLeft); return *this; }
+FlexLayout& SetCornerRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) { View::SetCornerRadius(topLeft, topRight, bottomRight, bottomLeft); return *this; }
 /**
 * @brief Sets corner radii from a Vector4.
 *
 * @param[in] radius Corner radii as Vector4 (x=topLeft, y=topRight, z=bottomRight, w=bottomLeft)
 */
-InteractiveView& SetCornerRadius(const Vector4& radius) { View::SetCornerRadius(radius); return *this; }
+FlexLayout& SetCornerRadius(const Vector4& radius) { View::SetCornerRadius(radius); return *this; }
 /**
 * @brief Sets the corner radius policy.
 *
 * @param[in] policy ABSOLUTE for world-unit values (default), RELATIVE for percentage [0.0, 0.5] of the shorter side
 */
-InteractiveView& SetCornerRadiusPolicy(CornerRadiusPolicy policy) { View::SetCornerRadiusPolicy(policy); return *this; }
+FlexLayout& SetCornerRadiusPolicy(CornerRadiusPolicy policy) { View::SetCornerRadiusPolicy(policy); return *this; }
 /**
 * @brief Shortcut to set the corner radius policy to RELATIVE.
 *
 * Equivalent to SetCornerRadiusPolicy(CornerRadiusPolicy::RELATIVE).
 */
-InteractiveView& SetCornerRadiusPolicyRelative() { View::SetCornerRadiusPolicyRelative(); return *this; }
+FlexLayout& SetCornerRadiusPolicyRelative() { View::SetCornerRadiusPolicyRelative(); return *this; }
 /**
 * @brief Sets a uniform corner squareness for all four corners.
 *
 * @param[in] squareness The squareness value to apply to all corners
 */
-InteractiveView& SetCornerSquareness(float squareness) { View::SetCornerSquareness(squareness); return *this; }
+FlexLayout& SetCornerSquareness(float squareness) { View::SetCornerSquareness(squareness); return *this; }
 /**
 * @brief Sets individual corner squareness values for all four corners.
 *
@@ -196,19 +196,19 @@ InteractiveView& SetCornerSquareness(float squareness) { View::SetCornerSquarene
 * @param[in] bottomRight The squareness for the bottom-right corner
 * @param[in] bottomLeft  The squareness for the bottom-left corner
 */
-InteractiveView& SetCornerSquareness(float topLeft, float topRight, float bottomRight, float bottomLeft) { View::SetCornerSquareness(topLeft, topRight, bottomRight, bottomLeft); return *this; }
+FlexLayout& SetCornerSquareness(float topLeft, float topRight, float bottomRight, float bottomLeft) { View::SetCornerSquareness(topLeft, topRight, bottomRight, bottomLeft); return *this; }
 /**
 * @brief Sets corner squareness from a Vector4.
 *
 * @param[in] squareness Squareness values as Vector4 (x=topLeft, y=topRight, z=bottomRight, w=bottomLeft)
 */
-InteractiveView& SetCornerSquareness(const Vector4& squareness) { View::SetCornerSquareness(squareness); return *this; }
+FlexLayout& SetCornerSquareness(const Vector4& squareness) { View::SetCornerSquareness(squareness); return *this; }
 /**
 * @brief Sets the borderline width of the view.
 *
 * @param[in] width The borderline width to set
 */
-InteractiveView& SetBorderlineWidth(float width) { View::SetBorderlineWidth(width); return *this; }
+FlexLayout& SetBorderlineWidth(float width) { View::SetBorderlineWidth(width); return *this; }
 /**
 * @brief Sets the borderline color of the view.
 *
@@ -218,25 +218,25 @@ InteractiveView& SetBorderlineWidth(float width) { View::SetBorderlineWidth(widt
 *
 * @param[in] color The UiColor to apply
 */
-InteractiveView& SetBorderlineColor(const UiColor& color) { View::SetBorderlineColor(color); return *this; }
+FlexLayout& SetBorderlineColor(const UiColor& color) { View::SetBorderlineColor(color); return *this; }
 /**
 * @brief Sets the borderline offset of the view.
 *
 * @param[in] offset The borderline offset to set
 */
-InteractiveView& SetBorderlineOffset(float offset) { View::SetBorderlineOffset(offset); return *this; }
+FlexLayout& SetBorderlineOffset(float offset) { View::SetBorderlineOffset(offset); return *this; }
 /**
 * @brief Sets the name of this view.
 *
 * @param[in] name The name to set
 */
-InteractiveView& SetName(const Dali::String& name) { View::SetName(name); return *this; }
+FlexLayout& SetName(const Dali::String& name) { View::SetName(name); return *this; }
 /**
 * @brief Attaches the interaction trait to this View.
 *
 * @return Reference to this View for fluent chaining
 */
-InteractiveView& AsInteractive() { View::AsInteractive(); return *this; }
+FlexLayout& AsInteractive() { View::AsInteractive(); return *this; }
 /**
 * @brief Attaches the interaction trait to this View and configures it.
 *
@@ -244,7 +244,7 @@ InteractiveView& AsInteractive() { View::AsInteractive(); return *this; }
 * @return Reference to this View for fluent chaining
 */
 template<typename F>
-InteractiveView& AsInteractive(F&& configure) { View::AsInteractive(configure); return *this; }
+FlexLayout& AsInteractive(F&& configure) { View::AsInteractive(configure); return *this; }
 /**
 * @brief Attaches the selectable trait to this View.
 *
@@ -253,7 +253,7 @@ InteractiveView& AsInteractive(F&& configure) { View::AsInteractive(configure); 
 *
 * @return Reference to this View for fluent chaining
 */
-InteractiveView& AsSelectable() { View::AsSelectable(); return *this; }
+FlexLayout& AsSelectable() { View::AsSelectable(); return *this; }
 /**
 * @brief Attaches the selectable trait to this View and configures it.
 *
@@ -265,13 +265,13 @@ InteractiveView& AsSelectable() { View::AsSelectable(); return *this; }
 * @return Reference to this View for fluent chaining
 */
 template<typename F>
-InteractiveView& AsSelectable(F&& configure) { View::AsSelectable(configure); return *this; }
+FlexLayout& AsSelectable(F&& configure) { View::AsSelectable(configure); return *this; }
 /**
 * @brief Assigns this View instance to a target variable.
 * This method is useful for capturing a reference to a View created within
 * a declarative UI tree for later use.
 */
-InteractiveView& As(View& self) { View::As(self); return *this; }
+FlexLayout& As(View& self) { View::As(self); return *this; }
 /**
 * @brief Executes a custom action on this View instance.
 *
@@ -284,7 +284,7 @@ InteractiveView& As(View& self) { View::As(self); return *this; }
 * @return Reference to this View for fluent chaining.
 */
 template<typename F>
-InteractiveView& With(F&& action)
+FlexLayout& With(F&& action)
 {
   action(*this);
   return *this;
@@ -305,11 +305,11 @@ InteractiveView& With(F&& action)
 *     .SetFlags(AbsoluteLayoutFlags::POSITION_PROPORTIONAL));
 * @endcode
 */
-InteractiveView& SetLayoutParams(LayoutParams params) { View::SetLayoutParams(params); return *this; }
+FlexLayout& SetLayoutParams(LayoutParams params) { View::SetLayoutParams(params); return *this; }
 /**
 * @brief Adds a list of children to this View in a declarative way.
 * This method allows for a hierarchical UI tree construction by passing
 * a brace-enclosed initializer list of View objects.
 * @param[in] children The initializer list containing child View handles to be added.
 */
-InteractiveView& Children(std::initializer_list<View> children) { View::Children(children); return *this; }
+FlexLayout& Children(std::initializer_list<View> children) { View::Children(children); return *this; }

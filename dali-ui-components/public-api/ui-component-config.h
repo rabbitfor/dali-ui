@@ -32,7 +32,7 @@ namespace Integration
 class UiComponentConfigImpl;
 }
 
-#include "ui-component-config.autogen.h"
+#include "ui-component-config.macro.autogen.h"
 /**
  * @brief Configuration for dali-ui-components default values.
  *
@@ -50,6 +50,7 @@ class UiComponentConfigImpl;
  */
 class DALI_UI_API UiComponentConfig : public UiConfig
 {
+  // @CHAIN_CLASS(UiComponentConfig, UiConfig)
 public:
   /**
    * @brief Creates an uninitialized UiComponentConfig handle.
@@ -112,10 +113,6 @@ public:
    */
   static UiComponentConfig DownCast(BaseHandle handle);
 
-public: // Properties
-  // @CHAIN_START(UiComponentConfig, UiConfig)
-  // @CHAIN_END
-
 public: // Not intended for Application developers
   /**
    * @brief This constructor is used internally to wrap an implementation object.
@@ -125,7 +122,7 @@ public: // Not intended for Application developers
   explicit UiComponentConfig(Integration::UiComponentConfigImpl* impl);
 
 public:
-  DALI_UI_CHAIN_UICONFIG_METHODS(UiComponentConfig)
+#include "ui-component-config.autogen.h"
 };
 
 } // namespace Ui

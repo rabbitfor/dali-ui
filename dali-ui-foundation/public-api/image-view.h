@@ -37,6 +37,7 @@ namespace Integration DALI_INTERNAL
 class ImageViewImpl;
 }
 
+#include "image-view.macro.autogen.h"
 /**
  * @brief ImageView is a View for displaying an image resource.
  *
@@ -54,6 +55,7 @@ class ImageViewImpl;
 class DALI_UI_API ImageView : public View
 {
 public: // Creation & Destruction
+  // @CHAIN_CLASS(ImageView, View)
   /**
    * @brief Creates an uninitialized ImageView handle.
    *
@@ -504,7 +506,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(ImageView)
+#include "image-view.autogen.h"
 };
 
 } // namespace Ui

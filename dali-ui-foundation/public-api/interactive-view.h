@@ -33,7 +33,7 @@ namespace Integration
 class InteractiveViewImpl;
 }
 
-#include "interactive-view.autogen.h"
+#include "interactive-view.macro.autogen.h"
 /**
  * @brief InteractiveView is a View subclass with interactive behavior built in.
  *
@@ -145,7 +145,7 @@ public: // Signals
   Signal<bool(View, const InputEvent&)>& LongPressedSignal();
 
 public: // API
-  // @CHAIN_START(InteractiveView, View)
+  // @CHAIN_CLASS(InteractiveView, View)
 
   /**
    * @brief Returns whether the view is currently in the pressed state.
@@ -163,6 +163,7 @@ public: // API
    */
   bool IsPseudoDisabled() const;
 
+  // @CHAIN
   /**
    * @brief Sets the pseudo disabled state.
    *
@@ -179,6 +180,7 @@ public: // API
    */
   bool IsClickable() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether clicking is allowed.
    *
@@ -195,6 +197,7 @@ public: // API
    */
   KeyClickPolicy GetKeyClickPolicy() const;
 
+  // @CHAIN
   /**
    * @brief Sets the key click policy.
    *
@@ -204,7 +207,7 @@ public: // API
   InteractiveView& SetKeyClickPolicy(KeyClickPolicy policy);
 
 public: // Signal connection helpers
-  // @CHAIN_MANUAL
+  // @CHAIN
   /**
    * @brief Connects a handler to ClickedSignal.
    *
@@ -229,7 +232,7 @@ public: // Signal connection helpers
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
   /**
    * @brief Connects a handler to PressedChangedSignal.
    *
@@ -248,7 +251,7 @@ public: // Signal connection helpers
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
   /**
    * @brief Connects a handler to LongPressedSignal.
    *
@@ -272,8 +275,6 @@ public: // Signal connection helpers
     return *this;
   }
 
-  // @CHAIN_END
-
 public: // Not intended for application developers
   /// @cond internal
   /**
@@ -292,7 +293,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(InteractiveView)
+#include "interactive-view.autogen.h"
 };
 
 } // namespace Ui

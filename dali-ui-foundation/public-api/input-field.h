@@ -42,7 +42,7 @@ namespace Integration
 class InputFieldImpl;
 }
 
-#include "input-field.autogen.h"
+#include "input-field.macro.autogen.h"
 /**
  * @brief InputField is a single-line editable text view.
  *
@@ -123,7 +123,8 @@ public: // Static Methods
   static InputField DownCast(BaseHandle handle);
 
 public: // Setters for chaining
-  // @CHAIN_START(InputField, View)
+  // @CHAIN_CLASS(InputField, View)
+  // @CHAIN
   /**
    * @brief Sets the text.
    *
@@ -138,6 +139,7 @@ public: // Setters for chaining
    */
   Dali::String GetText() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font family of the text.
    *
@@ -152,6 +154,7 @@ public: // Setters for chaining
    */
   Dali::String GetFontFamily() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font size of the text.
    *
@@ -166,6 +169,7 @@ public: // Setters for chaining
    */
   float GetFontSize() const;
 
+  // @CHAIN
   /**
    * @brief Sets the color of the text.
    *
@@ -180,6 +184,7 @@ public: // Setters for chaining
    */
   UiColor GetTextColor();
 
+  // @CHAIN
   /**
    * @brief Sets the horizontal alignment of the text within the inputField.
    *
@@ -194,6 +199,7 @@ public: // Setters for chaining
    */
   Text::Alignment GetHorizontalTextAlignment() const;
 
+  // @CHAIN
   /**
    * @brief Sets the vertical alignment of the text within the inputField.
    *
@@ -208,6 +214,7 @@ public: // Setters for chaining
    */
   Text::Alignment GetVerticalTextAlignment() const;
 
+  // @CHAIN
   /**
    * @brief Sets the overflow mode.
    *
@@ -222,6 +229,7 @@ public: // Setters for chaining
    */
   Text::OverflowMode GetOverflowMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets the placeholder text displayed when the input field is empty.
    *
@@ -236,6 +244,7 @@ public: // Setters for chaining
    */
   Dali::String GetPlaceholder() const;
 
+  // @CHAIN
   /**
    * @brief Sets the color of the placeholder text.
    *
@@ -252,6 +261,7 @@ public: // Setters for chaining
    */
   UiColor GetPlaceholderColor();
 
+  // @CHAIN
   /**
    * @brief Sets the width of the text cursor.
    *
@@ -268,6 +278,7 @@ public: // Setters for chaining
    */
   int GetCursorWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the color of the text cursor
    *
@@ -287,6 +298,7 @@ public: // Setters for chaining
    */
   UiColor GetCursorColor();
 
+  // @CHAIN
   /**
    * @brief Sets the highlight color of the selected text region.
    *
@@ -303,6 +315,7 @@ public: // Setters for chaining
    */
   UiColor GetSelectionColor();
 
+  // @CHAIN
   /**
    * @brief Sets the maximum number of characters that can be entered into the InputField.
    *
@@ -317,6 +330,7 @@ public: // Setters for chaining
    */
   int GetMaximumLength() const;
 
+  // @CHAIN
   /**
    * @brief Sets how the layout direction of the text is resolved.
    *
@@ -342,6 +356,7 @@ public: // Setters for chaining
    */
   Text::LayoutDirectionMode GetLayoutDirectionMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font weight.
    *
@@ -356,6 +371,7 @@ public: // Setters for chaining
    */
   Text::FontWeight GetFontWeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font width.
    *
@@ -370,6 +386,7 @@ public: // Setters for chaining
    */
   Text::FontWidth GetFontWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font slant.
    *
@@ -384,6 +401,7 @@ public: // Setters for chaining
    */
   Text::FontSlant GetFontSlant() const;
 
+  // @CHAIN
   /**
    * @brief Sets the underline style.
    *
@@ -396,6 +414,7 @@ public: // Setters for chaining
    */
   void ResetUnderline();
 
+  // @CHAIN
   /**
    * @brief Sets the shadow style.
    *
@@ -408,6 +427,7 @@ public: // Setters for chaining
    */
   void ResetShadow();
 
+  // @CHAIN
   /**
    * @brief Sets the outline style.
    *
@@ -420,6 +440,7 @@ public: // Setters for chaining
    */
   void ResetOutline();
 
+  // @CHAIN
   /**
    * @brief Sets the line-through style.
    *
@@ -432,6 +453,7 @@ public: // Setters for chaining
    */
   void ResetLineThrough();
 
+  // @CHAIN
   /**
    * @brief Sets the font size scale.
    *
@@ -449,6 +471,7 @@ public: // Setters for chaining
    */
   float GetFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum font size scale.
    *
@@ -466,6 +489,7 @@ public: // Setters for chaining
    */
   float GetMinimumFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum font size scale.
    *
@@ -483,6 +507,7 @@ public: // Setters for chaining
    */
   float GetMaximumFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the system font size scale is applied.
    *
@@ -500,8 +525,6 @@ public: // Setters for chaining
    * @return True if the system font size scale is applied, otherwise false.
    */
   bool IsSystemFontSizeScaleEnabled() const;
-
-  // @CHAIN_END
 
   // Read Only
   /**
@@ -729,7 +752,7 @@ public:
   };
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(InputField)
+#include "input-field.autogen.h"
 };
 
 } // namespace Ui

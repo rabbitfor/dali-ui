@@ -31,7 +31,7 @@ namespace Integration
 class LayoutImpl;
 }
 
-#include "layout.autogen.h"
+#include "layout.macro.autogen.h"
 /**
  * @brief Layout is a View that arranges child views using a layout algorithm.
  *
@@ -106,8 +106,7 @@ public:
   static Layout DownCast(BaseHandle handle);
 
 public:
-  // @CHAIN_START(Layout, View)
-  // @CHAIN_END
+  // @CHAIN_CLASS(Layout, View)
 
 public: // Not intended for application developers
   /// @cond internal
@@ -127,7 +126,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(Layout)
+#include "layout.autogen.h"
 };
 
 } // namespace Ui

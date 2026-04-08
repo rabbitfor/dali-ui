@@ -35,6 +35,7 @@ namespace Integration
 class GridLayoutImpl;
 }
 
+#include "grid-layout.macro.autogen.h"
 /**
  * @brief GridLayout arranges its children in a grid of rows and columns.
  *
@@ -57,6 +58,7 @@ class GridLayoutImpl;
 class DALI_UI_API GridLayout : public Layout
 {
 public:
+  // @CHAIN_CLASS(GridLayout, Layout)
   /**
    * @brief Creates an uninitialized GridLayout handle.
    */
@@ -196,8 +198,6 @@ public: // Spacing API
   float GetColumnSpacing() const;
 
 public: // Chaining methods
-  DALI_UI_CHAIN_LAYOUT_METHODS(GridLayout)
-
   GridLayout& RowSpacing(float spacing)
   {
     SetRowSpacing(spacing);
@@ -227,6 +227,9 @@ public: // Not intended for application developers
   DALI_INTERNAL          GridLayout(Integration::GridLayoutImpl& implementation);
   explicit DALI_INTERNAL GridLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
+
+public:
+#include "grid-layout.autogen.h"
 };
 
 } // namespace Ui

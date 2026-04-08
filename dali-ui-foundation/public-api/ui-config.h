@@ -46,7 +46,7 @@ namespace Integration
 class UiConfigImpl;
 }
 
-#include "ui-config.autogen.h"
+#include "ui-config.macro.autogen.h"
 /**
  * @brief An immutable-after-init configuration object for dali-ui global settings.
  *
@@ -166,7 +166,8 @@ public: // Properties
    */
   void Apply();
 
-  // @CHAIN_START(UiConfig)
+  // @CHAIN_CLASS(UiConfig)
+  // @CHAIN
   /**
    * @brief Sets the scaling factor applied to spx and sdp units.
    *
@@ -182,6 +183,7 @@ public: // Properties
    */
   float GetScalingFactor() const;
 
+  // @CHAIN
   /**
    * @brief Sets the screen DPI used for dp and sdp unit calculations.
    *
@@ -197,6 +199,7 @@ public: // Properties
    */
   int GetDpi() const;
 
+  // @CHAIN
   /**
    * @brief Sets the baseline DPI used as the reference for dp calculations.
    *
@@ -212,6 +215,7 @@ public: // Properties
    */
   int GetBaselineDpi() const;
 
+  // @CHAIN
   /**
    * @brief Sets the default key click policy for clickable views.
    *
@@ -227,6 +231,7 @@ public: // Properties
    */
   KeyClickPolicy GetKeyClickPolicy() const;
 
+  // @CHAIN
   /**
    * @brief Sets the predicate used to determine whether a key event triggers
    * click execution (e.g. "Return", "KP_Enter").
@@ -268,6 +273,7 @@ public: // Properties
    */
   ExecutionKeyPredicate GetExecutionKeyPredicate() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum key repeat count to trigger a long-press via key input.
    *
@@ -283,6 +289,7 @@ public: // Properties
    */
   uint32_t GetMinLongPressKeyCount() const;
 
+  // @CHAIN
   /**
    * @brief Sets the tap recognizer time limit in milliseconds.
    *
@@ -298,6 +305,7 @@ public: // Properties
    */
   uint32_t GetTapRecognizerTime() const;
 
+  // @CHAIN
   /**
    * @brief Sets an image to be displayed when image loading fails.
    *
@@ -322,7 +330,8 @@ public: // Properties
    */
   const Dali::String& GetBrokenImageUrl(BrokenImageType brokenImageType) const;
 
-  // @CHAIN_MANUAL
+  // @CHAIN
+  // @CHAIN
   /**
    * @brief Sets whether to clear focus when the Escape key is pressed.
    *
@@ -339,6 +348,7 @@ public: // Properties
    */
   bool IsFocusClearOnEscapeEnabled() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether to always show the keyboard focus indicator.
    *
@@ -355,6 +365,7 @@ public: // Properties
    */
   bool IsFocusIndicatorAlwaysShown() const;
 
+  // @CHAIN
   /**
    * @brief Sets the default font point-size for text elements.
    *
@@ -370,6 +381,7 @@ public: // Properties
    */
   float GetDefaultFontSize() const;
 
+  // @CHAIN
   /**
    * @brief Sets the default text color for text elements.
    *
@@ -385,6 +397,7 @@ public: // Properties
    */
   Vector4 GetDefaultTextColor() const;
 
+  // @CHAIN
   /**
    * @brief Sets the default interaction effect applied to views when AsInteractive() is called.
    *
@@ -400,8 +413,6 @@ public: // Properties
    * @return The default interaction effect handle, or an uninitialized Trait if none is set
    */
   Trait GetDefaultInteractionEffect() const;
-
-  // @CHAIN_END
 
 public: // Not intended for Application developers
   /**

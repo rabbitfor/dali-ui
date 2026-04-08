@@ -70,7 +70,7 @@ namespace Integration
 class ViewImpl;
 }
 
-#include "view.autogen.h"
+#include "view.macro.autogen.h"
 /**
  * @brief View is a base UI component class that extends CustomActor.
  *
@@ -238,7 +238,7 @@ public: // Measure / Arrange API
   void SetArrangeCallback(::Dali::UniquePtr<LayoutArrangeCallback> callback);
 
 public: // Properties
-  // @CHAIN_START(View)
+  // @CHAIN_CLASS(View)
 
   /**
    * @brief Gets the x scale factor applied to the view.
@@ -247,6 +247,7 @@ public: // Properties
    */
   float GetScaleX() const;
 
+  // @CHAIN
   /**
    * @brief Sets the x scale factor applied to the view.
    *
@@ -261,6 +262,7 @@ public: // Properties
    */
   float GetScaleY() const;
 
+  // @CHAIN
   /**
    * @brief Sets the y scale factor applied to the view.
    *
@@ -268,6 +270,7 @@ public: // Properties
    */
   View& SetScaleY(float scaleY);
 
+  // @CHAIN
   /**
    * @brief Sets the y scale factor applied to the view.
    *
@@ -283,6 +286,7 @@ public: // Properties
    */
   bool IsVisible() const;
 
+  // @CHAIN
   /**
    * @brief Sets the visibility of the view.
    *
@@ -298,6 +302,7 @@ public: // Properties
    */
   float GetOpacity() const;
 
+  // @CHAIN
   /**
    * @brief Sets the opacity of the view.
    *
@@ -316,6 +321,7 @@ public: // Properties
    */
   MeasuredSize GetSize() const;
 
+  // @CHAIN
   /**
    * @brief Sets the X position of the View.
    *
@@ -330,6 +336,7 @@ public: // Properties
    */
   float GetPositionX() const;
 
+  // @CHAIN
   /**
    * @brief Sets the Y position of the View.
    *
@@ -344,6 +351,7 @@ public: // Properties
    */
   float GetPositionY() const;
 
+  // @CHAIN
   /**
    * @brief Sets the parent origin of the View.
    *
@@ -358,6 +366,7 @@ public: // Properties
    */
   Vector3 GetParentOrigin() const;
 
+  // @CHAIN
   /**
    * @brief Sets the pivot point of the View.
    *
@@ -372,6 +381,7 @@ public: // Properties
    */
   Vector3 GetPivotPoint() const;
 
+  // @CHAIN
   /**
    * @brief Sets the requested width.
    *
@@ -390,6 +400,7 @@ public: // Properties
    */
   float GetRequestedWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the requested height.
    *
@@ -408,6 +419,7 @@ public: // Properties
    */
   float GetRequestedHeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum width.
    *
@@ -422,6 +434,7 @@ public: // Properties
    */
   float GetMinimumWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum height.
    *
@@ -436,6 +449,7 @@ public: // Properties
    */
   float GetMinimumHeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum width.
    *
@@ -450,6 +464,7 @@ public: // Properties
    */
   float GetMaximumWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum height.
    *
@@ -464,6 +479,7 @@ public: // Properties
    */
   float GetMaximumHeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets the view margin.
    *
@@ -478,6 +494,7 @@ public: // Properties
    */
   Extents GetViewMargin() const;
 
+  // @CHAIN
   /**
    * @brief Sets the view padding.
    *
@@ -499,6 +516,7 @@ public: // Properties
    */
   bool IsFocusable() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the actor should be focusable by keyboard navigation.
    *
@@ -513,6 +531,7 @@ public: // Properties
    */
   bool IsTouchFocusable() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the actor should be focused when touched.
    *
@@ -527,6 +546,7 @@ public: // Properties
    */
   UiColor GetBackgroundColor();
 
+  // @CHAIN
   /**
    * @brief Sets the background color.
    *
@@ -548,6 +568,7 @@ public: // Properties
    */
   bool IsEnabled() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the view is enabled.
    *
@@ -565,6 +586,7 @@ public: // Properties
    */
   Vector4 GetCornerRadius() const;
 
+  // @CHAIN
   /**
    * @brief Sets a uniform corner radius for all four corners.
    *
@@ -572,6 +594,7 @@ public: // Properties
    */
   View& SetCornerRadius(float radius);
 
+  // @CHAIN
   /**
    * @brief Sets individual corner radii for all four corners.
    *
@@ -582,6 +605,7 @@ public: // Properties
    */
   View& SetCornerRadius(float topLeft, float topRight, float bottomRight, float bottomLeft);
 
+  // @CHAIN
   /**
    * @brief Sets corner radii from a Vector4.
    *
@@ -596,6 +620,7 @@ public: // Properties
    */
   CornerRadiusPolicy GetCornerRadiusPolicy() const;
 
+  // @CHAIN
   /**
    * @brief Sets the corner radius policy.
    *
@@ -603,6 +628,7 @@ public: // Properties
    */
   View& SetCornerRadiusPolicy(CornerRadiusPolicy policy);
 
+  // @CHAIN
   /**
    * @brief Shortcut to set the corner radius policy to RELATIVE.
    *
@@ -624,6 +650,7 @@ public: // Properties
    */
   Vector4 GetCornerSquareness() const;
 
+  // @CHAIN
   /**
    * @brief Sets a uniform corner squareness for all four corners.
    *
@@ -631,6 +658,7 @@ public: // Properties
    */
   View& SetCornerSquareness(float squareness);
 
+  // @CHAIN
   /**
    * @brief Sets individual corner squareness values for all four corners.
    *
@@ -641,6 +669,7 @@ public: // Properties
    */
   View& SetCornerSquareness(float topLeft, float topRight, float bottomRight, float bottomLeft);
 
+  // @CHAIN
   /**
    * @brief Sets corner squareness from a Vector4.
    *
@@ -655,6 +684,7 @@ public: // Properties
    */
   float GetBorderlineWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the borderline width of the view.
    *
@@ -669,6 +699,7 @@ public: // Properties
    */
   UiColor GetBorderlineColor();
 
+  // @CHAIN
   /**
    * @brief Sets the borderline color of the view.
    *
@@ -687,6 +718,7 @@ public: // Properties
    */
   float GetBorderlineOffset() const;
 
+  // @CHAIN
   /**
    * @brief Sets the borderline offset of the view.
    *
@@ -701,6 +733,7 @@ public: // Properties
    */
   Dali::String GetName() const;
 
+  // @CHAIN
   /**
    * @brief Sets the name of this view.
    *
@@ -729,7 +762,8 @@ public: // Properties
    */
   bool IsEffectivelyFocused() const;
 
-  // @CHAIN_MANUAL
+  // @CHAIN
+  // @CHAIN
   /**
    * @brief Attaches the interaction trait to this View.
    *
@@ -741,7 +775,7 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
   /**
    * @brief Attaches the interaction trait to this View and configures it.
    *
@@ -759,7 +793,8 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
+  // @CHAIN
   /**
    * @brief Attaches the selectable trait to this View.
    *
@@ -774,7 +809,7 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
   /**
    * @brief Attaches the selectable trait to this View and configures it.
    *
@@ -796,7 +831,8 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_MANUAL
+  // @CHAIN
+  // @CHAIN
   /**
    * @brief Assigns this View instance to a target variable.
    * This method is useful for capturing a reference to a View created within
@@ -808,7 +844,7 @@ public: // Properties
     return *this;
   }
 
-  // @CHAIN_MANUAL_SELF
+  // @CHAIN_SELF
   /**
    * @brief Executes a custom action on this View instance.
    *
@@ -827,6 +863,7 @@ public: // Properties
     return *this;
   }
 
+  // @CHAIN
   /**
    * @brief Sets layout parameters on this View.
    *
@@ -845,7 +882,8 @@ public: // Properties
    */
   View& SetLayoutParams(LayoutParams params);
 
-  // @CHAIN_MANUAL
+  // @CHAIN
+  // @CHAIN
   /**
    * @brief Adds a list of children to this View in a declarative way.
    * This method allows for a hierarchical UI tree construction by passing
@@ -860,8 +898,6 @@ public: // Properties
     }
     return *this;
   }
-
-  // @CHAIN_END
 
   /**
    * @brief Inserts a child at the specified index.

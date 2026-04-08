@@ -29,6 +29,7 @@ namespace Integration DALI_INTERNAL
 class LottieAnimationViewImpl;
 }
 
+#include "lottie-animation-view.macro.autogen.h"
 /**
  * @brief LottieAnimationView is a View for displaying Lottie vector animations.
  *
@@ -44,6 +45,7 @@ class LottieAnimationViewImpl;
 class DALI_UI_API LottieAnimationView : public View
 {
 public: // Creation & Destruction
+  // @CHAIN_CLASS(LottieAnimationView, View)
   /**
    * @brief Creates an uninitialized LottieAnimationView handle.
    *
@@ -179,7 +181,7 @@ public: // Not intended for application developers
   /// @endcond
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(LottieAnimationView)
+#include "lottie-animation-view.autogen.h"
 };
 
 } // namespace Ui

@@ -34,6 +34,7 @@ namespace Integration
 class FlexLayoutImpl;
 }
 
+#include "flex-layout.macro.autogen.h"
 /**
  * @brief FlexLayout arranges its children using the CSS Flexbox algorithm.
  *
@@ -49,6 +50,7 @@ class FlexLayoutImpl;
 class DALI_UI_API FlexLayout : public Layout
 {
 public:
+  // @CHAIN_CLASS(FlexLayout, Layout)
   /**
    * @brief Creates an uninitialized FlexLayout handle.
    */
@@ -176,8 +178,6 @@ public: // API
   FlexAlign GetAlignContent() const;
 
 public: // Chaining methods
-  DALI_UI_CHAIN_LAYOUT_METHODS(FlexLayout)
-
   FlexLayout& Direction(FlexDirection direction)
   {
     SetDirection(direction);
@@ -213,6 +213,9 @@ public: // Not intended for application developers
   DALI_INTERNAL          FlexLayout(Integration::FlexLayoutImpl& implementation);
   explicit DALI_INTERNAL FlexLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
+
+public:
+#include "flex-layout.autogen.h"
 };
 
 } // namespace Ui

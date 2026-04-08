@@ -44,7 +44,7 @@ namespace Integration
 class LabelImpl;
 }
 
-#include "label.autogen.h"
+#include "label.macro.autogen.h"
 /**
  * @brief Label is a non-editable View that displays text.
  *
@@ -133,7 +133,8 @@ public: // Static Methods
   static Label DownCast(BaseHandle handle);
 
 public: // Setters for chaining
-  // @CHAIN_START(Label, View)
+  // @CHAIN_CLASS(Label, View)
+  // @CHAIN
   /**
    * @brief Sets the text.
    *
@@ -148,6 +149,7 @@ public: // Setters for chaining
    */
   Dali::String GetText() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font family of the text.
    *
@@ -162,6 +164,7 @@ public: // Setters for chaining
    */
   Dali::String GetFontFamily() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font size of the text.
    *
@@ -176,6 +179,7 @@ public: // Setters for chaining
    */
   float GetFontSize() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the text should be multi-line.
    *
@@ -190,6 +194,7 @@ public: // Setters for chaining
    */
   bool IsMultiLine() const;
 
+  // @CHAIN
   /**
    * @brief Sets the line wrap mode.
    *
@@ -204,6 +209,7 @@ public: // Setters for chaining
    */
   Text::LineWrapMode GetLineWrapMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets the color of the text.
    *
@@ -218,6 +224,7 @@ public: // Setters for chaining
    */
   UiColor GetTextColor();
 
+  // @CHAIN
   /**
    * @brief Sets the horizontal alignment of the text within the label.
    *
@@ -232,6 +239,7 @@ public: // Setters for chaining
    */
   Text::Alignment GetHorizontalTextAlignment() const;
 
+  // @CHAIN
   /**
    * @brief Sets the vertical alignment of the text within the label.
    *
@@ -246,6 +254,7 @@ public: // Setters for chaining
    */
   Text::Alignment GetVerticalTextAlignment() const;
 
+  // @CHAIN
   /**
    * @brief Sets the overflow mode.
    *
@@ -260,6 +269,7 @@ public: // Setters for chaining
    */
   Text::OverflowMode GetOverflowMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets the line height of the text.
    *
@@ -298,6 +308,7 @@ public: // Setters for chaining
    */
   float GetLineHeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets how the line height value is interpreted.
    *
@@ -320,6 +331,7 @@ public: // Setters for chaining
    */
   Text::LineHeightMode GetLineHeightMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets how the layout direction of the text is resolved.
    *
@@ -343,6 +355,7 @@ public: // Setters for chaining
    */
   Text::LayoutDirectionMode GetLayoutDirectionMode() const;
 
+  // @CHAIN
   /**
    * @brief Enables or disables mark-up processing for the text.
    *
@@ -357,6 +370,7 @@ public: // Setters for chaining
    */
   bool IsMarkupEnabled() const;
 
+  // @CHAIN
   /**
    * @brief Sets the color of anchors in the text.
    *
@@ -371,6 +385,7 @@ public: // Setters for chaining
    */
   UiColor GetAnchorColor();
 
+  // @CHAIN
   /**
    * @brief Sets the color of anchors when they are clicked.
    *
@@ -385,6 +400,7 @@ public: // Setters for chaining
    */
   UiColor GetAnchorClickedColor();
 
+  // @CHAIN
   /**
    * @brief Sets the marquee speed.
    *
@@ -399,6 +415,7 @@ public: // Setters for chaining
    */
   int GetMarqueeSpeed() const;
 
+  // @CHAIN
   /**
    * @brief Sets the number of complete loops for marquee.
    *
@@ -413,6 +430,7 @@ public: // Setters for chaining
    */
   int GetMarqueeLoopCount() const;
 
+  // @CHAIN
   /**
    * @brief Sets the amount of time to delay the start of marquee and further loops.
    *
@@ -427,6 +445,7 @@ public: // Setters for chaining
    */
   float GetMarqueeLoopDelay() const;
 
+  // @CHAIN
   /**
    * @brief Sets the gap before marquee wraps.
    *
@@ -441,6 +460,7 @@ public: // Setters for chaining
    */
   int GetMarqueeGap() const;
 
+  // @CHAIN
   /**
    * @brief Sets how the marquee stops.
    *
@@ -455,6 +475,7 @@ public: // Setters for chaining
    */
   Text::MarqueeStopMode GetMarqueeStopMode() const;
 
+  // @CHAIN
   /**
    * @brief Sets the marquee orientation.
    *
@@ -469,6 +490,7 @@ public: // Setters for chaining
    */
   Text::MarqueeOrientation GetMarqueeOrientation() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font weight.
    *
@@ -483,6 +505,7 @@ public: // Setters for chaining
    */
   Text::FontWeight GetFontWeight() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font width.
    *
@@ -497,6 +520,7 @@ public: // Setters for chaining
    */
   Text::FontWidth GetFontWidth() const;
 
+  // @CHAIN
   /**
    * @brief Sets the font slant.
    *
@@ -511,6 +535,7 @@ public: // Setters for chaining
    */
   Text::FontSlant GetFontSlant() const;
 
+  // @CHAIN
   /**
    * @brief Sets the underline style.
    *
@@ -523,6 +548,7 @@ public: // Setters for chaining
    */
   void ResetUnderline();
 
+  // @CHAIN
   /**
    * @brief Sets the shadow style.
    *
@@ -535,6 +561,7 @@ public: // Setters for chaining
    */
   void ResetShadow();
 
+  // @CHAIN
   /**
    * @brief Sets the outline style.
    *
@@ -547,6 +574,7 @@ public: // Setters for chaining
    */
   void ResetOutline();
 
+  // @CHAIN
   /**
    * @brief Sets the line-through style.
    *
@@ -559,6 +587,7 @@ public: // Setters for chaining
    */
   void ResetLineThrough();
 
+  // @CHAIN
   /**
    * @brief Sets the bevel style.
    *
@@ -571,6 +600,7 @@ public: // Setters for chaining
    */
   void ResetBevel();
 
+  // @CHAIN
   /**
    * @brief Sets the text fit range.
    *
@@ -586,6 +616,7 @@ public: // Setters for chaining
    */
   Label& SetTextFit(const Text::FitRange& range);
 
+  // @CHAIN
   /**
    * @brief Sets the text fit candidates.
    *
@@ -607,6 +638,7 @@ public: // Setters for chaining
    */
   void ResetTextFit();
 
+  // @CHAIN
   /**
    * @brief Sets the font size scale.
    *
@@ -624,6 +656,7 @@ public: // Setters for chaining
    */
   float GetFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets the minimum font size scale.
    *
@@ -641,6 +674,7 @@ public: // Setters for chaining
    */
   float GetMinimumFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets the maximum font size scale.
    *
@@ -658,6 +692,7 @@ public: // Setters for chaining
    */
   float GetMaximumFontSizeScale() const;
 
+  // @CHAIN
   /**
    * @brief Sets whether the system font size scale is applied.
    *
@@ -674,8 +709,6 @@ public: // Setters for chaining
    * @return True if the system font size scale is applied, otherwise false.
    */
   bool IsSystemFontSizeScaleEnabled() const;
-
-  // @CHAIN_END
 
   // Read Only
   /**
@@ -1008,7 +1041,7 @@ public:
   };
 
 public:
-  DALI_UI_CHAIN_VIEW_METHODS(Label)
+#include "label.autogen.h"
 };
 
 } // namespace Ui

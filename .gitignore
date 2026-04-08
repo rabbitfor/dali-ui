@@ -59,6 +59,7 @@ compile_commands.json
 *code-workspace
 *.cache/
 *.stamp
+__pycache__
 
 /dali-ui-foundation/internal/graphics/generated
 /build/tizen/dali-ui-foundation/dali-shader-generator

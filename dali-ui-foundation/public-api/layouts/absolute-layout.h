@@ -33,6 +33,7 @@ namespace Integration
 class AbsoluteLayoutImpl;
 }
 
+#include "absolute-layout.macro.autogen.h"
 /**
  * @brief AbsoluteLayout positions its children at explicit coordinates.
  *
@@ -57,6 +58,7 @@ class AbsoluteLayoutImpl;
 class DALI_UI_API AbsoluteLayout : public Layout
 {
 public:
+  // @CHAIN_CLASS(AbsoluteLayout, Layout)
   /**
    * @brief Creates an uninitialized AbsoluteLayout handle.
    */
@@ -100,13 +102,14 @@ public:
   static AbsoluteLayout DownCast(BaseHandle handle);
 
 public: // Chaining methods
-  DALI_UI_CHAIN_LAYOUT_METHODS(AbsoluteLayout)
-
 public: // Not intended for application developers
   /// @cond internal
   DALI_INTERNAL          AbsoluteLayout(Integration::AbsoluteLayoutImpl& implementation);
   explicit DALI_INTERNAL AbsoluteLayout(Dali::Internal::CustomActor* internal);
   /// @endcond
+
+public:
+#include "absolute-layout.autogen.h"
 };
 
 } // namespace Ui
