@@ -378,17 +378,27 @@ void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
   if(on)
   {
     mState = mState + state;
-
-    // Orthogonal state constraint: Disabled is mutually exclusive with Focused and Pressed.
-    // Clear them immediately rather than waiting for potentially late system events.
-    if(state == UiState::DISABLED)
-    {
-      mState = mState - UiState::FOCUSED - UiState::PRESSED;
-    }
   }
   else
   {
     mState = mState - state;
+
+    // NOTE Orthogonal state constraint: Disabled is mutually exclusive with Focused and Pressed.
+    // Clear them immediately rather than waiting for potentially late system events.
+
+    // NOTE that when the view is focused and user sets `view.SetEnabled(false)`,
+    // the event squence will be: "Focused out" -> "Enabled changed".
+    if(state.IsAnyDisabled())
+    {
+      mState = mState - UiState::PRESSED;
+    }
+    else if(state == UiState::FOCUSED && !IsEnabled())
+    {
+      // This is the case that the focus has gone because it turned disabled.
+      // (but disabled state hasn't dispatched yet)
+      // -> Immediately update states at once.
+      mState = mState - UiState::PRESSED + UiState::DISABLED;
+    }
   }
 
   if(mState != prev)
@@ -412,6 +422,11 @@ void ViewImpl::OnFocusChanged(bool focused, InputEvent cause)
 void ViewImpl::OnEnableChanged(bool enabled)
 {
   SetViewState(UiState::DISABLED, !enabled);
+
+  if(mInteractiveTrait)
+  {
+    mInteractiveTrait->OnEnabledChanged(View::DownCast(Self()), enabled);
+  }
 }
 
 void ViewImpl::OnRelayout(const Vector2& size, RelayoutContainer& container)
