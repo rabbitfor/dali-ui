@@ -1235,6 +1235,11 @@ public: // API for derived classes to override
    */
   virtual bool IsResourceReady() const;
 
+  /**
+   * @copydoc Dali::Ui::View::IsOnScene
+   */
+  bool IsOnScene() const;
+
   // Accessibility
 
   /**

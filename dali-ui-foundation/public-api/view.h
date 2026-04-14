@@ -1411,6 +1411,13 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @brief Checks whether the view is connected to the scene.
+   *
+   * @return true if the view is on scene, false otherwise
+   */
+  bool IsOnScene() const;
+
   // Signals
 
   /**

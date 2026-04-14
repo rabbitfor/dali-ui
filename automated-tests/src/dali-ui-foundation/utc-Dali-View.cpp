@@ -1637,3 +1637,25 @@ int UtcDaliViewStandaloneExcludedFromWrapContentP(void)
   DALI_TEST_EQUALS(size.GetHeight(), 30.0f, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliViewIsOnSceneP(void)
+{
+  UiTestApplication application;
+  View view = View::New();
+
+  DALI_TEST_CHECK(!view.IsOnScene());
+
+  application.GetScene().Add(view);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(view.IsOnScene());
+
+  application.GetScene().Remove(view);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!view.IsOnScene());
+
+  END_TEST;
+}
