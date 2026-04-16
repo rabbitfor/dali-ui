@@ -245,7 +245,7 @@ void ViewImpl::OnFocusLost()
 // State API
 // =============================================================================
 
-const UiState& ViewImpl::GetState() const
+const ViewState& ViewImpl::GetState() const
 {
   return mState;
 }
@@ -377,7 +377,7 @@ bool ViewImpl::UnsetStateHandlerWhenNotProcessing(const Dali::String& id)
   return static_cast<Internal::StateHandlerTrait&>(existing).GetImpl().UnsetWhenNotProcessing(id.CStr());
 }
 
-void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
+void ViewImpl::SetViewState(ViewState state, bool on, InputEvent cause)
 {
   // NOTE Orthogonal state constraint: Disabled is mutually exclusive with Focused and Pressed.
   // Clear them immediately rather than waiting for potentially late system events.
@@ -385,7 +385,7 @@ void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
   // NOTE that when the view is focused and user sets `view.SetEnabled(false)`,
   // the event squence will be: "Focused out" -> "Enabled changed".
 
-  UiState prev = mState;
+  ViewState prev = mState;
   if(on)
   {
     mState = mState + state;
@@ -399,7 +399,7 @@ void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
     // - FOCUSED can exist
     if(state.IsAnyDisabled())
     {
-      mState = mState - UiState::PRESSED;
+      mState = mState - ViewState::PRESSED;
     }
   }
   else
@@ -410,9 +410,9 @@ void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
     // This is the case that the focus has gone because it turned disabled.
     // (but disabled state hasn't dispatched yet)
     // -> Immediately update states at once.
-    if(state == UiState::FOCUSED && !IsEnabled())
+    if(state == ViewState::FOCUSED && !IsEnabled())
     {
-      mState = mState - UiState::PRESSED + UiState::DISABLED;
+      mState = mState - ViewState::PRESSED + ViewState::DISABLED;
     }
   }
 
@@ -424,7 +424,7 @@ void ViewImpl::SetViewState(UiState state, bool on, InputEvent cause)
 
 void ViewImpl::OnFocusChanged(bool focused, InputEvent cause)
 {
-  SetViewState(UiState::FOCUSED, focused, cause);
+  SetViewState(ViewState::FOCUSED, focused, cause);
 
   if(mInteractiveTrait)
   {
@@ -436,7 +436,7 @@ void ViewImpl::OnFocusChanged(bool focused, InputEvent cause)
 
 void ViewImpl::OnEnableChanged(bool enabled)
 {
-  SetViewState(UiState::DISABLED, !enabled);
+  SetViewState(ViewState::DISABLED, !enabled);
 
   if(mInteractiveTrait)
   {
