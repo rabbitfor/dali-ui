@@ -823,6 +823,19 @@ float InputFieldImpl::GetHeightForWidth(float width)
   return mController->GetHeightForWidth(width - (padding.start + padding.end)) + padding.top + padding.bottom;
 }
 
+void InputFieldImpl::OnFocusChanged(bool focused)
+{
+  if(focused)
+  {
+    OnFocusGained();
+  }
+  else
+  {
+    OnFocusLost();
+  }
+  ViewImpl::OnFocusChanged(focused);
+}
+
 void InputFieldImpl::OnFocusGained()
 {
   DALI_LOG_RELEASE_INFO("[%p]\n", mController.Get());
@@ -847,10 +860,6 @@ void InputFieldImpl::OnFocusGained()
   {
     mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
   }
-
-#if 0 // TODO Call ViewImpl::OnFocusChanged here to update state and emit signal
-  EmitFocusChangedSignal(true); // Calls back into the Control hence done last.
-#endif
 }
 
 void InputFieldImpl::OnFocusLost()
@@ -869,10 +878,6 @@ void InputFieldImpl::OnFocusLost()
   }
 
   mController->KeyboardFocusLostEvent();
-
-#if 0 // TODO Call ViewImpl::OnFocusChanged here to update state and emit signal
-  EmitFocusChangedSignal(false); // Calls back into the Control hence done last.
-#endif
 }
 
 void InputFieldImpl::OnSceneConnection(int depth)
