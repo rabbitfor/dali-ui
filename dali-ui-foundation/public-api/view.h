@@ -64,10 +64,7 @@ class Base;
 // Forward declarations
 class UiColor;
 
-namespace Integration
-{
 class ViewImpl;
-}
 
 #include "view.autogen.h"
 /**
@@ -1169,7 +1166,7 @@ public: // Not intended for application developers
    *
    * @param[in] implementation The View implementation
    */
-  explicit DALI_UI_API View(Integration::ViewImpl& implementation);
+  explicit DALI_UI_API View(ViewImpl& implementation);
 
   /**
    * @brief Allows the creation of this View from an Internal::CustomActor pointer.

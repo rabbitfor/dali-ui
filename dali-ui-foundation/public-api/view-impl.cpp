@@ -42,10 +42,9 @@
 #include <dali-ui-foundation/devel-api/visuals/visual-actions-devel.h>
 #include <dali-ui-foundation/integration-api/layouts/layout-impl.h>
 #include <dali-ui-foundation/integration-api/layouts/layout-manager.h>
-#include <dali-ui-foundation/integration-api/trait-id.h>
+#include <dali-ui-foundation/integration-api/reserved-trait-id.h>
 #include <dali-ui-foundation/integration-api/trait-impl.h>
 #include <dali-ui-foundation/integration-api/ui-config-manager.h>
-#include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/internal/focus-manager/focus-manager-impl.h>
 #include <dali-ui-foundation/internal/focus-manager/keyinput-focus-manager.h>
 #include <dali-ui-foundation/internal/layouts/layout-callbacks-trait.h>
@@ -65,8 +64,10 @@
 #include <dali-ui-foundation/public-api/image-view.h>
 #include <dali-ui-foundation/public-api/layouts/layout-params.h>
 #include <dali-ui-foundation/public-api/render-effects/render-effect.h>
+#include <dali-ui-foundation/public-api/trait-id.h>
 #include <dali-ui-foundation/public-api/ui-color-manager.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
+#include <dali-ui-foundation/public-api/view-impl.h>
 #include <dali-ui-foundation/public-api/view.h>
 #include <dali-ui-foundation/public-api/visuals/color-visual-properties.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
@@ -90,9 +91,6 @@ namespace
 thread_local bool gAllowNonViewChild = false;
 
 } // namespace
-
-namespace Integration
-{
 
 namespace
 {
@@ -128,7 +126,7 @@ BaseHandle Create()
 }
 
 // Type Registration
-DALI_TYPE_REGISTRATION_BEGIN(Ui::Integration::ViewImpl, Ui::View, Create)
+DALI_TYPE_REGISTRATION_BEGIN(Ui::ViewImpl, Ui::View, Create)
 DALI_TYPE_REGISTRATION_END()
 
 inline bool FloatEqual(float a, float b, float epsilon = 0.001f)
@@ -171,7 +169,7 @@ void RegisterViewAccessibleGetter()
         return {nullptr, true};
       }
 
-      auto& viewImpl = Integration::GetImpl(view);
+      auto& viewImpl = GetImpl(view);
       if(Dali::Ui::Internal::ViewDataImpl::Get(viewImpl).IsCreateAccessibleEnabled())
       {
         return {std::shared_ptr<ViewAccessible>(viewImpl.CreateAccessibleObject()), true};
@@ -250,7 +248,7 @@ ViewImpl::ViewImpl()
     static_cast<int>(Dali::CustomActorImpl::DISABLE_SIZE_NEGOTIATION))),
   mImpl(new Internal::ViewDataImpl(*this))
 {
-  mImpl->mFlags = static_cast<Ui::Integration::ViewImpl::ViewBehaviour>(
+  mImpl->mFlags = static_cast<Ui::ViewImpl::ViewBehaviour>(
     static_cast<int>(VIEW_BEHAVIOUR_DEFAULT) |
     static_cast<int>(Dali::CustomActorImpl::DISABLE_SIZE_NEGOTIATION));
 }
@@ -334,20 +332,20 @@ ViewImpl::StateChangedSignalType& ViewImpl::StateChangedSignal()
 
 Ui::InteractiveTrait ViewImpl::EnsureInteractiveTrait()
 {
-  Trait existing = GetTrait(ReservedTraitId::INTERACTION_TRAIT);
+  Trait existing = GetTrait(Integration::ReservedTraitId::INTERACTION_TRAIT);
 
   if(!existing)
   {
     Ui::InteractiveTrait interaction = Ui::InteractiveTrait::New();
-    SetTrait(ReservedTraitId::INTERACTION_TRAIT, interaction);
+    SetTrait(Integration::ReservedTraitId::INTERACTION_TRAIT, interaction);
 
     // Apply interaction effect only if the user has not already set one explicitly.
-    if(!GetTrait(ReservedTraitId::INTERACTION_EFFECT))
+    if(!GetTrait(Integration::ReservedTraitId::INTERACTION_EFFECT))
     {
-      Trait defaultEffect = UiConfigManager::Get().GetConfig().GetDefaultInteractionEffect();
+      Trait defaultEffect = Integration::UiConfigManager::Get().GetConfig().GetDefaultInteractionEffect();
       if(defaultEffect)
       {
-        SetTrait(ReservedTraitId::INTERACTION_EFFECT, defaultEffect);
+        SetTrait(Integration::ReservedTraitId::INTERACTION_EFFECT, defaultEffect);
       }
     }
 
@@ -363,27 +361,27 @@ void ViewImpl::SetInteractionEffect(Trait effect)
 {
   if(effect)
   {
-    SetTrait(ReservedTraitId::INTERACTION_EFFECT, effect);
+    SetTrait(Integration::ReservedTraitId::INTERACTION_EFFECT, effect);
   }
   else
   {
-    RemoveTrait(ReservedTraitId::INTERACTION_EFFECT);
+    RemoveTrait(Integration::ReservedTraitId::INTERACTION_EFFECT);
   }
 }
 
 bool ViewImpl::IsInteractive() const
 {
-  return !!GetTrait(ReservedTraitId::INTERACTION_TRAIT);
+  return !!GetTrait(Integration::ReservedTraitId::INTERACTION_TRAIT);
 }
 
 Ui::SelectableTrait ViewImpl::EnsureSelectableTrait()
 {
-  Trait existing = GetTrait(ReservedTraitId::SELECTABLE_TRAIT);
+  Trait existing = GetTrait(Integration::ReservedTraitId::SELECTABLE_TRAIT);
 
   if(!existing)
   {
     Ui::SelectableTrait selectable = Ui::SelectableTrait::New();
-    SetTrait(ReservedTraitId::SELECTABLE_TRAIT, selectable);
+    SetTrait(Integration::ReservedTraitId::SELECTABLE_TRAIT, selectable);
     return selectable;
   }
 
@@ -394,17 +392,17 @@ Ui::SelectableTrait ViewImpl::EnsureSelectableTrait()
 
 bool ViewImpl::IsSelectable() const
 {
-  return !!GetTrait(ReservedTraitId::SELECTABLE_TRAIT);
+  return !!GetTrait(Integration::ReservedTraitId::SELECTABLE_TRAIT);
 }
 
 void ViewImpl::SetNamedStateHandler(const Dali::String& id, Dali::ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
-  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
+  Trait existing = GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT);
 
   if(!existing)
   {
     Internal::StateHandlerTrait stateHandlerTrait = Internal::StateHandlerTrait::New();
-    SetTrait(ReservedTraitId::STATE_HANDLER_TRAIT, stateHandlerTrait);
+    SetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT, stateHandlerTrait);
     existing = stateHandlerTrait;
   }
 
@@ -413,7 +411,7 @@ void ViewImpl::SetNamedStateHandler(const Dali::String& id, Dali::ConnectionTrac
 
 bool ViewImpl::UnsetStateHandler(const Dali::String& id)
 {
-  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
+  Trait existing = GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT);
   if(!existing)
   {
     return false;
@@ -424,7 +422,7 @@ bool ViewImpl::UnsetStateHandler(const Dali::String& id)
 
 bool ViewImpl::UnsetStateHandlerWhenNotProcessing(const Dali::String& id)
 {
-  Trait existing = GetTrait(ReservedTraitId::STATE_HANDLER_TRAIT);
+  Trait existing = GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT);
   if(!existing)
   {
     return false;
@@ -827,7 +825,7 @@ MeasuredSize ViewImpl::OnMeasure(float widthConstraint, float heightConstraint)
     float maxBottom = 0.0f;
     for(auto& childData : mImpl->mChildren)
     {
-      ViewImpl& childImpl = Integration::GetImpl(childData.view);
+      ViewImpl& childImpl = GetImpl(childData.view);
 
       // Standalone children are measured by MeasureStandaloneChildren()
       // in ViewImpl::Measure() after OnMeasure returns.
@@ -944,7 +942,7 @@ MeasuredSize ViewImpl::OnArrange(const LayoutRect& bounds)
 
     for(auto& childData : mImpl->mChildren)
     {
-      ViewImpl& childImpl = Integration::GetImpl(childData.view);
+      ViewImpl& childImpl = GetImpl(childData.view);
 
       // Standalone children are handled by ArrangeStandaloneChildren()
       // in ViewImpl::Arrange() after OnArrange returns.
@@ -993,7 +991,7 @@ void ViewImpl::MeasureStandaloneChildren(float effectiveWidth, float effectiveHe
 {
   for(auto& childData : mImpl->mChildren)
   {
-    ViewImpl& childImpl = Integration::GetImpl(childData.view);
+    ViewImpl& childImpl = GetImpl(childData.view);
     if(!childImpl.IsLayoutModeStandalone())
     {
       continue;
@@ -1011,7 +1009,7 @@ void ViewImpl::ArrangeStandaloneChildren(const LayoutRect& bounds)
 {
   for(auto& childData : mImpl->mChildren)
   {
-    ViewImpl& childImpl = Integration::GetImpl(childData.view);
+    ViewImpl& childImpl = GetImpl(childData.view);
     if(!childImpl.IsLayoutModeStandalone())
     {
       continue;
@@ -1029,14 +1027,14 @@ void ViewImpl::InvalidateMeasure()
   Ui::Layout parentLayout = GetParentLayout();
   if(parentLayout)
   {
-    Integration::GetImpl(parentLayout).InvalidateMeasure();
+    GetImpl(parentLayout).InvalidateMeasure();
     return;
   }
 
   Ui::View parentView = GetParentView();
   if(parentView)
   {
-    Integration::GetImpl(parentView).InvalidateMeasure();
+    GetImpl(parentView).InvalidateMeasure();
     return;
   }
 
@@ -1050,7 +1048,7 @@ void ViewImpl::InvalidateArrange()
   Ui::Layout parentLayout = GetParentLayout();
   if(parentLayout)
   {
-    Integration::GetImpl(parentLayout).InvalidateArrange();
+    GetImpl(parentLayout).InvalidateArrange();
     return;
   }
 
@@ -1058,7 +1056,7 @@ void ViewImpl::InvalidateArrange()
   Ui::View parentView = GetParentView();
   if(parentView)
   {
-    Integration::GetImpl(parentView).InvalidateArrange();
+    GetImpl(parentView).InvalidateArrange();
     return;
   }
 
@@ -1286,7 +1284,7 @@ void ViewImpl::Insert(uint32_t index, Ui::View child)
 
   // Invalidate the child's measure cache — its previous cache was computed
   // under a different parent's constraints and is no longer reliable.
-  Integration::GetImpl(child).InvalidateMeasure();
+  GetImpl(child).InvalidateMeasure();
 }
 
 void ViewImpl::RemoveAllChildren()
@@ -1297,7 +1295,7 @@ void ViewImpl::RemoveAllChildren()
     {
       // Invalidate each child's measure cache so that re-parented children
       // are re-measured under the new parent's constraints.
-      Integration::GetImpl(childData.view).InvalidateMeasure();
+      GetImpl(childData.view).InvalidateMeasure();
       Self().Remove(childData.view);
     }
   }
@@ -1344,7 +1342,7 @@ void ViewImpl::Raise(Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.Raise();
       return;
     }
@@ -1360,7 +1358,7 @@ void ViewImpl::Lower(Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.Lower();
       return;
     }
@@ -1376,7 +1374,7 @@ void ViewImpl::RaiseToTop(Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.RaiseToTop();
       return;
     }
@@ -1392,7 +1390,7 @@ void ViewImpl::LowerToBottom(Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.LowerToBottom();
       return;
     }
@@ -1412,7 +1410,7 @@ void ViewImpl::RaiseAbove(Ui::View target, Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.RaiseAbove(target);
       return;
     }
@@ -1432,7 +1430,7 @@ void ViewImpl::LowerBelow(Ui::View target, Ui::LayoutOrderPolicy policy)
     Ui::View parent = Ui::View::DownCast(self.GetParent());
     if(parent)
     {
-      ScopedSkipChildrenUpdate guard(Integration::GetImpl(parent).mImpl->mSkipChildrenUpdate);
+      ScopedSkipChildrenUpdate guard(GetImpl(parent).mImpl->mSkipChildrenUpdate);
       self.LowerBelow(target);
       return;
     }
@@ -1458,16 +1456,16 @@ TraitId ToTraitId(LayoutParamsType type)
   switch(type)
   {
     case LayoutParamsType::ABSOLUTE:
-      return ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
+      return Integration::ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
     case LayoutParamsType::STACK:
-      return ReservedTraitId::STACK_LAYOUT_PARAMS;
+      return Integration::ReservedTraitId::STACK_LAYOUT_PARAMS;
     case LayoutParamsType::GRID:
-      return ReservedTraitId::GRID_LAYOUT_PARAMS;
+      return Integration::ReservedTraitId::GRID_LAYOUT_PARAMS;
     case LayoutParamsType::FLEX:
-      return ReservedTraitId::FLEX_LAYOUT_PARAMS;
+      return Integration::ReservedTraitId::FLEX_LAYOUT_PARAMS;
   }
   DALI_ASSERT_ALWAYS(false && "Unknown LayoutParamsType");
-  return ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
+  return Integration::ReservedTraitId::ABSOLUTE_LAYOUT_PARAMS;
 }
 
 } // unnamed namespace
@@ -1492,12 +1490,12 @@ ViewImpl::ViewImpl(ViewBehaviour behaviourFlags)
 : CustomActorImpl(static_cast<ActorFlags>(behaviourFlags)),
   mImpl(new Internal::ViewDataImpl(*this))
 {
-  mImpl->mFlags = static_cast<Ui::Integration::ViewImpl::ViewBehaviour>(behaviourFlags);
+  mImpl->mFlags = static_cast<Ui::ViewImpl::ViewBehaviour>(behaviourFlags);
 }
 
 void ViewImpl::Initialize()
 {
-  if(!(mImpl->mFlags & Ui::Integration::ViewImpl::ViewBehaviour::DISABLE_VISUALS))
+  if(!(mImpl->mFlags & Ui::ViewImpl::ViewBehaviour::DISABLE_VISUALS))
   {
     mImpl->InitializeVisualData();
   }
@@ -1507,7 +1505,7 @@ void ViewImpl::Initialize()
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 
-  if(mImpl->mFlags & Ui::Integration::ViewImpl::ViewBehaviour::REQUIRES_KEY_NAVIGATION_SUPPORT)
+  if(mImpl->mFlags & Ui::ViewImpl::ViewBehaviour::REQUIRES_KEY_NAVIGATION_SUPPORT)
   {
     SetKeyNavigationSupport(true);
   }
@@ -1806,7 +1804,7 @@ void ViewImpl::OnChildAdd(Actor& child)
     // Invalidate the child's measure cache — its previous cache was computed
     // under a different parent's constraints and is no longer reliable.
     // This also propagates to the parent (this) via InvalidateMeasure chain.
-    Integration::GetImpl(view).InvalidateMeasure();
+    GetImpl(view).InvalidateMeasure();
   }
   else
   {
@@ -1840,7 +1838,7 @@ void ViewImpl::OnChildRemove(Actor& child)
       // re-measured when re-parented to a different container.
       // Note: Actor parent-child relationship is already severed at this
       // point, so child's InvalidateMeasure cannot propagate to us.
-      Integration::GetImpl(view).InvalidateMeasure();
+      GetImpl(view).InvalidateMeasure();
       mImpl->mChildren.Erase(it);
       InvalidateMeasure();
     }
@@ -2074,8 +2072,6 @@ Dali::Vector<Accessibility::Relation> ViewImpl::GetAccessibilityRelations()
 
   return result;
 }
-
-} // namespace Integration
 
 namespace IntegrationView
 {

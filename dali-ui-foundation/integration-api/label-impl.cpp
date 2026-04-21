@@ -1124,7 +1124,7 @@ void LabelImpl::OnInitialize()
 
   mVisual   = Ui::VisualFactory::Get().CreateVisual(propertyMap);
   View view = Ui::View::DownCast(self);
-  Internal::ViewDataImpl::Get(Integration::GetImpl(view)).RegisterVisual(Text::LabelPropertyIndex::TEXT, mVisual, DepthIndex::CONTENT);
+  Internal::ViewDataImpl::Get(GetImpl(view)).RegisterVisual(Text::LabelPropertyIndex::TEXT, mVisual, DepthIndex::CONTENT);
 
   Internal::TextVisual::SetAsyncTextInterface(mVisual, this);
   Internal::TextVisual::SetAnimatableTextColorProperty(mVisual, Text::LabelPropertyIndex::TEXT_COLOR);
@@ -1473,7 +1473,7 @@ void LabelImpl::OnAnimateAnimatableProperty(Animation& animation, Dali::Property
 
     Internal::TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Integration::ViewImpl::OnAnimateAnimatableProperty(animation, index, state);
+  ViewImpl::OnAnimateAnimatableProperty(animation, index, state);
 }
 
 void LabelImpl::OnConstraintAnimatableProperty(Constraint& constraint, Dali::Property::Index index, bool applied)
@@ -1494,7 +1494,7 @@ void LabelImpl::OnConstraintAnimatableProperty(Constraint& constraint, Dali::Pro
 
     Internal::TextVisual::SetConstraintApplyAlways(mVisual, mTextColorAnimatedCount > 0);
   }
-  Integration::ViewImpl::OnConstraintAnimatableProperty(constraint, index, applied);
+  ViewImpl::OnConstraintAnimatableProperty(constraint, index, applied);
 }
 
 // =============================================================================
@@ -2109,7 +2109,7 @@ void LabelImpl::SetViewBackgroundEnabled(bool enabled)
 {
   View view = Ui::View::DownCast(Self());
   // Avoid unnecessary updates when no background visual exists.
-  if(!Internal::ViewDataImpl::Get(Integration::GetImpl(view)).GetVisual(Ui::View::Property::BACKGROUND))
+  if(!Internal::ViewDataImpl::Get(GetImpl(view)).GetVisual(Ui::View::Property::BACKGROUND))
   {
     return;
   }
@@ -2117,7 +2117,7 @@ void LabelImpl::SetViewBackgroundEnabled(bool enabled)
   if(mIsViewBackgroundEnabled != enabled)
   {
     mIsViewBackgroundEnabled = enabled;
-    Internal::ViewDataImpl::Get(Integration::GetImpl(view)).EnableVisual(Ui::View::Property::BACKGROUND, enabled);
+    Internal::ViewDataImpl::Get(GetImpl(view)).EnableVisual(Ui::View::Property::BACKGROUND, enabled);
   }
 }
 

@@ -80,20 +80,20 @@ private:
   GridLayoutImpl& operator=(GridLayout&&)          = delete;
 };
 
-inline Integration::GridLayoutImpl& GetImpl(Ui::GridLayout& layout)
+} // namespace Integration
+
+inline Integration::GridLayoutImpl& GetImpl(GridLayout& layout)
 {
   DALI_ASSERT_ALWAYS(layout);
   Dali::RefObject& handle = layout.GetImplementation();
   return static_cast<Integration::GridLayoutImpl&>(handle);
 }
 
-inline const Integration::GridLayoutImpl& GetImpl(const Ui::GridLayout& layout)
+inline const Integration::GridLayoutImpl& GetImpl(const GridLayout& layout)
 {
   DALI_ASSERT_ALWAYS(layout);
   const Dali::RefObject& handle = layout.GetImplementation();
   return static_cast<const Integration::GridLayoutImpl&>(handle);
 }
-
-} // namespace Integration
 } // namespace Ui
 } // namespace Dali
