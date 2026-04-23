@@ -351,6 +351,26 @@ public: // Non-virtual API (safe to reorder / extend)
   void SetScaleY(float scaleY);
 
   /**
+   * @copydoc Ui::View::SetLayoutDirection()
+   */
+  void SetLayoutDirection(Dali::LayoutDirection::Type direction);
+
+  /**
+   * @copydoc Ui::View::ClearLayoutDirection()
+   */
+  void ClearLayoutDirection();
+
+  /**
+   * @copydoc Ui::View::IsLayoutDirectionInherited()
+   */
+  bool IsLayoutDirectionInherited() const;
+
+  /**
+   * @copydoc Ui::View::GetAdjustedLayoutDirection()
+   */
+  Dali::LayoutDirection::Type GetAdjustedLayoutDirection() const;
+
+  /**
    * @copydoc Ui::View::IsVisible()
    */
   bool IsVisible() const;
