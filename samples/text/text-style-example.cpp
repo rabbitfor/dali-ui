@@ -205,13 +205,13 @@ private:
 
   void PrintTextBackgroundColorInfo(Label label, const char* title)
   {
-    const Vector4 color = label.GetTextBackgroundColor().Resolve();
+    const Vector4 color = label.GetTextBackgroundColor().GetRgba();
     DALI_LOG_ERROR("%s - R:%f G:%f B:%f A:%f\n", title, color.r, color.g, color.b, color.a);
   }
 
   void PrintTextBackgroundColorInfo(InputField inputField, const char* title)
   {
-    const Vector4 color = inputField.GetTextBackgroundColor().Resolve();
+    const Vector4 color = inputField.GetTextBackgroundColor().GetRgba();
     DALI_LOG_ERROR("%s - R:%f G:%f B:%f A:%f\n", title, color.r, color.g, color.b, color.a);
   }
 

@@ -437,7 +437,7 @@ private:
   {
     if(touch.GetState(0) == PointState::UP)
     {
-      Vector4 currentColor = mInputField.GetPlaceholderColor().Resolve();
+      Vector4 currentColor = mInputField.GetPlaceholderColor().GetRgba();
       if(currentColor == UiColor(COLOR_DARK_GRAY))
       {
         mInputField.SetPlaceholderColor(UiColor(COLOR_LIGHT_BLUE));
@@ -460,7 +460,7 @@ private:
   {
     if(touch.GetState(0) == PointState::UP)
     {
-      Vector4 currentColor = mInputField.GetSelectionColor().Resolve();
+      Vector4 currentColor = mInputField.GetSelectionColor().GetRgba();
       if(currentColor == UiColor(COLOR_LIGHT_BLUE))
       {
         mInputField.SetSelectionColor(UiColor(COLOR_CYAN));
@@ -638,10 +638,10 @@ private:
 
   void PrintInputFieldInfo()
   {
-    Vector4 textColor        = mInputField.GetTextColor().Resolve();
-    Vector4 placeholderColor = mInputField.GetPlaceholderColor().Resolve();
-    Vector4 cursorColor      = mInputField.GetCursorColor().Resolve();
-    Vector4 selectionColor   = mInputField.GetSelectionColor().Resolve();
+    Vector4 textColor        = mInputField.GetTextColor().GetRgba();
+    Vector4 placeholderColor = mInputField.GetPlaceholderColor().GetRgba();
+    Vector4 cursorColor      = mInputField.GetCursorColor().GetRgba();
+    Vector4 selectionColor   = mInputField.GetSelectionColor().GetRgba();
 
     DALI_LOG_ERROR("----------------------------------------------------------------\n");
     DALI_LOG_ERROR("InputField Info\n");

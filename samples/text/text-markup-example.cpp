@@ -82,8 +82,8 @@ private:
 
   void PrintLabelInfo(Label label, const char* title)
   {
-    Vector4 anchorColor = label.GetAnchorColor().Resolve();
-    Vector4 anchorClickedColor = label.GetAnchorClickedColor().Resolve();
+    Vector4 anchorColor = label.GetAnchorColor().GetRgba();
+    Vector4 anchorClickedColor = label.GetAnchorClickedColor().GetRgba();
 
     DALI_LOG_ERROR("----------------------------------------------------------------\n");
     DALI_LOG_ERROR("%s\n", title);

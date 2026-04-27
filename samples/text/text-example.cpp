@@ -277,7 +277,7 @@ private:
 
   void PrintLabelInfo(Label label, const char* title)
   {
-    Vector4 textColor = label.GetTextColor().Resolve();
+    Vector4 textColor = label.GetTextColor().GetRgba();
 
     DALI_LOG_ERROR("----------------------------------------------------------------\n");
     DALI_LOG_ERROR("%s\n", title);
@@ -300,10 +300,10 @@ private:
 
   void PrintInputFieldInfo(InputField field, const char* title)
   {
-    Vector4 textColor = field.GetTextColor().Resolve();
-    Vector4 placeholderColor = field.GetPlaceholderColor().Resolve();
-    Vector4 cursorColor = field.GetCursorColor().Resolve();
-    Vector4 selectionColor = field.GetSelectionColor().Resolve();
+    Vector4 textColor = field.GetTextColor().GetRgba();
+    Vector4 placeholderColor = field.GetPlaceholderColor().GetRgba();
+    Vector4 cursorColor = field.GetCursorColor().GetRgba();
+    Vector4 selectionColor = field.GetSelectionColor().GetRgba();
 
     DALI_LOG_ERROR("----------------------------------------------------------------\n");
     DALI_LOG_ERROR("%s\n", title);
@@ -359,7 +359,7 @@ private:
 
   void ToggleColor()
   {
-    const bool isLightColor = (mLabel.GetTextColor().Resolve() == UiColor(COLOR_DARK_TEXT));
+    const bool isLightColor = (mLabel.GetTextColor().GetRgba() == UiColor(COLOR_DARK_TEXT));
     if(isLightColor)
     {
       ApplyDarkColor();
