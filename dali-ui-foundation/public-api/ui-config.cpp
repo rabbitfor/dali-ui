@@ -296,5 +296,16 @@ bool UiConfig::IsLabelAsyncRendering() const
   return GetImpl(*this).IsLabelAsyncRendering();
 }
 
+UiConfig& UiConfig::SetDefaultInteractiveViewEffect(StateEffect effect)
+{
+  GetImpl(*this).SetDefaultInteractiveViewEffect(effect);
+  return *this;
+}
+
+StateEffect UiConfig::GetDefaultInteractiveViewEffect() const
+{
+  return GetImpl(*this).GetDefaultInteractiveViewEffect();
+}
+
 } // namespace Ui
 } // namespace Dali

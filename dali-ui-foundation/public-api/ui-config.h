@@ -26,8 +26,8 @@
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <dali-ui-foundation/public-api/key-click-policy.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/text/text-enumerations.h>
-#include <dali-ui-foundation/public-api/trait-object.h>
 
 namespace Dali
 {
@@ -543,6 +543,22 @@ public: // Properties
    * @return True if asynchronous rendering is enabled for Label by default
    */
   bool IsLabelAsyncRendering() const;
+
+  /**
+   * @brief Sets the default interactive view effect applied to views when AsInteractive() is called.
+   *
+   * @pre The config must not be frozen.
+   * @param[in] effect A StateEffect, or StateEffect{} to disable the default
+   * @return Reference to this for method chaining
+   */
+  UiConfig& SetDefaultInteractiveViewEffect(StateEffect effect);
+
+  /**
+   * @brief Returns the default interactive view effect.
+   *
+   * @return The default interactive view effect, or StateEffect{} if none is set
+   */
+  StateEffect GetDefaultInteractiveViewEffect() const;
 
   // @CHAIN_END
 

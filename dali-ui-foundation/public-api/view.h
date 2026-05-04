@@ -21,7 +21,6 @@
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/object/base-handle.h>
 #include <functional>
 #include <initializer_list>
 
@@ -33,8 +32,8 @@
 #include <dali-ui-foundation/public-api/layouts/layout-params.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
 #include <dali-ui-foundation/public-api/selectable-trait.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/state-event.h>
-#include <dali-ui-foundation/public-api/trait-object.h>
 #include <dali-ui-foundation/public-api/ui-scale-policy.h>
 #include <dali-ui-foundation/public-api/unique-any.h>
 #include <dali-ui-foundation/public-api/view-focus-enums.h>
@@ -1205,6 +1204,63 @@ public: // Properties
     View::SetAttachment(id, UniqueAny(Dali::Move(data)));
     return *this;
   }
+
+  /**
+   * @brief Sets a state effect on this view.
+   *
+   * The effect is applied when the view becomes interactive (via AsInteractive()).
+   * If the view is already interactive, the effect is applied immediately.
+   *
+   * The effect object is shared by reference. Pass StateEffect{} to remove the
+   * current effect.
+   *
+   * If this method is called before AsInteractive(), the explicitly set effect
+   * takes priority over the UiConfig default.
+   *
+   * @param[in] effect A StateEffect, or StateEffect{} to remove
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffect(StateEffect effect);
+
+  /**
+   * @brief Sets the primary target used by state effects.
+   *
+   * The target must be this View or one of its descendants. State effect
+   * implementations may use this target instead of the owner View.
+   *
+   * @param[in] target The primary target View, or an empty View to clear
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffectPrimaryTarget(View target);
+
+  /**
+   * @brief Gets the primary target used by state effects.
+   *
+   * If no primary target has been set, this View is returned.
+   *
+   * @return The primary target View
+   */
+  View GetStateEffectPrimaryTarget() const;
+
+  /**
+   * @brief Sets the secondary target used by state effects.
+   *
+   * The target must be this View or one of its descendants. State effect
+   * implementations may use this as an additional target.
+   *
+   * @param[in] target The secondary target View, or an empty View to clear
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffectSecondaryTarget(View target);
+
+  /**
+   * @brief Gets the secondary target used by state effects.
+   *
+   * If no secondary target has been set, an empty View is returned.
+   *
+   * @return The secondary target View, or an empty View
+   */
+  View GetStateEffectSecondaryTarget() const;
 
   // @CHAIN_END
 

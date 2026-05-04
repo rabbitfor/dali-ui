@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/default-theme-loader.h>
 #include <dali-ui-foundation/integration-api/ui-config-impl.h>
+#include <dali-ui-foundation/public-api/overlay-effect.h>
 
 namespace
 {
@@ -52,7 +53,8 @@ namespace Integration
 {
 
 UiConfigImpl::UiConfigImpl()
-: mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
+: mDefaultInteractiveViewEffect(OverlayEffect::Default()),
+  mExecutionKeyPredicate(DefaultExecutionKeyPredicate),
   mDefaultTextColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f)),
   mDefaultPlaceholderTextColor(Vector4(0.8f, 0.8f, 0.8f, 0.8f)),
   mScalingFactor(1.0f),
@@ -356,6 +358,17 @@ void UiConfigImpl::SetLabelAsyncRendering(bool asyncRendering)
 bool UiConfigImpl::IsLabelAsyncRendering() const
 {
   return mLabelAsyncRendering;
+}
+
+void UiConfigImpl::SetDefaultInteractiveViewEffect(StateEffect effect)
+{
+  DALI_ASSERT_ALWAYS(!mFrozen && "UiConfig is frozen after UiConfig::Apply()");
+  mDefaultInteractiveViewEffect = effect;
+}
+
+StateEffect UiConfigImpl::GetDefaultInteractiveViewEffect() const
+{
+  return mDefaultInteractiveViewEffect;
 }
 
 void UiConfigImpl::OnApplied()

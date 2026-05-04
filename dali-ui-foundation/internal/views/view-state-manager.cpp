@@ -22,7 +22,10 @@
 #include <dali/public-api/actors/actor.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/reserved-trait-id.h>
+#include <dali-ui-foundation/integration-api/view-integ.h>
 #include <dali-ui-foundation/internal/state-event-impl.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/state-event.h>
 #include <dali-ui-foundation/public-api/view-impl.h>
 
@@ -78,15 +81,29 @@ void ViewStateManager::NotifyStateChanged(Ui::View view, ViewState prev, ViewSta
     {
       ViewImpl& impl = GetImpl(n.view);
 
-      if(impl.StateChangedSignal().Empty())
+      IntrusivePtr<TraitObject> object = IntegrationView::GetTrait(impl, Integration::ReservedTraitId::STATE_EFFECT);
+      DALI_ASSERT_DEBUG(!object || (dynamic_cast<StateEffectObject*>(object.Get()) && "STATE_EFFECT trait must be a StateEffectObject"));
+
+      auto* stateEffect = object ? static_cast<StateEffectObject*>(object.Get()) : nullptr;
+      if(stateEffect || !impl.StateChangedSignal().Empty())
+      {
+        Internal::StateEventImplPtr stateEventImpl = Internal::StateEventImpl::New(n.prev, n.next, n.cause);
+        StateEvent                  stateEvent(stateEventImpl.Get());
+
+        if(stateEffect)
+        {
+          stateEffect->OnViewStateChanged(n.view, stateEvent);
+        }
+
+        if(!impl.StateChangedSignal().Empty())
+        {
+          impl.StateChangedSignal().Emit(n.view, stateEvent);
+        }
+      }
+      else
       {
         continue;
       }
-
-      Internal::StateEventImplPtr stateEventImpl = Internal::StateEventImpl::New(n.prev, n.next, n.cause);
-      StateEvent                  stateEvent(stateEventImpl.Get());
-
-      impl.StateChangedSignal().Emit(n.view, stateEvent);
     }
   }
 }

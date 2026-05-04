@@ -51,6 +51,7 @@
 #include <dali-ui-foundation/internal/layouts/layout-params-impl.h>
 #include <dali-ui-foundation/internal/render-effects/render-effect-impl.h>
 #include <dali-ui-foundation/internal/ui-color-manager-impl.h>
+#include <dali-ui-foundation/internal/views/state-effect-target-object.h>
 #include <dali-ui-foundation/internal/views/state-handler-trait.h>
 #include <dali-ui-foundation/internal/views/view-state-manager.h>
 #include <dali-ui-foundation/internal/views/view/view-accessibility-data.h>
@@ -91,6 +92,51 @@ namespace
 /// Used by IntegrationView::AddActorChild. Thread-local because Actor::Add invokes
 /// OnChildAdd synchronously on the same (event) thread.
 thread_local bool gAllowNonViewChild = false;
+
+bool IsSelfOrDescendant(View owner, View target)
+{
+  if(!owner || !target)
+  {
+    return false;
+  }
+
+  const int32_t ownerId  = owner.GetProperty<int32_t>(Actor::Property::ID);
+  const int32_t targetId = target.GetProperty<int32_t>(Actor::Property::ID);
+  return ownerId == targetId || owner.FindChildById(targetId);
+}
+
+Internal::StateEffectTargetObject* GetStateEffectTargetObject(const ViewImpl& viewImpl)
+{
+  IntrusivePtr<TraitObject> object = IntegrationView::GetTrait(viewImpl, Integration::ReservedTraitId::STATE_EFFECT_TARGET);
+  return dynamic_cast<Internal::StateEffectTargetObject*>(object.Get());
+}
+
+Internal::StateEffectTargetObject* GetOrCreateStateEffectTargetObject(ViewImpl& viewImpl)
+{
+  auto* object = GetStateEffectTargetObject(viewImpl);
+  if(!object)
+  {
+    IntrusivePtr<TraitObject> newObject(new Internal::StateEffectTargetObject());
+    object = static_cast<Internal::StateEffectTargetObject*>(newObject.Get());
+    IntegrationView::SetTrait(viewImpl, Integration::ReservedTraitId::STATE_EFFECT_TARGET, newObject);
+  }
+  return object;
+}
+
+View FindStateEffectTarget(View owner, int32_t targetId)
+{
+  if(!owner || targetId == Internal::StateEffectTargetObject::INVALID_TARGET_ID)
+  {
+    return View();
+  }
+
+  if(owner.GetProperty<int32_t>(Actor::Property::ID) == targetId)
+  {
+    return owner;
+  }
+
+  return View::DownCast(owner.FindChildById(targetId));
+}
 
 IntrusivePtr<TraitObject> ToTraitObject(BaseHandle handle)
 {
@@ -253,6 +299,12 @@ HandleType GetTraitHandle(const ViewImpl& viewImpl, TraitId id)
   IntrusivePtr<TraitObject> object   = IntegrationView::GetTrait(viewImpl, id);
   auto*                   baseObject = dynamic_cast<BaseObject*>(object.Get());
   return baseObject ? HandleType::DownCast(BaseHandle(baseObject)) : HandleType();
+}
+
+StateEffect GetStateEffectTrait(const ViewImpl& viewImpl)
+{
+  IntrusivePtr<TraitObject> object = IntegrationView::GetTrait(viewImpl, Integration::ReservedTraitId::STATE_EFFECT);
+  return StateEffect(dynamic_cast<StateEffectObject*>(object.Get()));
 }
 
 // Arranges a standalone MATCH_PARENT child within its parent.
@@ -426,10 +478,76 @@ Ui::InteractiveTrait ViewImpl::EnsureInteractiveTrait()
   {
     Ui::InteractiveTrait interaction = Ui::InteractiveTrait::New();
     IntegrationView::SetTrait(*this, Integration::ReservedTraitId::INTERACTION_TRAIT, ToTraitObject(interaction));
+
+    if(!GetStateEffectTrait(*this))
+    {
+      StateEffect defaultEffect = Integration::UiConfigManager::Get().GetConfig().GetDefaultInteractiveViewEffect();
+      if(defaultEffect)
+      {
+        IntegrationView::SetTrait(*this, Integration::ReservedTraitId::STATE_EFFECT, defaultEffect);
+      }
+    }
+
     return interaction;
   }
 
   return existing;
+}
+
+void ViewImpl::SetStateEffect(StateEffect effect)
+{
+  if(effect)
+  {
+    IntegrationView::SetTrait(*this, Integration::ReservedTraitId::STATE_EFFECT, effect);
+  }
+  else
+  {
+    IntegrationView::RemoveTrait(*this, Integration::ReservedTraitId::STATE_EFFECT);
+  }
+}
+
+void ViewImpl::SetStateEffectPrimaryTarget(View target)
+{
+  View owner = View::DownCast(Self());
+  if(target)
+  {
+    DALI_ASSERT_ALWAYS(IsSelfOrDescendant(owner, target) && "State effect primary target must be this View or a descendant");
+  }
+
+  auto* object = GetOrCreateStateEffectTargetObject(*this);
+  object->SetPrimaryTargetId(target ? target.GetProperty<int32_t>(Actor::Property::ID) : Internal::StateEffectTargetObject::INVALID_TARGET_ID);
+}
+
+View ViewImpl::GetStateEffectPrimaryTarget() const
+{
+  View  owner  = View::DownCast(Self());
+  auto* object = GetStateEffectTargetObject(*this);
+  if(!object)
+  {
+    return owner;
+  }
+
+  View target = FindStateEffectTarget(owner, object->GetPrimaryTargetId());
+  return target ? target : owner;
+}
+
+void ViewImpl::SetStateEffectSecondaryTarget(View target)
+{
+  View owner = View::DownCast(Self());
+  if(target)
+  {
+    DALI_ASSERT_ALWAYS(IsSelfOrDescendant(owner, target) && "State effect secondary target must be this View or a descendant");
+  }
+
+  auto* object = GetOrCreateStateEffectTargetObject(*this);
+  object->SetSecondaryTargetId(target ? target.GetProperty<int32_t>(Actor::Property::ID) : Internal::StateEffectTargetObject::INVALID_TARGET_ID);
+}
+
+View ViewImpl::GetStateEffectSecondaryTarget() const
+{
+  View  owner  = View::DownCast(Self());
+  auto* object = GetStateEffectTargetObject(*this);
+  return object ? FindStateEffectTarget(owner, object->GetSecondaryTargetId()) : View();
 }
 
 bool ViewImpl::IsInteractive() const

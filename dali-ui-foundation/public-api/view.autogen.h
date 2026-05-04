@@ -467,4 +467,40 @@
   DALI_ASSERT_ALWAYS(data && "SetAttachment requires non-null data"); \
   View::SetAttachment(id, UniqueAny(Dali::Move(data))); \
   return *this; \
-  }
+  } \
+  /** \
+  * @brief Sets a state effect on this view. \
+  * \
+  * The effect is applied when the view becomes interactive (via AsInteractive()). \
+  * If the view is already interactive, the effect is applied immediately. \
+  * \
+  * The effect object is shared by reference. Pass StateEffect{} to remove the \
+  * current effect. \
+  * \
+  * If this method is called before AsInteractive(), the explicitly set effect \
+  * takes priority over the UiConfig default. \
+  * \
+  * @param[in] effect A StateEffect, or StateEffect{} to remove \
+  * @return Reference to this View for method chaining \
+  */ \
+  ChildClass& SetStateEffect(StateEffect effect) { View::SetStateEffect(effect); return *this; } \
+  /** \
+  * @brief Sets the primary target used by state effects. \
+  * \
+  * The target must be this View or one of its descendants. State effect \
+  * implementations may use this target instead of the owner View. \
+  * \
+  * @param[in] target The primary target View, or an empty View to clear \
+  * @return Reference to this View for method chaining \
+  */ \
+  ChildClass& SetStateEffectPrimaryTarget(View target) { View::SetStateEffectPrimaryTarget(target); return *this; } \
+  /** \
+  * @brief Sets the secondary target used by state effects. \
+  * \
+  * The target must be this View or one of its descendants. State effect \
+  * implementations may use this as an additional target. \
+  * \
+  * @param[in] target The secondary target View, or an empty View to clear \
+  * @return Reference to this View for method chaining \
+  */ \
+  ChildClass& SetStateEffectSecondaryTarget(View target) { View::SetStateEffectSecondaryTarget(target); return *this; }

@@ -24,7 +24,6 @@
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/tap-gesture.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/signals/callback.h>
@@ -38,9 +37,9 @@
 #include <dali-ui-foundation/public-api/callback.h>
 #include <dali-ui-foundation/public-api/dali-ui-common.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/state-event.h>
 #include <dali-ui-foundation/public-api/trait-id.h>
-#include <dali-ui-foundation/public-api/trait-object.h>
 #include <dali-ui-foundation/public-api/ui-color-manager.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali-ui-foundation/public-api/ui-scale-manager.h>
@@ -514,6 +513,31 @@ public: // Non-virtual API (safe to reorder / extend)
    * @copydoc Ui::View::IsSelectable()
    */
   bool IsSelectable() const;
+
+  /**
+   * @copydoc Ui::View::SetStateEffect()
+   */
+  void SetStateEffect(StateEffect effect);
+
+  /**
+   * @copydoc Ui::View::SetStateEffectPrimaryTarget()
+   */
+  void SetStateEffectPrimaryTarget(View target);
+
+  /**
+   * @copydoc Ui::View::GetStateEffectPrimaryTarget()
+   */
+  View GetStateEffectPrimaryTarget() const;
+
+  /**
+   * @copydoc Ui::View::SetStateEffectSecondaryTarget()
+   */
+  void SetStateEffectSecondaryTarget(View target);
+
+  /**
+   * @copydoc Ui::View::GetStateEffectSecondaryTarget()
+   */
+  View GetStateEffectSecondaryTarget() const;
 
   /**
    * @copydoc Ui::View::SetAttachment()
