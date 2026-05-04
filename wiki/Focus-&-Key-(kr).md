@@ -9,17 +9,43 @@ View는 포커스를 얻은 상태여야만 키 이벤트를 수신할 수 있�
 
 <br/>
 
-## View를 포커스 가능하게 만들기
+## 포커스 가능 조건
 
-기본적으로 View는 포커스를 받을 수 **없습니다**. 명시적으로 활성화해야 합니다:
+View가 포커스를 받으려면 focus system이 해당 View를 유효한 focus target으로 판단할 수 있어야 합니다:
+
+1. View가 초기화되어 있어야 합니다.
+2. View가 View tree / scene에 붙어 있어야 합니다.
+3. View가 visible 상태여야 합니다.
+4. View가 enabled 상태여야 합니다.
+5. View가 focusable이어야 합니다. 일반 `View`의 기본값은 **focusable false**이므로, 필요하면 `SetFocusable(true)`를 호출해야 합니다.
+6. ancestor 중 `SetDescendantFocusBlocked(true)`가 설정된 View가 없어야 합니다.
 
 ```cpp
-View view = View::New();
-view.SetFocusable(true);       // 키보드 네비게이션으로 이 View에 도달 가능
-view.SetTouchFocusable(true);  // 터치 시에도 포커스 부여
+View button = View::New()
+  .SetFocusable(true);
+
+scene.Add(button);
+FocusManager::Get().RequestFocus(button);
 ```
 
-단, `InteractiveView`, `InputField` 등 일부 View는 기본적으로 포커스가 활성화되어 있습니다. 또한 일반 View에 `AsInteractive()`를 사용하여 Interactive 특성을 부여하는 경우에도 자동으로 focusable이 활성화됩니다.
+> [!TIP]
+> 포커스 성능을 위해, 하위에 focusable View가 절대 없는 container에는 가능한 `SetDescendantFocusBlocked(true)`를 설정해 두는 것을 권장합니다. Focus search가 포커스를 받을 수 없는 subtree 전체를 건너뛸 수 있습니다.
+
+> [!NOTE]
+> `InteractiveView`, `InputField` 등 일부 View는 기본적으로 focusable입니다. 일반 `View`에 `AsInteractive()`를 호출하는 경우에도 focusable이 자동으로 활성화됩니다.
+
+> [!IMPORTANT]
+> `SetTouchFocusable(true)`는 해당 View를 터치했을 때 그 View 자체가 포커스를 받아야 하는 경우에만 사용하세요. 다른 focus target을 조작하기 위한 command button은 일반적으로 touch-focusable로 만들지 않는 편이 좋습니다. 그렇지 않으면 조작 대상의 focus를 버튼이 다시 가져갈 수 있습니다.
+
+### Descendant focus 차단
+
+`SetDescendantFocusBlocked(true)`는 해당 View의 모든 descendant가 포커스를 받지 못하도록 막습니다:
+
+```cpp
+container.SetDescendantFocusBlocked(true);
+```
+
+장식용 subtree, 그룹 단위로 disabled된 영역, 또는 focusable View가 없다는 것이 명확한 subtree에 사용하세요. 해당 ancestor 아래의 descendant는 `RequestFocus()`, `SetCurrentFocusView()`, focus navigation에서 거부됩니다.
 
 <br/>
 
@@ -30,14 +56,36 @@ view.SetTouchFocusable(true);  // 터치 시에도 포커스 부여
 ```cpp
 auto focusMgr = FocusManager::Get();
 
-// 특정 View로 포커스 이동
-focusMgr.SetCurrentFocusActor(button);
+// child delegation을 포함한 focus 요청
+focusMgr.RequestFocus(containerOrButton);
 
-// 현재 포커스된 액터 조회
-Actor focused = focusMgr.GetCurrentFocusActor();
+// 특정 View에 직접 focus 설정
+focusMgr.SetCurrentFocusView(button);
+
+// 현재 포커스된 View 조회
+View focused = focusMgr.GetCurrentFocusView();
 
 // 포커스 해제
 focusMgr.ClearFocus();
+```
+
+### SetCurrentFocusView와 RequestFocus의 차이
+
+일반적인 application focus 요청에는 `RequestFocus()`를 사용하세요. Android와 유사하게 focus request를 resolve합니다:
+
+1. 대상 View에 focus request를 보냅니다.
+2. container는 eligible focusable descendant로 요청을 위임할 수 있습니다.
+3. 최종 resolve된 View가 current focus로 설정됩니다.
+4. 대상 또는 candidate가 blocked 상태이거나 scene에 없거나 disabled, invisible, non-focusable이면 실패합니다.
+
+`SetCurrentFocusView()`는 child delegation 없이 정확히 그 View 자체에 focus를 설정하고 싶을 때 사용합니다. 해당 View 자체가 focusable이 아니면, focusable child를 가지고 있어도 실패합니다.
+
+```cpp
+// layout 자신이 focusable하지 않아도 첫 번째 focusable child로 위임될 수 있습니다.
+focusMgr.RequestFocus(layout);
+
+// layout 자신에게 직접 focus를 시도합니다. child로 위임하지 않습니다.
+focusMgr.SetCurrentFocusView(layout);
 ```
 
 <br/>
@@ -63,18 +111,21 @@ focusMgr.MoveFocusBackward();  // 이전에 포커스되었던 View로 복귀
 ```cpp
 viewA.SetRightFocusableView(viewB);
 viewB.SetLeftFocusableView(viewA);
+viewA.SetForwardFocusableView(next);
+next.SetBackwardFocusableView(viewA);
 ```
 
-사용 가능한 방향: `SetLeftFocusableView`, `SetRightFocusableView`, `SetUpFocusableView`, `SetDownFocusableView`, `SetClockwiseFocusableView`, `SetCounterClockwiseFocusableView`.
+사용 가능한 setter: `SetLeftFocusableView`, `SetRightFocusableView`, `SetUpFocusableView`, `SetDownFocusableView`, `SetClockwiseFocusableView`, `SetCounterClockwiseFocusableView`, `SetForwardFocusableView`, `SetBackwardFocusableView`.
 
 <br/>
 
-### 포커스 그룹 & 루핑
+### 포커스 그룹
 
 ```cpp
-focusMgr.SetAsFocusGroup(container, true);  // 이 서브트리 내에서 포커스 순환
-focusMgr.SetFocusGroupLoop(true);            // 그룹 경계에서 순환 처리
+focusMgr.SetAsFocusGroup(container, true);  // 이 subtree 안에 focus 이동을 제한
 ```
+
+FocusGroup은 containment boundary입니다. focus가 FocusGroup 내부에 있을 때 기본 keyboard focus 이동은 해당 subtree 안으로 제한됩니다. 패널, 다이얼로그, 팝업, 컴포넌트 내부처럼 arrow key나 Tab / Shift+Tab으로 focus가 밖으로 빠져나가면 안 되는 영역에 사용하세요.
 
 <br/>
 
@@ -150,24 +201,28 @@ view.FocusChangedSignal().Connect(&tracker, [](View view, bool focused) {
 ### 글로벌 시그널 (FocusManager)
 
 ```cpp
-focusMgr.FocusChangedSignal().Connect(&tracker, [](Actor oldFocus, Actor newFocus) {
+focusMgr.FocusChangedSignal().Connect(&tracker, [](View oldFocus, View newFocus) {
   // oldFocus에서 newFocus로 포커스 이동
 });
 ```
 
 <br/>
 
-### 커스텀 포커스 알고리즘
+### 커스텀 포커스 네비게이션
 
-`PreFocusChangeSignal`을 통해 기본 포커스 이동 로직을 재정의할 수 있습니다:
+View subtree의 focus navigation을 직접 제어하려면 focus navigation callback을 설정합니다:
 
 ```cpp
-focusMgr.PreFocusChangeSignal().Connect(&tracker,
-  [](Actor current, Actor proposed, FocusDirection direction) -> Actor {
-    // 포커스를 받을 액터를 반환합니다.
-    // proposed를 반환하면 기본 동작, 다른 액터를 반환하면 재정의.
-    return proposed;
-  });
+View MyFocusNavigation(View currentFocusedView, FocusDirection direction)
+{
+  if(direction == FocusDirection::RIGHT)
+  {
+    return FindCustomRightTarget(currentFocusedView);
+  }
+  return View(); // 빈 handle을 반환하면 parent/default navigation이 이어서 처리합니다.
+}
+
+container.SetFocusNavigationCallback(FocusNavigationCallback::New(&MyFocusNavigation));
 ```
 
 <br/>
