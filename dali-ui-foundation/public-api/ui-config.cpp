@@ -296,6 +296,16 @@ ViewInitializer UiConfig::GetViewInitializer() const
   return GetImpl(*this).GetViewInitializer();
 }
 
+void UiConfig::SetDefaultInteractiveViewEffect(StateEffect effect)
+{
+  GetImpl(*this).SetDefaultInteractiveViewEffect(effect);
+}
+
+StateEffect UiConfig::GetDefaultInteractiveViewEffect() const
+{
+  return GetImpl(*this).GetDefaultInteractiveViewEffect();
+}
+
 void UiConfig::DefaultViewInitializer(View view)
 {
   view.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);

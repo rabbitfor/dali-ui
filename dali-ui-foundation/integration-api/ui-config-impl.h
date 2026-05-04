@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/theme-loader-interface.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/trait-object.h>
 #include <dali-ui-foundation/public-api/ui-config.h>
 
@@ -437,6 +438,16 @@ public:
   ViewInitializer GetViewInitializer() const;
 
   /**
+   * @copydoc UiConfig::SetDefaultInteractiveViewEffect()
+   */
+  void SetDefaultInteractiveViewEffect(StateEffect effect);
+
+  /**
+   * @copydoc UiConfig::GetDefaultInteractiveViewEffect()
+   */
+  StateEffect GetDefaultInteractiveViewEffect() const;
+
+  /**
    * @brief Called after this config is applied via UiConfig::Apply().
    *
    * Derived config implementations override this to register themselves
@@ -483,6 +494,7 @@ private:
 private:
   Dali::String mBrokenImageUrls[3]{}; ///< Broken image URLs for SMALL, NORMAL, LARGE
 
+  StateEffect               mDefaultInteractiveViewEffect; ///< Default effect for interactive views
   ExecutionKeyPredicate     mExecutionKeyPredicate;
   ViewInitializer           mViewInitializer;
   Vector4                   mDefaultTextColor;
