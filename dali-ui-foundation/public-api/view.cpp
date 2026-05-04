@@ -680,10 +680,32 @@ bool View::IsSelectable() const
   return GetImpl(*this).IsSelectable();
 }
 
-View& View::SetInteractionEffect(Trait effect)
+View& View::SetStateEffect(StateEffect effect)
 {
-  GetImpl(*this).SetInteractionEffect(effect);
+  GetImpl(*this).SetStateEffect(effect);
   return *this;
+}
+
+View& View::SetStateEffectPrimaryTarget(View target)
+{
+  GetImpl(*this).SetStateEffectPrimaryTarget(target);
+  return *this;
+}
+
+View View::GetStateEffectPrimaryTarget() const
+{
+  return GetImpl(*this).GetStateEffectPrimaryTarget();
+}
+
+View& View::SetStateEffectSecondaryTarget(View target)
+{
+  GetImpl(*this).SetStateEffectSecondaryTarget(target);
+  return *this;
+}
+
+View View::GetStateEffectSecondaryTarget() const
+{
+  return GetImpl(*this).GetStateEffectSecondaryTarget();
 }
 
 BaseHandle View::GetLayoutParamsInternal(LayoutParamsType type) const

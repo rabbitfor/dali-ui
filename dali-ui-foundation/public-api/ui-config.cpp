@@ -296,15 +296,15 @@ bool UiConfig::IsLabelAsyncRendering() const
   return GetImpl(*this).IsLabelAsyncRendering();
 }
 
-UiConfig& UiConfig::SetDefaultInteractionEffect(Trait effect)
+UiConfig& UiConfig::SetDefaultInteractiveViewEffect(StateEffect effect)
 {
-  GetImpl(*this).SetDefaultInteractionEffect(effect);
+  GetImpl(*this).SetDefaultInteractiveViewEffect(effect);
   return *this;
 }
 
-Trait UiConfig::GetDefaultInteractionEffect() const
+StateEffect UiConfig::GetDefaultInteractiveViewEffect() const
 {
-  return GetImpl(*this).GetDefaultInteractionEffect();
+  return GetImpl(*this).GetDefaultInteractiveViewEffect();
 }
 
 } // namespace Ui

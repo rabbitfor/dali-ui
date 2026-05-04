@@ -31,6 +31,7 @@
 #include <dali-ui-foundation/public-api/layouts/layout-params.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
 #include <dali-ui-foundation/public-api/selectable-trait.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/state-event.h>
 #include <dali-ui-foundation/public-api/trait.h>
 #include <dali-ui-foundation/public-api/ui-scale-policy.h>
@@ -1173,6 +1174,63 @@ public: // Properties
     return *this;
   }
 
+  /**
+   * @brief Sets a state effect on this view.
+   *
+   * The effect is applied when the view becomes interactive (via AsInteractive()).
+   * If the view is already interactive, the effect is applied immediately.
+   *
+   * The effect is frozen at set time — subsequent modifications to the original
+   * handle do not affect this view. Pass StateEffect{} to remove the current effect.
+   *
+   * If this method is called before AsInteractive(), the explicitly set effect
+   * takes priority over the UiConfig default.
+   *
+   * @param[in] effect A StateEffect, or StateEffect{} to remove
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffect(StateEffect effect);
+
+  /**
+   * @brief Sets the primary target used by state effects.
+   *
+   * The target must be this View or one of its descendants. State effect
+   * implementations may use this target instead of the owner View.
+   *
+   * @param[in] target The primary target View, or an empty View to clear
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffectPrimaryTarget(View target);
+
+  /**
+   * @brief Gets the primary target used by state effects.
+   *
+   * If no primary target has been set, this View is returned.
+   *
+   * @return The primary target View
+   */
+  View GetStateEffectPrimaryTarget() const;
+
+  /**
+   * @brief Sets the secondary target used by state effects.
+   *
+   * The target must be this View or one of its descendants. State effect
+   * implementations may use this as an additional target.
+   *
+   * @param[in] target The secondary target View, or an empty View to clear
+   * @return Reference to this View for method chaining
+   */
+  View& SetStateEffectSecondaryTarget(View target);
+
+  /**
+   * @brief Gets the secondary target used by state effects.
+   *
+   * If no secondary target has been set, an empty View is returned.
+   *
+   * @return The secondary target View, or an empty View
+   */
+  View GetStateEffectSecondaryTarget() const;
+
   // @CHAIN_END
 
   /**
@@ -1369,23 +1427,6 @@ public: // Trait accessors (non-chaining)
    * @return True if this View has a SelectableTrait
    */
   bool IsSelectable() const;
-
-  /**
-   * @brief Sets an interaction effect on this view.
-   *
-   * The effect is applied when the view becomes interactive (via AsInteractive()).
-   * If the view is already interactive, the effect is applied immediately.
-   *
-   * The effect is frozen at set time — subsequent modifications to the original
-   * handle do not affect this view. Pass Trait{} to remove the current effect.
-   *
-   * If this method is called before AsInteractive(), the explicitly set effect
-   * takes priority over the UiConfig default.
-   *
-   * @param[in] effect A Trait implementing InteractionEffectInterface, or Trait{} to remove
-   * @return Reference to this View for method chaining
-   */
-  View& SetInteractionEffect(Trait effect);
 
 public: // VisualBase (non-chaining)
   /**

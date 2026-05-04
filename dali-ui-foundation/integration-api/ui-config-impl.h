@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/theme-loader-interface.h>
+#include <dali-ui-foundation/public-api/state-effect.h>
 #include <dali-ui-foundation/public-api/trait.h>
 #include <dali-ui-foundation/public-api/ui-config.h>
 
@@ -408,19 +409,19 @@ public:
   bool IsLabelAsyncRendering() const;
 
   /**
-   * @brief Sets the default interaction effect applied to views when AsInteractive() is called.
+   * @brief Sets the default interactive view effect applied to views when AsInteractive() is called.
    *
    * @pre Must not be frozen.
-   * @param[in] effect A Trait implementing InteractionEffectInterface, or Trait{} to disable the default
+   * @param[in] effect A StateEffect, or StateEffect{} to disable the default
    */
-  void SetDefaultInteractionEffect(Trait effect);
+  void SetDefaultInteractiveViewEffect(StateEffect effect);
 
   /**
-   * @brief Returns the default interaction effect.
+   * @brief Returns the default interactive view effect.
    *
-   * @return The default interaction effect handle, or an uninitialized Trait if none is set
+   * @return The default interactive view effect handle, or an uninitialized StateEffect if none is set
    */
-  Trait GetDefaultInteractionEffect() const;
+  StateEffect GetDefaultInteractiveViewEffect() const;
 
   /**
    * @brief Called after this config is applied via UiConfig::Apply().
@@ -469,7 +470,7 @@ private:
 private:
   Dali::String mBrokenImageUrls[3]{}; ///< Broken image URLs for SMALL, NORMAL, LARGE
 
-  Trait                    mDefaultInteractionEffect; ///< Default effect for interactive views
+  StateEffect              mDefaultInteractiveViewEffect; ///< Default effect for interactive views
   ExecutionKeyPredicate    mExecutionKeyPredicate;
   Vector4                  mDefaultTextColor;
   Vector4                  mDefaultPlaceholderTextColor;
