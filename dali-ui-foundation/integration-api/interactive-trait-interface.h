@@ -66,6 +66,23 @@ public:
    * @param[in] enabled True if enabled, false if disabled
    */
   virtual void OnEnabledChanged(View view, bool enabled) = 0;
+
+  /**
+   * @brief Called when the control is connected to a scene.
+   *
+   * @param[in] view The sender view
+   */
+  virtual void OnSceneConnection(View view) = 0;
+
+  /**
+   * @brief Called when the control is disconnected from a scene.
+   *
+   * Allows the trait to clean up pending interaction state when input release
+   * events can no longer be delivered to the view.
+   *
+   * @param[in] view The sender view
+   */
+  virtual void OnSceneDisconnection(View view) = 0;
 };
 
 } // namespace Ui
