@@ -72,8 +72,6 @@ protected:
 
 private:
   View ResolveTarget(View owner) const;
-  View AcquireOverlay() const;
-  void ReleaseOverlay(View overlay) const;
   void ApplyOverlayProperties(View overlay, View target) const;
 
 private:

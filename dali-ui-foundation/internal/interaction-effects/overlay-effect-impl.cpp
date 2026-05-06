@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/reserved-trait-id.h>
 #include <dali-ui-foundation/integration-api/view-integ.h>
-#include <dali-ui-foundation/internal/common/object-pool.h>
 #include <dali-ui-foundation/public-api/interactive-trait.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
 #include <dali-ui-foundation/public-api/view-impl.h>
@@ -38,12 +37,6 @@ namespace Internal
 
 namespace
 {
-
-ObjectPool<View>& GetOverlayViewPool()
-{
-  static thread_local ObjectPool<View> pool;
-  return pool;
-}
 
 UiColor GetOverlayColorWithActiveCount(const UiColor& color, uint32_t activeCount)
 {
@@ -105,7 +98,7 @@ OverlayEffectDataTrait GetOverlayEffectDataTrait(View owner)
   return GetOverlayEffectDataTraitFromView(owner);
 }
 
-void ResetOverlayView(View overlay)
+void RemoveOverlayView(View overlay)
 {
   if(!overlay)
   {
@@ -116,13 +109,6 @@ void ResetOverlayView(View overlay)
   {
     overlay.GetParent().Remove(overlay);
   }
-
-  overlay.ClearBackground();
-  overlay.SetRequestedWidth(WRAP_CONTENT);
-  overlay.SetRequestedHeight(WRAP_CONTENT);
-  overlay.SetLayoutMode(LayoutMode::DEFAULT);
-  overlay.SetCornerRadius(Vector4::ZERO);
-  overlay.SetCornerRadiusPolicy(CornerRadiusPolicy::ABSOLUTE);
 }
 
 } // namespace
@@ -218,7 +204,9 @@ void OverlayEffectImpl::HandleStateChanged(OverlayEffectDataTraitImpl& data, Vie
       return;
     }
 
-    overlay = AcquireOverlay();
+    // If overlay View creation becomes a measured hot path, consider applying
+    // an object pool at this creation point.
+    overlay = View::New();
     ApplyOverlayProperties(overlay, target);
     target.Add(overlay);
     overlay.LowerToBottom();
@@ -234,7 +222,7 @@ void OverlayEffectImpl::Cleanup(OverlayEffectDataTraitImpl& data)
   data.ClearActiveOverlay();
   if(overlay)
   {
-    ReleaseOverlay(overlay);
+    RemoveOverlayView(overlay);
   }
 }
 
@@ -297,22 +285,6 @@ View OverlayEffectImpl::ResolveTarget(View owner) const
 
   View primaryTarget = owner.GetStateEffectPrimaryTarget();
   return primaryTarget ? primaryTarget : owner;
-}
-
-View OverlayEffectImpl::AcquireOverlay() const
-{
-  return GetOverlayViewPool().Acquire([]()
-  {
-    return View::New();
-  });
-}
-
-void OverlayEffectImpl::ReleaseOverlay(View overlay) const
-{
-  GetOverlayViewPool().Release(overlay, [](View view)
-  {
-    ResetOverlayView(view);
-  });
 }
 
 void OverlayEffectImpl::ApplyOverlayProperties(View overlay, View target) const
