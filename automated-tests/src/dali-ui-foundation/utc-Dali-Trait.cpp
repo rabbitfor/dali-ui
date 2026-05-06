@@ -296,7 +296,7 @@ int UtcDaliTraitReservedIdP(void)
   ViewImpl& viewImpl = GetImpl(view);
   TestTrait trait = TestTrait::New();
 
-  IntegrationView::SetTrait(viewImpl,ReservedTraitId::INTERACTION_EFFECT, trait);
+  IntegrationView::SetTrait(viewImpl,ReservedTraitId::STATE_EFFECT, trait);
 
   DALI_TEST_EQUALS(trait.GetImpl().GetAttachedCount(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS(trait.GetImpl().GetLastId().value, 50u, TEST_LOCATION);

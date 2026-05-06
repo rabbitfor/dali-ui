@@ -235,6 +235,20 @@ InteractiveView CreateTestInteractiveViewFromImpl(TestApplication& application, 
   return view;
 }
 
+void ProcessTouch(UiTestApplication& application, PointState::Type state, uint32_t time = 100u)
+{
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
+  point.SetState(state);
+  point.SetScreenPosition(Vector2(50.0f, 50.0f));
+  point.SetDeviceId(1);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  application.ProcessEvent(touchEvent);
+}
+
 } // namespace
 
 void utc_dali_interactiveview_startup(void)
@@ -698,5 +712,145 @@ int UtcDaliInteractiveViewVirtualAndSignalBothCalledP(void)
   // Both virtual and signal should be called
   DALI_TEST_CHECK(impl->clickedCalled);
   DALI_TEST_CHECK(signalData.called);
+  END_TEST;
+}
+
+// ============================================================================
+// Default OverlayEffect
+// ============================================================================
+
+int UtcDaliInteractiveViewDefaultOverlayEffectP(void)
+{
+  UiTestApplication application;
+  InteractiveView   view = CreateTestInteractiveView(application);
+
+  uint32_t initialChildCount = view.GetChildCount();
+
+  ProcessTouch(application, PointState::DOWN);
+
+  DALI_TEST_CHECK(view.GetChildCount() > initialChildCount);
+  View overlay = view.GetChildAt(0);
+  DALI_TEST_CHECK(overlay);
+  DALI_TEST_EQUALS(overlay.GetBackgroundColor().GetRgba().a, 0.19f, 0.001f, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+
+  DALI_TEST_EQUALS(view.IndexOfChild(overlay), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(overlay.GetBackgroundColor().GetRgba().a, 0.1f, 0.001f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectPrimaryTargetP(void)
+{
+  UiTestApplication application;
+  InteractiveView   owner = CreateTestInteractiveView(application);
+  View              target = View::New().SetRequestedWidth(80.0f).SetRequestedHeight(80.0f);
+  owner.Add(target);
+  owner.SetStateEffectPrimaryTarget(target);
+
+  ProcessTouch(application, PointState::DOWN);
+
+  DALI_TEST_CHECK(owner.GetChildCount() >= 1u);
+  DALI_TEST_EQUALS(target.GetChildCount(), 1u, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+
+  DALI_TEST_EQUALS(target.GetChildCount(), 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectFollowsTargetCornerRadiusP(void)
+{
+  UiTestApplication application;
+  InteractiveView   view = CreateTestInteractiveView(application);
+  view.SetCornerRadius(Vector4(4.0f, 5.0f, 6.0f, 7.0f));
+  view.SetCornerRadiusPolicy(CornerRadiusPolicy::ABSOLUTE);
+
+  ProcessTouch(application, PointState::DOWN);
+
+  View overlay = view.GetChildAt(0);
+  DALI_TEST_EQUALS(overlay.GetCornerRadius(), Vector4(4.0f, 5.0f, 6.0f, 7.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(overlay.GetCornerRadiusPolicy(), CornerRadiusPolicy::ABSOLUTE, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectExplicitCornerRadiusP(void)
+{
+  UiTestApplication application;
+  InteractiveView   view = CreateTestInteractiveView(application);
+  view.SetCornerRadius(20.0f);
+
+  view.SetStateEffect(OverlayEffect::Default().Configure()
+                              .SetCornerRadius(Vector4(1.0f, 2.0f, 3.0f, 4.0f))
+                              .SetCornerRadiusPolicyRelative()
+                              .Build());
+
+  ProcessTouch(application, PointState::DOWN);
+
+  View overlay = view.GetChildAt(0);
+  DALI_TEST_EQUALS(overlay.GetCornerRadius(), Vector4(1.0f, 2.0f, 3.0f, 4.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(overlay.GetCornerRadiusPolicy(), CornerRadiusPolicy::RELATIVE, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectRoundP(void)
+{
+  UiTestApplication application;
+  InteractiveView   view = CreateTestInteractiveView(application);
+  view.SetCornerRadius(20.0f);
+  view.SetCornerRadiusPolicy(CornerRadiusPolicy::ABSOLUTE);
+  view.SetStateEffect(OverlayEffect::Round());
+
+  ProcessTouch(application, PointState::DOWN);
+
+  View overlay = view.GetChildAt(0);
+  DALI_TEST_EQUALS(overlay.GetCornerRadius(), Vector4(0.5f, 0.5f, 0.5f, 0.5f), TEST_LOCATION);
+  DALI_TEST_EQUALS(overlay.GetCornerRadiusPolicy(), CornerRadiusPolicy::RELATIVE, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectConfigureP(void)
+{
+  OverlayEffect configured = OverlayEffect::Default().Configure()
+                               .SetOverlayColor(UiColor(0x000000, 0.2f))
+                               .Build();
+
+  DALI_TEST_EQUALS(OverlayEffect::Default().GetOverlayColor().GetRgba(), UiColor(0x000000, 0.1f).GetRgba(), TEST_LOCATION);
+  DALI_TEST_EQUALS(configured.GetOverlayColor().GetRgba(), UiColor(0x000000, 0.2f).GetRgba(), TEST_LOCATION);
+  DALI_TEST_EQUALS(OverlayEffect::Config::New().GetOverlayColor().GetRgba(), UiColor(0x000000, 0.1f).GetRgba(), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliInteractiveViewOverlayEffectFocusedAndPressedP(void)
+{
+  UiTestApplication application;
+  InteractiveView   view = CreateTestInteractiveView(application);
+
+  view.SetStateEffect(OverlayEffect::Default().Configure()
+                              .SetOverlayColor(UiColor(0x000000, 0.4f))
+                              .Build());
+
+  FocusManager::Get().SetCurrentFocusView(view);
+
+  DALI_TEST_CHECK(view.GetChildCount() > 0u);
+  View overlay = view.GetChildAt(0);
+  DALI_TEST_CHECK(overlay);
+  DALI_TEST_EQUALS(overlay.GetBackgroundColor().GetRgba().a, 0.4f, 0.001f, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::DOWN);
+
+  DALI_TEST_CHECK(view.GetChildAt(0) == overlay);
+  DALI_TEST_EQUALS(overlay.GetBackgroundColor().GetRgba().a, 0.64f, 0.001f, TEST_LOCATION);
+
+  ProcessTouch(application, PointState::FINISHED, 120u);
+
+  DALI_TEST_CHECK(view.GetChildAt(0) == overlay);
+  DALI_TEST_EQUALS(overlay.GetBackgroundColor().GetRgba().a, 0.4f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
