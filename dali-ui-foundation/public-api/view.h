@@ -21,6 +21,7 @@
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/object/base-handle.h>
 #include <functional>
 #include <initializer_list>
 
@@ -33,7 +34,7 @@
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
 #include <dali-ui-foundation/public-api/selectable-trait.h>
 #include <dali-ui-foundation/public-api/state-event.h>
-#include <dali-ui-foundation/public-api/trait.h>
+#include <dali-ui-foundation/public-api/trait-object.h>
 #include <dali-ui-foundation/public-api/ui-scale-policy.h>
 #include <dali-ui-foundation/public-api/unique-any.h>
 #include <dali-ui-foundation/public-api/view-focus-enums.h>
@@ -1483,23 +1484,6 @@ public: // Trait accessors (non-chaining)
    * @return True if this View has a SelectableTrait
    */
   bool IsSelectable() const;
-
-  /**
-   * @brief Sets an interaction effect on this view.
-   *
-   * The effect is applied when the view becomes interactive (via AsInteractive()).
-   * If the view is already interactive, the effect is applied immediately.
-   *
-   * The effect is frozen at set time — subsequent modifications to the original
-   * handle do not affect this view. Pass Trait{} to remove the current effect.
-   *
-   * If this method is called before AsInteractive(), the explicitly set effect
-   * takes priority over the UiConfig default.
-   *
-   * @param[in] effect A Trait implementing InteractionEffectInterface, or Trait{} to remove
-   * @return Reference to this View for method chaining
-   */
-  View& SetInteractionEffect(Trait effect);
 
 public: // VisualBase (non-chaining)
   /**
