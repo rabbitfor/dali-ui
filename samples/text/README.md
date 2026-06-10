@@ -8,6 +8,7 @@ This sample demonstrates DALi UI text features.
 - Layout direction
 - Markup text
 - Marquee
+- Overflow option extension
 - Text style, bevel, and cutout mask
 - Text fit and fit candidate
 - Font variation
@@ -27,6 +28,7 @@ This sample demonstrates DALi UI text features.
 | `text-layout-direction.example` | Text layout direction sample |
 | `text-markup.example` | Markup text sample |
 | `text-marquee.example` | Marquee text sample |
+| `text-overflow-option.example` | Overflow option extension sample |
 | `text-style.example` | Text style sample |
 | `text-style-bevel.example` | Text bevel style sample |
 | `text-fit.example` | Text fit sample |
