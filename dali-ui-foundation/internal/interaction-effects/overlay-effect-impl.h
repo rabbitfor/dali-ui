@@ -18,8 +18,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/weak-handle.h>
-
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/state-effect-impl.h>
 #include <dali-ui-foundation/public-api/input-event.h>
@@ -27,6 +25,7 @@
 #include <dali-ui-foundation/public-api/state-event.h>
 #include <dali-ui-foundation/public-api/trait-object.h>
 #include <dali-ui-foundation/public-api/view.h>
+#include <dali-ui-foundation/public-api/visuals/color-visual.h>
 
 namespace Dali
 {
@@ -72,7 +71,7 @@ protected:
 
 private:
   View ResolveTarget(View owner) const;
-  void ApplyOverlayProperties(View overlay, View target) const;
+  void ApplyOverlayProperties(ColorVisual overlay, View target) const;
 
 private:
   UiColor            mOverlayColor;
@@ -104,13 +103,13 @@ public:
   void AttachEffect(OverlayEffectImpl* effect);
   void DetachEffect(bool cleanupOverlay = true);
 
-  void SetActiveOverlay(View overlay);
-  View GetActiveOverlay() const;
-  bool HasActiveOverlay() const;
-  void ClearActiveOverlay();
-  bool IsPressed() const;
-  bool IsFocused() const;
-  void SetState(const ViewState& state);
+  void        SetActiveOverlay(ColorVisual overlay);
+  ColorVisual GetActiveOverlay() const;
+  bool        HasActiveOverlay() const;
+  void        ClearActiveOverlay();
+  bool        IsPressed() const;
+  bool        IsFocused() const;
+  void        SetState(const ViewState& state);
 
 protected:
   ~OverlayEffectDataTraitImpl() override;
@@ -119,7 +118,7 @@ protected:
 
 private:
   OverlayEffectImpl* mEffect;
-  WeakHandle<View>   mActiveOverlay;
+  ColorVisual        mActiveOverlay;
   bool               mPressed;
   bool               mFocused;
 };

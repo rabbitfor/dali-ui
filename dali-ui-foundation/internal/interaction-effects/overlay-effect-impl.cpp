@@ -25,7 +25,6 @@
 #include <dali-ui-foundation/integration-api/reserved-trait-id.h>
 #include <dali-ui-foundation/integration-api/view-integ.h>
 #include <dali-ui-foundation/public-api/interactive-trait.h>
-#include <dali-ui-foundation/public-api/layouts/layout-types.h>
 #include <dali-ui-foundation/public-api/view-impl.h>
 
 namespace Dali
@@ -96,19 +95,6 @@ OverlayEffectDataTrait GetOrCreateOverlayEffectDataTrait(View owner)
 OverlayEffectDataTrait GetOverlayEffectDataTrait(View owner)
 {
   return GetOverlayEffectDataTraitFromView(owner);
-}
-
-void RemoveOverlayView(View overlay)
-{
-  if(!overlay)
-  {
-    return;
-  }
-
-  if(overlay.GetParent())
-  {
-    overlay.GetParent().Remove(overlay);
-  }
 }
 
 } // namespace
@@ -195,7 +181,7 @@ void OverlayEffectImpl::HandleStateChanged(OverlayEffectDataTraitImpl& data, Vie
     return;
   }
 
-  View overlay = data.GetActiveOverlay();
+  ColorVisual overlay = data.GetActiveOverlay();
   if(!overlay)
   {
     View target = ResolveTarget(owner);
@@ -204,25 +190,24 @@ void OverlayEffectImpl::HandleStateChanged(OverlayEffectDataTraitImpl& data, Vie
       return;
     }
 
-    // If overlay View creation becomes a measured hot path, consider applying
-    // an object pool at this creation point.
-    overlay = View::New();
+    // If overlay ColorVisual creation becomes a measured hot path, consider
+    // applying an object pool at this creation point.
+    overlay = ColorVisual::New();
     ApplyOverlayProperties(overlay, target);
-    target.Add(overlay);
-    overlay.LowerToBottom();
+    target.AddVisual(overlay, Visual::ContainerRangeType::BETWEEN_BACKGROUND_AND_CONTENT);
     data.SetActiveOverlay(overlay);
   }
 
-  overlay.SetBackgroundColor(GetOverlayColorWithActiveCount(mOverlayColor, activeCount));
+  overlay.SetColor(GetOverlayColorWithActiveCount(mOverlayColor, activeCount));
 }
 
 void OverlayEffectImpl::Cleanup(OverlayEffectDataTraitImpl& data)
 {
-  View overlay = data.GetActiveOverlay();
+  ColorVisual overlay = data.GetActiveOverlay();
   data.ClearActiveOverlay();
   if(overlay)
   {
-    RemoveOverlayView(overlay);
+    overlay.Detach();
   }
 }
 
@@ -287,12 +272,11 @@ View OverlayEffectImpl::ResolveTarget(View owner) const
   return primaryTarget ? primaryTarget : owner;
 }
 
-void OverlayEffectImpl::ApplyOverlayProperties(View overlay, View target) const
+void OverlayEffectImpl::ApplyOverlayProperties(ColorVisual overlay, View target) const
 {
-  overlay.SetBackgroundColor(mOverlayColor);
-  overlay.SetRequestedWidth(MATCH_PARENT);
-  overlay.SetRequestedHeight(MATCH_PARENT);
-  overlay.SetLayoutMode(LayoutMode::STANDALONE);
+  overlay.SetColor(mOverlayColor);
+  overlay.SetWidth(1.0f);
+  overlay.SetHeight(1.0f);
 
   if(mUseTargetCornerRadius)
   {
@@ -372,19 +356,19 @@ void OverlayEffectDataTraitImpl::DetachEffect(bool cleanupOverlay)
   mFocused = false;
 }
 
-void OverlayEffectDataTraitImpl::SetActiveOverlay(View overlay)
+void OverlayEffectDataTraitImpl::SetActiveOverlay(ColorVisual overlay)
 {
   mActiveOverlay = overlay;
 }
 
-View OverlayEffectDataTraitImpl::GetActiveOverlay() const
+ColorVisual OverlayEffectDataTraitImpl::GetActiveOverlay() const
 {
-  return mActiveOverlay.GetHandle();
+  return mActiveOverlay;
 }
 
 bool OverlayEffectDataTraitImpl::HasActiveOverlay() const
 {
-  return !!mActiveOverlay.GetHandle();
+  return !!mActiveOverlay;
 }
 
 void OverlayEffectDataTraitImpl::ClearActiveOverlay()
