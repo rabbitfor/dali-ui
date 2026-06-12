@@ -566,6 +566,28 @@ View ViewImpl::GetStateEffectSecondaryTarget() const
   return trait ? FindStateEffectTarget(owner, trait.GetImpl().GetSecondaryTargetId()) : View();
 }
 
+void ViewImpl::SetDefaultFocusIndicatorEnabled(bool enabled)
+{
+  Internal::ViewDataImpl& viewDataImpl = Internal::ViewDataImpl::Get(*this);
+  if(viewDataImpl.mDefaultFocusIndicatorEnabled == enabled)
+  {
+    return;
+  }
+
+  viewDataImpl.mDefaultFocusIndicatorEnabled = enabled;
+
+  Ui::FocusManager focusManager = Ui::FocusManager::Get();
+  if(focusManager)
+  {
+    Dali::Ui::GetImpl(focusManager).RefreshFocusIndicator(Ui::View::DownCast(Self()));
+  }
+}
+
+bool ViewImpl::IsDefaultFocusIndicatorEnabled() const
+{
+  return Internal::ViewDataImpl::Get(*this).mDefaultFocusIndicatorEnabled;
+}
+
 bool ViewImpl::IsInteractive() const
 {
   return !!IntegrationView::GetTrait(*this, Integration::ReservedTraitId::INTERACTION_TRAIT);

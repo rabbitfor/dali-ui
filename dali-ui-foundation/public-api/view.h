@@ -2088,6 +2088,26 @@ public: // Animation
    */
   static ViewAnimationSpec NewAnimationSpec();
 
+  /**
+   * @brief Sets whether the default focus indicator is shown for this View.
+   *
+   * This controls only the FocusManager's default focus indicator for this View.
+   * State effects that provide their own focus visual may disable it while attached
+   * and restore the previous value when detached.
+   *
+   * The default value is true.
+   *
+   * @param[in] enabled True to show the default focus indicator, false to hide it
+   */
+  void SetDefaultFocusIndicatorEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the default focus indicator is shown for this View.
+   *
+   * @return True if the default focus indicator is shown for this View
+   */
+  bool IsDefaultFocusIndicatorEnabled() const;
+
 public:
   /**
    * @brief Sets an attachment internally.

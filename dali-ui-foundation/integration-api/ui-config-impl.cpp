@@ -406,11 +406,6 @@ void UiConfigImpl::OnApplicationCreated()
 {
   Dali::TextAbstraction::EnableDesignCompatibility();
 
-  // TODO Disable default focus ring when default interaction effect applied.
-  // auto  handle           = FocusManager::Get();
-  // auto& focusManagerImpl = GetImpl(handle);
-  // focusManagerImpl.EnableFocusIndicator(false);
-
   Dali::DevelWindowSystem::SetGeometryHittestEnabled(true);
 }
 

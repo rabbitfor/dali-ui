@@ -536,6 +536,16 @@ public: // Non-virtual API (safe to reorder / extend)
   View GetStateEffectSecondaryTarget() const;
 
   /**
+   * @copydoc Ui::View::SetDefaultFocusIndicatorEnabled()
+   */
+  void SetDefaultFocusIndicatorEnabled(bool enabled);
+
+  /**
+   * @copydoc Ui::View::IsDefaultFocusIndicatorEnabled()
+   */
+  bool IsDefaultFocusIndicatorEnabled() const;
+
+  /**
    * @brief Ensures this View has a selectable trait and returns it.
    */
   Ui::SelectableTrait EnsureSelectableTrait();

@@ -183,6 +183,13 @@ public:
    */
   bool GetClearFocusOnWindowFocusLost() const;
 
+  /**
+   * @brief Re-applies focus indicator visibility for the current focused view.
+   *
+   * @param[in] view The view whose focus indicator setting changed
+   */
+  void RefreshFocusIndicator(View view);
+
 public:
   /**
    * @copydoc Ui::FocusManager::FocusChangedSignal()

@@ -58,6 +58,11 @@ namespace // Unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
+bool ShouldShowDefaultFocusIndicator(View view)
+{
+  return view && GetImpl(view).IsDefaultFocusIndicatorEnabled();
+}
+
 const char* const FOCUS_BORDER_IMAGE_FILE_NAME = "keyboard_focus.9.png";
 
 // Key name constants for OnKeyEvent
@@ -257,7 +262,7 @@ bool FocusManager::DoSetCurrentFocusView(View view, const FocusChangeContext& co
       mCurrentWindowId      = static_cast<uint32_t>(currentWindow.GetNativeId());
     }
 
-    if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE))
+    if((mIsFocusIndicatorShown == SHOW) && (mEnableFocusIndicator == ENABLE) && ShouldShowDefaultFocusIndicator(view))
     {
       view.Add(GetFocusIndicatorView());
     }
@@ -896,7 +901,7 @@ void FocusManager::OnKeyEvent(Dali::Integration::SceneHolder sceneHolder, KeyEve
     View focusedView = GetCurrentFocusView();
     if(focusedView)
     {
-      if(mEnableFocusIndicator == ENABLE)
+      if((mEnableFocusIndicator == ENABLE) && ShouldShowDefaultFocusIndicator(focusedView))
       {
         // Make sure the focused view is highlighted
         focusedView.Add(GetFocusIndicatorView());
@@ -1013,7 +1018,7 @@ void FocusManager::OnWindowFocusChanged(Window window, bool focusIn)
     {
       SetCurrentFocusView(currentFocusedView);
 
-      if(mEnableFocusIndicator == ENABLE)
+      if((mEnableFocusIndicator == ENABLE) && ShouldShowDefaultFocusIndicator(currentFocusedView))
       {
         // Make sure the focused view is highlighted
         currentFocusedView.Add(GetFocusIndicatorView());
@@ -1099,6 +1104,23 @@ void FocusManager::SetClearFocusOnWindowFocusLost(bool enabled)
 bool FocusManager::GetClearFocusOnWindowFocusLost() const
 {
   return mClearFocusOnWindowFocusLost;
+}
+
+void FocusManager::RefreshFocusIndicator(View view)
+{
+  if(!view || view != GetCurrentFocusView())
+  {
+    return;
+  }
+
+  if((mEnableFocusIndicator == ENABLE) && (mIsFocusIndicatorShown == SHOW) && ShouldShowDefaultFocusIndicator(view))
+  {
+    view.Add(GetFocusIndicatorView());
+  }
+  else
+  {
+    ClearFocusIndicator(view);
+  }
 }
 
 void FocusManager::OnSceneDisconnection(Dali::Actor actor)

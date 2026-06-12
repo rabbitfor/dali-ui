@@ -656,6 +656,16 @@ View View::GetStateEffectSecondaryTarget() const
   return GetImpl(*this).GetStateEffectSecondaryTarget();
 }
 
+void View::SetDefaultFocusIndicatorEnabled(bool enabled)
+{
+  GetImpl(*this).SetDefaultFocusIndicatorEnabled(enabled);
+}
+
+bool View::IsDefaultFocusIndicatorEnabled() const
+{
+  return GetImpl(*this).IsDefaultFocusIndicatorEnabled();
+}
+
 BaseHandle View::GetLayoutParamsInternal(LayoutParamsType type) const
 {
   return GetImpl(*this).GetLayoutParams(type);
