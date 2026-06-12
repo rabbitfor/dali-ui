@@ -1439,6 +1439,57 @@ public: // Trait accessors (non-chaining)
   bool IsInteractive() const;
 
   /**
+   * @brief Returns whether this View has a selectable trait attached.
+   *
+   * @return True if this View has a SelectableTrait
+   */
+  bool IsSelectable() const;
+
+public: // VisualBase (non-chaining)
+  /**
+   * @brief Add a Dali::Ui::VisualBase to the view.
+   *
+   * The visual is added to the top of the visuals.
+   * If the container cannot add more than maximum count of visuals
+   * or the visual is already added, return false and it will be ignored.
+   *
+   * If input visual already added to another view,
+   * visual will be detached from old view and added to this view.
+   *
+   * @param[in] visualBase The visual to add.
+   * @param[in] containerRangeType The range of visuals to be added.
+   * @return True if the visual was added successfully, false otherwise.
+   */
+  bool AddVisual(Dali::Ui::VisualBase visualBase, Dali::Ui::Visual::ContainerRangeType containerRangeType);
+
+  /**
+   * @brief Remove a Dali::Ui::VisualBase from the view.
+   *
+   * @note The VisualBase's SiblingOrder value of all other Dali::Ui::VisualBase
+   * who were added at same container with removed visual will be changed automatically.
+   *
+   * @param[in] visualBase The visual to remove.
+   */
+  void RemoveVisual(Dali::Ui::VisualBase visualBase);
+
+  /**
+   * @brief Get total number of Dali::Ui::VisualBase which we added using AddVisual().
+   *
+   * @param[in] containerRangeType The range of visuals to get.
+   * @return Get the number of visual base.
+   */
+  uint32_t GetVisualCount(Dali::Ui::Visual::ContainerRangeType containerRangeType) const;
+
+  /**
+   * @brief Get a Dali::Ui::VisualBase by sibling order.
+   *
+   * @param[in] containerRangeType The range of visuals to get.
+   * @param[in] siblingOrder The sibling order to get.
+   * @return Get visual base by sibling order. Empty handle if not exist.
+   */
+  Dali::Ui::VisualBase GetVisualAt(Dali::Ui::Visual::ContainerRangeType containerRangeType, uint32_t siblingOrder) const;
+
+  /**
    * @brief Sets a state effect on this view.
    *
    * The effect is applied when the view becomes interactive (via AsInteractive()).
@@ -1498,57 +1549,6 @@ public: // Trait accessors (non-chaining)
    * @return The secondary target View, or an empty View
    */
   View GetStateEffectSecondaryTarget() const;
-
-  /**
-   * @brief Returns whether this View has a selectable trait attached.
-   *
-   * @return True if this View has a SelectableTrait
-   */
-  bool IsSelectable() const;
-
-public: // VisualBase (non-chaining)
-  /**
-   * @brief Add a Dali::Ui::VisualBase to the view.
-   *
-   * The visual is added to the top of the visuals.
-   * If the container cannot add more than maximum count of visuals
-   * or the visual is already added, return false and it will be ignored.
-   *
-   * If input visual already added to another view,
-   * visual will be detached from old view and added to this view.
-   *
-   * @param[in] visualBase The visual to add.
-   * @param[in] containerRangeType The range of visuals to be added.
-   * @return True if the visual was added successfully, false otherwise.
-   */
-  bool AddVisual(Dali::Ui::VisualBase visualBase, Dali::Ui::Visual::ContainerRangeType containerRangeType);
-
-  /**
-   * @brief Remove a Dali::Ui::VisualBase from the view.
-   *
-   * @note The VisualBase's SiblingOrder value of all other Dali::Ui::VisualBase
-   * who were added at same container with removed visual will be changed automatically.
-   *
-   * @param[in] visualBase The visual to remove.
-   */
-  void RemoveVisual(Dali::Ui::VisualBase visualBase);
-
-  /**
-   * @brief Get total number of Dali::Ui::VisualBase which we added using AddVisual().
-   *
-   * @param[in] containerRangeType The range of visuals to get.
-   * @return Get the number of visual base.
-   */
-  uint32_t GetVisualCount(Dali::Ui::Visual::ContainerRangeType containerRangeType) const;
-
-  /**
-   * @brief Get a Dali::Ui::VisualBase by sibling order.
-   *
-   * @param[in] containerRangeType The range of visuals to get.
-   * @param[in] siblingOrder The sibling order to get.
-   * @return Get visual base by sibling order. Empty handle if not exist.
-   */
-  Dali::Ui::VisualBase GetVisualAt(Dali::Ui::Visual::ContainerRangeType containerRangeType, uint32_t siblingOrder) const;
 
 public: // Not intended for application developers
   /// @cond internal

@@ -594,6 +594,14 @@ public: // Properties
   /**
    * @brief Sets the default interactive view effect applied to views when AsInteractive() is called.
    *
+   * The effect handle is stored as-is and may be shared by multiple Views. This
+   * method does not clone or snapshot the effect. If an effect type exposes
+   * mutable APIs, modifying the effect after setting it as the default may affect
+   * Views sharing the same effect object.
+   *
+   * StateEffect implementations should keep per-View runtime state outside the
+   * effect object.
+   *
    * @pre The config must not be frozen.
    * @param[in] effect A StateEffect, or StateEffect::None() if no default effect should be applied to interactive Views
    */
