@@ -54,6 +54,7 @@
 #include <dali-ui-foundation/internal/views/state-handler-trait.h>
 #include <dali-ui-foundation/internal/views/view-state-manager.h>
 #include <dali-ui-foundation/internal/views/view/core-interaction-object.h>
+#include <dali-ui-foundation/provider-api/shadow.h>
 #include <dali-ui-foundation/public-api/layouts/layout.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali-ui-foundation/public-api/ui-constraint-tag-ranges.h>
@@ -888,6 +889,15 @@ bool ViewDataImpl::AddVisualObject(Dali::Ui::VisualBase visualBase, Dali::Ui::De
   return false;
 }
 
+bool ViewDataImpl::AddShadowVisualObject(Dali::Ui::VisualBase visualBase, Dali::Ui::DevelVisual::InternalContainerRangeType internalContainerRangeType)
+{
+  if(DALI_LIKELY(mVisualData))
+  {
+    return mVisualData->AddShadowVisualObject(visualBase, internalContainerRangeType);
+  }
+  return false;
+}
+
 void ViewDataImpl::RemoveVisualObject(Dali::Ui::VisualBase visualBase)
 {
   if(DALI_LIKELY(mVisualData))
@@ -1055,7 +1065,7 @@ void ViewDataImpl::SetProperty(BaseObject* object, Property::Index index, const 
         }
         else
         {
-          // The shadow is an empty property map, so we should clear the shadow
+          // The shadow is an empty property map, so clear the whole shadow stack.
           viewImpl.GetViewDataImpl().ClearShadow();
         }
         break;
@@ -2002,6 +2012,12 @@ void ViewDataImpl::ApplyFittingMode(const Vector2& size)
 
 void ViewDataImpl::SetShadow(const Property::Map& map)
 {
+  ClearShadow();
+  SetFirstShadow(map);
+}
+
+void ViewDataImpl::SetFirstShadow(const Property::Map& map)
+{
   if(DALI_LIKELY(mVisualData))
   {
     Ui::Visual::Base visual = Ui::VisualFactory::Get().CreateVisual(map);
@@ -2017,15 +2033,40 @@ void ViewDataImpl::SetShadow(const Property::Map& map)
   }
 }
 
+void ViewDataImpl::AppendShadow(const Dali::Ui::Shadow& shadow)
+{
+  if(!GetVisualImplPtr(Ui::View::Property::SHADOW))
+  {
+    // Keep the first shadow as the View::Property::SHADOW visual. That makes
+    // property lookup and shadow blur/opacity animations target the primary
+    // shadow directly, while later shadows can live in the visual container.
+    SetFirstShadow(Provider::Shadow::CreatePropertyMap(shadow));
+    return;
+  }
+
+  ColorVisual visual = Provider::Shadow::CreateVisual(shadow);
+  visual.SetName("shadow");
+  if(AddShadowVisualObject(visual, Ui::DevelVisual::InternalContainerRangeType::BETWEEN_BACKGROUND_EFFECT_AND_BACKGROUND))
+  {
+    mShadowVisualObjects.push_back(visual);
+    mViewImpl.RelayoutRequest();
+  }
+}
+
 void ViewDataImpl::ClearShadow()
 {
   if(DALI_LIKELY(mVisualData))
   {
     mVisualData->UnregisterVisual(Ui::View::Property::SHADOW);
-
-    // Trigger a size negotiation request that may be needed when unregistering a visual.
-    mViewImpl.RelayoutRequest();
   }
+
+  for(auto& visualObject : mShadowVisualObjects)
+  {
+    RemoveVisualObject(visualObject);
+  }
+  mShadowVisualObjects.clear();
+
+  mViewImpl.RelayoutRequest();
 }
 
 void ViewDataImpl::SetInnerShadow(const Property::Map& map)
