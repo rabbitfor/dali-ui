@@ -19,6 +19,7 @@
 #include <dali-ui-foundation/internal/views/view/selectable-trait-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/view-integ.h>
 #include <dali-ui-foundation/internal/views/view/core-interaction-object.h>
 #include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/public-api/input-event.h>
@@ -84,7 +85,7 @@ void SelectableTraitImpl::SetSelectedInternal(bool selected, InputEvent event)
   // TODO: Consult group-selection policy before committing state.
 
   mSelected = selected;
-  IntegrationView::SetState(GetImpl(owner), ViewState::SELECTED, selected, event);
+  Integration::View::SetState(GetImpl(owner), ViewState::SELECTED, selected, event);
   mSelectionChangedSignal.Emit(owner, mSelected, event);
 }
 
