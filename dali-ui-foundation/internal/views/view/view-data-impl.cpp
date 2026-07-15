@@ -925,6 +925,24 @@ bool ViewDataImpl::HandleKeyEventDefault(const Dali::KeyEvent& event)
   return false;
 }
 
+bool ViewDataImpl::HasIntrinsicHoverHandlingDefault() const
+{
+  if(auto* traitObject = GetCoreInteractionObject())
+  {
+    return traitObject->HasIntrinsicHoverHandling();
+  }
+  return false;
+}
+
+bool ViewDataImpl::HandleHoverEventDefault(const Dali::HoverEvent& event)
+{
+  if(auto* traitObject = GetCoreInteractionObject())
+  {
+    return traitObject->OnHoverEvent(event);
+  }
+  return false;
+}
+
 void ViewDataImpl::HandleFocusChangedDefault(bool focused)
 {
   InputEvent cause;
@@ -3500,7 +3518,7 @@ void ViewDataImpl::SetState(ViewState state, bool on, InputEvent cause)
     // - FOCUSED can exist
     if(state.IsAnyDisabled())
     {
-      mState = mState - ViewState::PRESSED;
+      mState = mState - ViewState::PRESSED - ViewState::HOVERED;
     }
   }
   else
@@ -3525,8 +3543,9 @@ void ViewDataImpl::SetState(ViewState state, bool on, InputEvent cause)
   if(mState != prev)
   {
     const bool pressedClearedByDisabled = prev.Contains(ViewState::PRESSED) && !mState.Contains(ViewState::PRESSED) && mState.IsAnyDisabled();
+    const bool hoveredClearedByDisabled = prev.Contains(ViewState::HOVERED) && !mState.Contains(ViewState::HOVERED) && mState.IsAnyDisabled();
 
-    if(pressedClearedByDisabled)
+    if(pressedClearedByDisabled || hoveredClearedByDisabled)
     {
       cause = cause ? cause.WithCancellation() : InputEvent::Programmatic().WithCancellation();
     }
@@ -3534,11 +3553,19 @@ void ViewDataImpl::SetState(ViewState state, bool on, InputEvent cause)
     View self = View::DownCast(mViewImpl.Self());
     ViewStateManager::Get().NotifyStateChanged(self, prev, mState, cause);
 
-    if(pressedClearedByDisabled)
+    if(pressedClearedByDisabled || hoveredClearedByDisabled)
     {
       if(auto* traitObject = GetCoreInteractionObject())
       {
-        traitObject->OnPressedClearedByViewState(self, cause);
+        if(pressedClearedByDisabled)
+        {
+          traitObject->OnPressedClearedByViewState(self, cause);
+        }
+
+        if(hoveredClearedByDisabled)
+        {
+          traitObject->OnHoveredClearedByViewState(self, cause);
+        }
       }
     }
   }
