@@ -53,6 +53,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/extension-api/shadow.h>
+#include <dali-ui-foundation/extension-api/view.h>
 #include <dali-ui-foundation/integration-api/asset-manager/asset-manager.h>
 #include <dali-ui-foundation/integration-api/reserved-trait-id.h>
 #include <dali-ui-foundation/integration-api/state-effect-impl.h>
@@ -92,6 +93,7 @@ using Dali::Integration::GetStdString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
+namespace ExtensionView   = Dali::Ui::Extension;
 namespace IntegrationView = Dali::Ui::Integration::View;
 
 namespace Dali
@@ -2576,7 +2578,7 @@ void ViewDataImpl::OnPropertySet(Property::Index index, const Property::Value& p
         Dali::Ui::FocusManager::Get().ClearFocus();
       }
 
-      IntegrationView::SetState(mViewImpl, ViewState::DISABLED, !enabled);
+      ExtensionView::SetState(mViewImpl, ViewState::DISABLED, !enabled);
 
       if(auto* traitObject = GetCoreInteractionObject())
       {
@@ -3199,7 +3201,7 @@ void ViewDataImpl::DispatchArrangeWithLayoutManager(LayoutManager* manager, cons
 {
   // Self geometry is applied centrally in Arrange(); the manager arranges
   // children only within the padding-adjusted content bounds. Owner final == input.
-  float   s       = mViewImpl.GetEffectiveScale();
+  float  s       = mViewImpl.GetEffectiveScale();
   Insets padding = mViewImpl.GetPadding();
 
   LayoutRect visContentBounds;
@@ -3497,7 +3499,7 @@ void ViewDataImpl::SetState(ViewState state, bool on, InputEvent cause)
   }
 }
 
-void ViewDataImpl::SetNamedStateHandler(const Dali::String& id, Dali::ConnectionTrackerInterface* tracker, CallbackBase* callback)
+void ViewDataImpl::SetNamedStateObserver(const Dali::String& id, Dali::ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
   auto* existing = dynamic_cast<StateHandlerTrait*>(GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT).Get());
 
@@ -3511,7 +3513,7 @@ void ViewDataImpl::SetNamedStateHandler(const Dali::String& id, Dali::Connection
   existing->Set(id.CStr(), tracker, callback);
 }
 
-bool ViewDataImpl::UnsetStateHandler(const Dali::String& id)
+bool ViewDataImpl::UnsetNamedStateObserver(const Dali::String& id)
 {
   auto* existing = dynamic_cast<StateHandlerTrait*>(GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT).Get());
   if(!existing)
@@ -3522,7 +3524,7 @@ bool ViewDataImpl::UnsetStateHandler(const Dali::String& id)
   return existing->Unset(id.CStr());
 }
 
-bool ViewDataImpl::UnsetStateHandlerWhenNotProcessing(const Dali::String& id)
+bool ViewDataImpl::UnsetNamedStateObserverIfNotExecuting(const Dali::String& id)
 {
   auto* existing = dynamic_cast<StateHandlerTrait*>(GetTrait(Integration::ReservedTraitId::STATE_HANDLER_TRAIT).Get());
   if(!existing)
@@ -3530,7 +3532,7 @@ bool ViewDataImpl::UnsetStateHandlerWhenNotProcessing(const Dali::String& id)
     return false;
   }
 
-  return existing->UnsetWhenNotProcessing(id.CStr());
+  return existing->UnsetIfNotExecuting(id.CStr());
 }
 
 Internal::CoreInteractionObject* ViewDataImpl::GetCoreInteractionObject() const

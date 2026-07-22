@@ -21,12 +21,39 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 
+// INTERNAL INCLUDES
+#include <dali-ui-foundation/internal/views/view/view-data-impl.h>
+#include <dali-ui-foundation/public-api/views/view-impl.h>
+
 namespace Dali
 {
 namespace Ui
 {
 namespace Extension
 {
+namespace Internal
+{
+void SetNamedStateObserver(ViewImpl& viewImpl, const Dali::String& id, Dali::ConnectionTrackerInterface* tracker, CallbackBase* callback)
+{
+  Ui::Internal::ViewDataImpl::Get(viewImpl).SetNamedStateObserver(id, tracker, callback);
+}
+} // namespace Internal
+
+void SetState(ViewImpl& viewImpl, ViewState state, bool on, InputEvent cause)
+{
+  Ui::Internal::ViewDataImpl::Get(viewImpl).SetState(state, on, cause);
+}
+
+bool UnsetNamedStateObserver(ViewImpl& viewImpl, const Dali::String& id)
+{
+  return Ui::Internal::ViewDataImpl::Get(viewImpl).UnsetNamedStateObserver(id);
+}
+
+bool UnsetNamedStateObserverIfNotExecuting(ViewImpl& viewImpl, const Dali::String& id)
+{
+  return Ui::Internal::ViewDataImpl::Get(viewImpl).UnsetNamedStateObserverIfNotExecuting(id);
+}
+
 void SetPositionX(View view, float x)
 {
   static_cast<Dali::Actor&>(view).SetPositionX(x);
