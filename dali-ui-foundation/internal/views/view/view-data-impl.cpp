@@ -96,7 +96,7 @@ using Dali::Integration::ToDaliString;
 using Dali::Integration::ToPropertyValue;
 using Dali::Integration::ToStdString;
 
-namespace ExtensionView   = Dali::Ui::Extension;
+namespace ExtensionView   = Dali::Ui::Extension::View;
 namespace IntegrationView = Dali::Ui::Integration::View;
 
 namespace Dali
