@@ -763,6 +763,8 @@ ViewImpl::ViewImpl(ViewBehaviour behaviourFlags)
 
 void ViewImpl::Initialize()
 {
+  Self().SetLeaveRequired(true);
+
   if(mImpl->AreVisualsEnabled())
   {
     mImpl->InitializeVisualData();
