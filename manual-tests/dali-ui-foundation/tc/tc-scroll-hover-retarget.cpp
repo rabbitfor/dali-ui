@@ -45,6 +45,25 @@ Dali::String Number(uint32_t value)
   return Dali::String(std::to_string(value).c_str());
 }
 
+const char* StateName(PointState::Type state)
+{
+  switch(state)
+  {
+    case PointState::STARTED:
+      return "STARTED";
+    case PointState::MOTION:
+      return "MOTION";
+    case PointState::STATIONARY:
+      return "STATIONARY";
+    case PointState::FINISHED:
+      return "FINISHED";
+    case PointState::LEAVE:
+      return "LEAVE";
+    case PointState::INTERRUPTED:
+      return "INTERRUPTED";
+  }
+  return "UNKNOWN";
+}
 } // namespace
 
 /**
@@ -60,7 +79,7 @@ public:
 
   Dali::String GetDescription() const override
   {
-    return "Checks HOVERED state transitions while scrolling items beneath a stationary pointer";
+    return "Checks LEAVE and STARTED delivery while scrolling items beneath a stationary pointer";
   }
 
   void OnEnter(View contentArea) override
@@ -140,23 +159,30 @@ private:
     label.SetRequestedHeight(MATCH_PARENT);
     item.Add(label);
 
-    item.StateChangedSignal().Connect(this, [this, index](View, StateEvent event)
+    item.HoverEventSignal().Connect(this, [this, index](Actor, HoverEvent event)
     {
-      OnItemStateChanged(index, event);
+      return OnItemHover(index, event);
     });
 
     mItems[index] = item;
     return item;
   }
 
-  void OnItemStateChanged(uint32_t index, StateEvent event)
+  bool OnItemHover(uint32_t index, HoverEvent event)
   {
-    if(event.Added(ViewState::HOVERED))
+    if(event.GetPointCount() == 0u)
+    {
+      return false;
+    }
+
+    PointState::Type state = event.GetState(0);
+
+    if(state == PointState::STARTED)
     {
       mItems[index].SetBackgroundColor(UiColor(COLOR_HOVERED));
       if(mObservationStarted)
       {
-        ++mHoveredAddedDuringScroll;
+        ++mStartedDuringScroll;
         if(mActiveItem >= 0)
         {
           ++mOrderingFailures;
@@ -167,32 +193,28 @@ private:
       if(!mObservationStarted)
       {
         mObservationStarted = true;
-        AppendLog(Dali::String("Item ") + Number(index + 1u) + " HOVERED added; scroll manually");
-      }
-      else
-      {
-        AppendLog(Dali::String("Item ") + Number(index + 1u) + " HOVERED added");
+        AppendLog(Dali::String("Item ") + Number(index + 1u) + " STARTED; scroll manually");
       }
     }
-    else if(event.Removed(ViewState::HOVERED))
+    else if(state == PointState::LEAVE || state == PointState::INTERRUPTED || state == PointState::FINISHED)
     {
       mItems[index].SetBackgroundColor(UiColor(COLOR_ITEM));
-      if(mObservationStarted)
+      if(mObservationStarted && state == PointState::LEAVE)
       {
-        ++mHoveredRemovedDuringScroll;
+        ++mLeaveDuringScroll;
       }
       if(mActiveItem == static_cast<int32_t>(index))
       {
         mActiveItem = -1;
       }
-      AppendLog(Dali::String("Item ") + Number(index + 1u) + " HOVERED removed");
-    }
-    else
-    {
-      return;
     }
 
+    if(state != PointState::MOTION && state != PointState::STATIONARY)
+    {
+      AppendLog(Dali::String("Item ") + Number(index + 1u) + " " + StateName(state));
+    }
     UpdateStatus();
+    return false;
   }
 
   void UpdateStatus()
@@ -206,15 +228,15 @@ private:
     {
       result = "FAIL";
     }
-    else if(mHoveredAddedDuringScroll > 0u && mHoveredRemovedDuringScroll > 0u)
+    else if(mStartedDuringScroll > 0u && mLeaveDuringScroll > 0u)
     {
       result = "PASS";
     }
 
     mStatus.SetText(
       Dali::String("Result: ") + result +
-      "\nDuring scroll: HOVERED added=" + Number(mHoveredAddedDuringScroll) +
-      ", removed=" + Number(mHoveredRemovedDuringScroll) +
+      "\nDuring scroll: STARTED=" + Number(mStartedDuringScroll) +
+      ", LEAVE=" + Number(mLeaveDuringScroll) +
       ", ordering failures=" + Number(mOrderingFailures));
   }
 
@@ -242,8 +264,8 @@ private:
   void ResetState()
   {
     mActiveItem = -1;
-    mHoveredAddedDuringScroll = 0u;
-    mHoveredRemovedDuringScroll = 0u;
+    mStartedDuringScroll = 0u;
+    mLeaveDuringScroll = 0u;
     mOrderingFailures = 0u;
     mObservationStarted = false;
     mLogLines.clear();
@@ -256,8 +278,8 @@ private:
   std::array<InteractiveView, ITEM_COUNT> mItems;
   std::deque<Dali::String> mLogLines;
   int32_t mActiveItem{-1};
-  uint32_t mHoveredAddedDuringScroll{0u};
-  uint32_t mHoveredRemovedDuringScroll{0u};
+  uint32_t mStartedDuringScroll{0u};
+  uint32_t mLeaveDuringScroll{0u};
   uint32_t mOrderingFailures{0u};
   bool mObservationStarted{false};
 };
