@@ -423,6 +423,126 @@ int UtcDaliFocusManagerSetCurrentFocusViewOnLayoutNoDelegationN(void)
   END_TEST;
 }
 
+int UtcDaliFocusManagerSceneDisconnectionReentrantGetClearsFocusP(void)
+{
+  UiTestApplication application;
+  FocusManager      focusManager = FocusManager::Get();
+  View              view         = View::New();
+  bool              reentrantGetCalled{false};
+  bool              reentrantGetReturnedEmpty{false};
+  unsigned int      focusLostCallCount{0u};
+  View              previousFocusView;
+  View              currentFocusView;
+
+  view.SetFocusable(true);
+  view.SceneDisconnectedSignal().Connect(&application, [&](Actor)
+  {
+    reentrantGetCalled         = true;
+    reentrantGetReturnedEmpty = !focusManager.GetCurrentFocusView();
+  });
+
+  application.GetScene().Add(view);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(view));
+  focusManager.FocusChangedSignal().Connect(&application, [&](View previous, View current)
+  {
+    ++focusLostCallCount;
+    previousFocusView = previous;
+    currentFocusView  = current;
+  });
+
+  application.GetScene().Remove(view);
+
+  DALI_TEST_CHECK(reentrantGetCalled);
+  DALI_TEST_CHECK(reentrantGetReturnedEmpty);
+  DALI_TEST_CHECK(!focusManager.GetCurrentFocusView());
+  DALI_TEST_EQUALS(focusLostCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(previousFocusView == view);
+  DALI_TEST_CHECK(!currentFocusView);
+  END_TEST;
+}
+
+int UtcDaliFocusManagerSceneDisconnectionReentrantSetPreservesPreviousFocusP(void)
+{
+  UiTestApplication application;
+  FocusManager      focusManager = FocusManager::Get();
+  View              previousView = View::New();
+  View              nextView     = View::New();
+  bool              reentrantSetCalled{false};
+  bool              reentrantSetSucceeded{false};
+  unsigned int      focusChangedCallCount{0u};
+  View              signaledPreviousView;
+  View              signaledCurrentView;
+
+  previousView.SetFocusable(true);
+  nextView.SetFocusable(true);
+  previousView.SceneDisconnectedSignal().Connect(&application, [&](Actor)
+  {
+    reentrantSetCalled    = true;
+    View disconnectedView = focusManager.GetCurrentFocusView();
+    reentrantSetSucceeded = !disconnectedView && focusManager.SetCurrentFocusView(nextView);
+  });
+
+  application.GetScene().Add(previousView);
+  application.GetScene().Add(nextView);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(previousView));
+  focusManager.FocusChangedSignal().Connect(&application, [&](View previous, View current)
+  {
+    ++focusChangedCallCount;
+    signaledPreviousView = previous;
+    signaledCurrentView  = current;
+  });
+
+  application.GetScene().Remove(previousView);
+
+  DALI_TEST_CHECK(reentrantSetCalled);
+  DALI_TEST_CHECK(reentrantSetSucceeded);
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == nextView);
+  DALI_TEST_EQUALS(focusChangedCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_CHECK(signaledPreviousView == previousView);
+  DALI_TEST_CHECK(signaledCurrentView == nextView);
+  END_TEST;
+}
+
+int UtcDaliFocusManagerFocusChangedSignalReentrantSetPreservesNewFocusP(void)
+{
+  UiTestApplication application;
+  FocusManager      focusManager = FocusManager::Get();
+  View              previousView = View::New();
+  View              nextView     = View::New();
+  bool              reentrantSetCalled{false};
+  bool              reentrantSetSucceeded{false};
+
+  previousView.SetFocusable(true);
+  nextView.SetFocusable(true);
+  application.GetScene().Add(previousView);
+  application.GetScene().Add(nextView);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(previousView));
+  focusManager.FocusChangedSignal().Connect(&application, [&](View previous, View current)
+  {
+    if(previous == previousView && !current)
+    {
+      reentrantSetCalled    = true;
+      reentrantSetSucceeded = focusManager.SetCurrentFocusView(nextView);
+    }
+  });
+
+  focusManager.ClearFocus();
+
+  DALI_TEST_CHECK(reentrantSetCalled);
+  DALI_TEST_CHECK(reentrantSetSucceeded);
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == nextView);
+  END_TEST;
+}
+
 // ============================================================
 // FocusNavigationCallback
 // ============================================================
