@@ -25,6 +25,96 @@ using namespace Dali;
 using namespace Dali::Ui;
 
 // ============================================================
+// Multi-window focus restoration
+// ============================================================
+
+int UtcDaliFocusManagerRestoresLastFocusedViewPerWindowP(void)
+{
+  UiTestApplication application;
+
+  Window windowA = application.GetWindow();
+  Window windowB = Window::New(PositionSize(0, 0, 480, 800), "window-b");
+
+  View viewA = View::New();
+  viewA.SetFocusable(true);
+  windowA.Add(viewA);
+
+  View viewB = View::New();
+  viewB.SetFocusable(true);
+  windowB.Add(viewB);
+
+  application.SendNotification();
+  application.Render();
+
+  FocusManager focusManager = FocusManager::Get();
+
+  // Seed each window's last-focused view, ending with window A active.
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(viewB));
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(viewA));
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == viewA);
+  DALI_TEST_CHECK(viewA.IsEffectivelyFocused());
+  DALI_TEST_CHECK(!viewB.IsEffectivelyFocused());
+
+  // A -> B restores the view that was previously focused in B.
+  windowA.Lower();
+  DALI_TEST_CHECK(!focusManager.GetCurrentFocusView());
+  DALI_TEST_CHECK(!viewA.IsEffectivelyFocused());
+  windowB.Raise();
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == viewB);
+  DALI_TEST_CHECK(!viewA.IsEffectivelyFocused());
+  DALI_TEST_CHECK(viewB.IsEffectivelyFocused());
+
+  // B -> A restores the view that was previously focused in A.
+  windowB.Lower();
+  DALI_TEST_CHECK(!focusManager.GetCurrentFocusView());
+  DALI_TEST_CHECK(!viewB.IsEffectivelyFocused());
+  windowA.Raise();
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == viewA);
+  DALI_TEST_CHECK(viewA.IsEffectivelyFocused());
+  DALI_TEST_CHECK(!viewB.IsEffectivelyFocused());
+
+  END_TEST;
+}
+
+int UtcDaliFocusManagerExplicitClearRemovesRememberedViewP(void)
+{
+  UiTestApplication application;
+
+  Window windowA = application.GetWindow();
+  Window windowB = Window::New(PositionSize(0, 0, 480, 800), "window-b");
+
+  View viewA = View::New();
+  viewA.SetFocusable(true);
+  windowA.Add(viewA);
+
+  View viewB = View::New();
+  viewB.SetFocusable(true);
+  windowB.Add(viewB);
+
+  application.SendNotification();
+  application.Render();
+
+  FocusManager focusManager = FocusManager::Get();
+
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(viewB));
+  DALI_TEST_CHECK(focusManager.SetCurrentFocusView(viewA));
+
+  focusManager.ClearFocus();
+  DALI_TEST_CHECK(!focusManager.GetCurrentFocusView());
+  DALI_TEST_CHECK(!viewA.IsEffectivelyFocused());
+
+  windowB.Raise();
+  DALI_TEST_CHECK(focusManager.GetCurrentFocusView() == viewB);
+
+  windowB.Lower();
+  windowA.Raise();
+  DALI_TEST_CHECK(!focusManager.GetCurrentFocusView());
+  DALI_TEST_CHECK(!viewA.IsEffectivelyFocused());
+
+  END_TEST;
+}
+
+// ============================================================
 // Extension key-input target
 // ============================================================
 
