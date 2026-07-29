@@ -262,6 +262,18 @@ private:
   bool DoSetCurrentFocusView(View view, const FocusChangeContext& context);
 
   /**
+   * Gets the focus view recorded for lifecycle bookkeeping.
+   * Unlike GetCurrentFocusView(), this may return a disconnected view whose
+   * focus-loss transition has not completed yet.
+   */
+  View GetRecordedFocusView() const;
+
+  /**
+   * Removes all per-window focus records that reference the specified view.
+   */
+  void RemoveFocusViewRecords(View view);
+
+  /**
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] sceneHolder The scene holder
    * @param[in] event The KeyEvent event.
@@ -327,10 +339,11 @@ private:
   bool EmitCustomWheelSignals(View view, const WheelEvent& event);
 
   /**
-   * Clear the focus view
-   * @param[in] view View to be cleared of focus
+   * Clears the focus only if the recorded focus still matches the expected view.
+   * @param[in] expectedView View expected to be the recorded focus
+   * @return Whether the recorded focus was cleared
    */
-  void ClearFocus(View view);
+  bool ClearCurrentFocus(View expectedView);
 
   /**
    * Detaches the shared focus indicator from a view.

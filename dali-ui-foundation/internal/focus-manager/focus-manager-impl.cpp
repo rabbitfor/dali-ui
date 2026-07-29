@@ -276,7 +276,7 @@ bool FocusManager::DoSetCurrentFocusView(View view, const FocusChangeContext& co
                                                                   ///         (e.g. Adaptor Stopped, SceneHolder removed but Scene is still alive)
   {
     // If developer set focus on same view, doing nothing
-    View currentFocusedView = GetCurrentFocusView();
+    View currentFocusedView = GetRecordedFocusView();
     DALI_LOG_DEBUG_INFO("current focused view : [%p] new focused view : [%p]\n", currentFocusedView.GetObjectPtr(), view.GetObjectPtr());
     if(view == currentFocusedView)
     {
@@ -286,6 +286,15 @@ bool FocusManager::DoSetCurrentFocusView(View view, const FocusChangeContext& co
     FocusChangeContext effectiveContext       = context;
     const bool         previousFocusIndicated = currentFocusedView && GetImpl(currentFocusedView).GetState().Contains(ViewState::FOCUS_INDICATED);
     effectiveContext.focusIndicated           = ShouldIndicateFocus(context, previousFocusIndicated);
+
+    if(currentFocusedView)
+    {
+      currentFocusedView.SceneDisconnectedSignal().Disconnect(mSlotDelegate, &FocusManager::OnSceneDisconnection);
+      if(!currentFocusedView.IsConnectedToScene())
+      {
+        RemoveFocusViewRecords(currentFocusedView);
+      }
+    }
 
     if(currentWindow.GetRootLayer() != mCurrentFocusedWindow.GetHandle())
     {
@@ -318,7 +327,7 @@ bool FocusManager::DoSetCurrentFocusView(View view, const FocusChangeContext& co
       mCurrentFocusViews.push_back(std::pair<WeakHandle<Layer>, WeakHandle<View>>(mCurrentFocusedWindow, view));
     }
 
-    if(currentFocusedView && currentFocusedView.IsConnectedToScene())
+    if(currentFocusedView)
     {
       DetachFocusIndicator(currentFocusedView);
       Internal::KeyInputFocusManager::Get().RemoveFocus(currentFocusedView);
@@ -359,15 +368,35 @@ bool FocusManager::DoSetCurrentFocusView(View view, const FocusChangeContext& co
 
 View FocusManager::GetCurrentFocusView()
 {
-  View view = mCurrentFocusView.GetHandle();
+  View view = GetRecordedFocusView();
 
   if(view && !view.IsConnectedToScene())
   {
-    // If the view has been removed from the stage, then it should not be focused
+    // A disconnected view is not externally focused. Keep the recorded view
+    // until its focus-loss transition completes.
     view.Reset();
-    mCurrentFocusView.Reset();
   }
   return view;
+}
+
+View FocusManager::GetRecordedFocusView() const
+{
+  return mCurrentFocusView.GetHandle();
+}
+
+void FocusManager::RemoveFocusViewRecords(View view)
+{
+  for(auto iter = mCurrentFocusViews.begin(); iter != mCurrentFocusViews.end();)
+  {
+    if(iter->second.GetHandle() == view)
+    {
+      iter = mCurrentFocusViews.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
 }
 
 View FocusManager::GetFocusViewFromCurrentWindow()
@@ -617,38 +646,32 @@ View FocusManager::FindNextFocusByFinder(View currentFocusView, View focusGroup,
   return View();
 }
 
-void FocusManager::ClearFocus(View view)
+bool FocusManager::ClearCurrentFocus(View expectedView)
 {
-  // Reset context for this system-triggered focus loss.
-  mLastFocusChangeContext = {};
-
-  if(view)
+  View recordedView = GetRecordedFocusView();
+  if(!expectedView || recordedView != expectedView)
   {
-    DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n", view.GetProperty<int32_t>(Dali::Actor::Property::ID));
-    view.SceneDisconnectedSignal().Disconnect(mSlotDelegate, &FocusManager::OnSceneDisconnection);
-
-    // Remove the view from mCurrentFocusViews if present
-    for(auto iter = mCurrentFocusViews.begin(); iter != mCurrentFocusViews.end(); ++iter)
-    {
-      if(iter->first == mCurrentFocusedWindow && iter->second.GetHandle() == view)
-      {
-        mCurrentFocusViews.erase(iter);
-        break;
-      }
-    }
-
-    if(view.IsConnectedToScene())
-    {
-      Internal::KeyInputFocusManager::Get().RemoveFocus(view);
-    }
-
-    // Send notification for the change of focus view
-    if(!mFocusChangedSignal.Empty())
-    {
-      mFocusChangedSignal.Emit(view, Ui::View());
-    }
+    return false;
   }
+
+  DALI_LOG_RELEASE_INFO("ClearFocus id:(%d)\n", expectedView.GetProperty<int32_t>(Dali::Actor::Property::ID));
+
+  // Commit authoritative state before invoking operations that may emit
+  // callbacks and set a new focus reentrantly.
+  mLastFocusChangeContext = {};
   mCurrentFocusView.Reset();
+  RemoveFocusViewRecords(expectedView);
+
+  expectedView.SceneDisconnectedSignal().Disconnect(mSlotDelegate, &FocusManager::OnSceneDisconnection);
+  DetachFocusIndicator(expectedView);
+  Internal::KeyInputFocusManager::Get().RemoveFocus(expectedView);
+
+  if(!mFocusChangedSignal.Empty())
+  {
+    mFocusChangedSignal.Emit(expectedView, Ui::View());
+  }
+
+  return true;
 }
 
 void FocusManager::DetachFocusIndicator(View view)
@@ -692,9 +715,7 @@ bool FocusManager::ShouldIndicateFocus(const FocusChangeContext& context, bool p
 
 void FocusManager::ClearFocus()
 {
-  View view = GetCurrentFocusView();
-  DetachFocusIndicator(view);
-  ClearFocus(view);
+  ClearCurrentFocus(GetRecordedFocusView());
 }
 
 void FocusManager::ClearFocusIndication(InputEvent cause)
@@ -1193,12 +1214,7 @@ void FocusManager::RefreshFocusIndicator(View view)
 void FocusManager::OnSceneDisconnection(Dali::Actor actor)
 {
   View view = View::DownCast(actor);
-  if(view && view == mCurrentFocusView.GetHandle())
-  {
-    DALI_LOG_RELEASE_INFO("ClearFocus due to view id:(%d) removed from scene\n", view.GetProperty<int32_t>(Dali::Actor::Property::ID));
-    DetachFocusIndicator(view);
-    ClearFocus(view);
-  }
+  ClearCurrentFocus(view);
 }
 
 } // namespace Internal
