@@ -302,6 +302,27 @@ int UtcDaliUiConfigAmbiguousPressDefaultsAndSettersP(void)
   END_TEST;
 }
 
+int UtcDaliUiConfigStationaryHoverTrackingP(void)
+{
+  UiConfig config = UiConfig::New();
+
+  DALI_TEST_CHECK(config.IsStationaryHoverTrackingEnabled());
+
+  config.SetStationaryHoverTrackingEnabled(false);
+  DALI_TEST_CHECK(!config.IsStationaryHoverTrackingEnabled());
+
+  config.SetStationaryHoverTrackingEnabled(true);
+  DALI_TEST_CHECK(config.IsStationaryHoverTrackingEnabled());
+
+  config.SetStationaryHoverTrackingEnabled(false);
+  config.Apply();
+
+  DALI_TEST_CHECK(!UiConfig::GetCurrent().IsStationaryHoverTrackingEnabled());
+  DALI_TEST_ASSERTION(config.SetStationaryHoverTrackingEnabled(true), "UiConfig is frozen after UiConfig::Apply()");
+
+  END_TEST;
+}
+
 // Constructor Tests
 
 int UtcDaliScrollViewConstructorP(void)

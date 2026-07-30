@@ -38,6 +38,7 @@
 #include <dali-ui-foundation/extension-api/view.h>
 #include <dali-ui-foundation/integration-api/scroll-view-impl.h>
 #include <dali-ui-foundation/internal/scroll-state-observer.h>
+#include <dali-ui-foundation/internal/stationary-hover-controller.h>
 #include <dali-ui-foundation/public-api/focus-manager/focus-manager.h>
 #include <dali-ui-foundation/public-api/layouts/scroll-view-layout-manager.h>
 #include <dali-ui-foundation/public-api/views/view-impl.h>
@@ -2122,6 +2123,7 @@ void ScrollViewImpl::SendScrollStarted()
   if(!mIsScrolling)
   {
     mIsScrolling = true;
+    Ui::Internal::StationaryHoverController::Get().BeginScroll(Self());
     Ui::Internal::ScrollStateObserver::Get().NotifyScrollStarted();
     Ui::ScrollView scrollView = Ui::ScrollView::DownCast(Self());
     mScrollStartedSignal.Emit(scrollView);
@@ -2142,6 +2144,7 @@ void ScrollViewImpl::SendScrollFinished()
   if(mIsScrolling)
   {
     mIsScrolling = false;
+    Ui::Internal::StationaryHoverController::Get().EndScroll(Self());
     Ui::Internal::ScrollStateObserver::Get().NotifyScrollFinished();
     Ui::ScrollView scrollView = Ui::ScrollView::DownCast(Self());
     mScrollFinishedSignal.Emit(scrollView);

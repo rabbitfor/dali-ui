@@ -22,11 +22,11 @@
 #include <dali/public-api/object/base-object.h>
 #include "test-render-surface.h"
 
+#include <dali/devel-api/events/touch-point.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/signals/slot-delegate.h>
-#include <dali/devel-api/events/touch-point.h>
-#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 namespace Dali
 {
@@ -56,6 +56,8 @@ public:
   void FeedWheelEvent(Dali::WheelEvent& wheelEvent);
 
   void FeedKeyEvent(Dali::KeyEvent& keyEvent);
+
+  void RequestHoverReevaluation();
 
   Dali::Integration::SceneHolder::KeyEventSignalType& KeyEventSignal();
 

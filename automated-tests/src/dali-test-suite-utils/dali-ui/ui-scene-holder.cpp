@@ -157,6 +157,11 @@ void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
 {
 }
 
+void SceneHolder::RequestHoverReevaluation()
+{
+  mScene.RequestHoverReevaluation();
+}
+
 Dali::Integration::SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
 {
   return mSceneHolderKeyEventSignal;
@@ -342,6 +347,11 @@ void SceneHolder::FeedWheelEvent(Dali::WheelEvent& wheelEvent)
 void SceneHolder::FeedKeyEvent(Dali::KeyEvent& keyEvent)
 {
   GetImplementation(*this).FeedKeyEvent(keyEvent);
+}
+
+void SceneHolder::RequestHoverReevaluation()
+{
+  GetImplementation(*this).RequestHoverReevaluation();
 }
 
 RenderTaskList SceneHolder::GetRenderTaskList()

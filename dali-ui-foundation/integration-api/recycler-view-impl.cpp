@@ -19,6 +19,7 @@
 #include <dali-ui-foundation/integration-api/recycler-view-impl.h>
 #include <dali-ui-foundation/integration-api/recycler.h>
 #include <dali-ui-foundation/internal/scroll-state-observer.h>
+#include <dali-ui-foundation/internal/stationary-hover-controller.h>
 #include <dali-ui-foundation/public-api/focus-manager/focus-manager.h>
 #include <dali-ui-foundation/public-api/views/scroll/bounce-edge-effect.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -1065,6 +1066,7 @@ void RecyclerViewImpl::SendScrollStarted()
   if(!mIsScrolling)
   {
     mIsScrolling = true;
+    Internal::StationaryHoverController::Get().BeginScroll(Self());
     Internal::ScrollStateObserver::Get().NotifyScrollStarted();
     RecyclerView rv = RecyclerView::DownCast(Self());
     mScrollStartedSignal.Emit(rv);
@@ -1077,6 +1079,7 @@ void RecyclerViewImpl::SendScrollFinished()
   if(mIsScrolling && !mIsDragging && !mScrollAnimation)
   {
     mIsScrolling = false;
+    Internal::StationaryHoverController::Get().EndScroll(Self());
     Internal::ScrollStateObserver::Get().NotifyScrollFinished();
     RecyclerView rv = RecyclerView::DownCast(Self());
     mScrollFinishedSignal.Emit(rv);

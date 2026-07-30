@@ -566,6 +566,16 @@ WebEngineType UiConfig::GetWebEngineType() const
   return GetImpl(*this).GetWebEngineType();
 }
 
+void UiConfig::SetStationaryHoverTrackingEnabled(bool enabled)
+{
+  GetImpl(*this).SetStationaryHoverTrackingEnabled(enabled);
+}
+
+bool UiConfig::IsStationaryHoverTrackingEnabled() const
+{
+  return GetImpl(*this).IsStationaryHoverTrackingEnabled();
+}
+
 void UiConfig::ResetStyleSheet(UiStyleSheet styleSheet)
 {
   GetImpl(*this).ResetStyleSheet(styleSheet);

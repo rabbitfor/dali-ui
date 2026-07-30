@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/extension-api/ui-config-impl.h>
+#include <dali-ui-foundation/internal/stationary-hover-controller.h>
 namespace
 {
 
@@ -87,6 +88,7 @@ public:
     mDefaultFocusIndicatorEnabled(true),
     mShowPlaceholderTextOnFocus(true),
     mLabelAsyncRendering(false),
+    mStationaryHoverTrackingEnabled(true),
     mFrozen(false)
   {
   }
@@ -130,6 +132,7 @@ public:
   bool                                         mDefaultFocusIndicatorEnabled;
   bool                                         mShowPlaceholderTextOnFocus;
   bool                                         mLabelAsyncRendering;
+  bool                                         mStationaryHoverTrackingEnabled;
   bool                                         mFrozen;
 };
 
@@ -606,6 +609,17 @@ Integration::FocusIndicationPolicy::Function UiConfigImpl::GetFocusIndicationPol
   return mImpl->mFocusIndicationPolicy;
 }
 
+void UiConfigImpl::SetStationaryHoverTrackingEnabled(bool enabled)
+{
+  DALI_ASSERT_ALWAYS(!mImpl->mFrozen && "UiConfig is frozen after UiConfig::Apply()");
+  mImpl->mStationaryHoverTrackingEnabled = enabled;
+}
+
+bool UiConfigImpl::IsStationaryHoverTrackingEnabled() const
+{
+  return mImpl->mStationaryHoverTrackingEnabled;
+}
+
 void UiConfigImpl::OnApplied()
 {
 }
@@ -615,6 +629,8 @@ void UiConfigImpl::OnApplicationCreated()
   Dali::TextAbstraction::EnableDesignCompatibility();
 
   Dali::DevelWindowSystem::SetGeometryHittestEnabled(true);
+
+  Internal::StationaryHoverController::Get().SetEnabled(mImpl->mStationaryHoverTrackingEnabled);
 }
 
 ThemeLoaderInterface* UiConfigImpl::CreateThemeLoader()

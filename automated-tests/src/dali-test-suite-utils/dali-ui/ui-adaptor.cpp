@@ -25,14 +25,14 @@
 #include <dali/integration-api/adaptor-framework/file-download/file-download-plugin-proxy.h> ///< For FileDownloadPluginProxy::RegisterEventThreadCallback
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 
-#include <dali/integration-api/debug.h>
-#include <dali/integration-api/scene.h>
-#include <test-application.h>
 #include <dali-ui/ui-adaptor-impl.h>
 #include <dali-ui/ui-async-task-manager.h>
 #include <dali-ui/ui-scene-holder-impl.h>
 #include <dali-ui/ui-test-application.h>
 #include <dali-ui/ui-window.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/scene.h>
+#include <test-application.h>
 #include "dali-test-suite-utils.h"
 
 #include <sys/prctl.h> ///< for syscall(SYS_gettid)

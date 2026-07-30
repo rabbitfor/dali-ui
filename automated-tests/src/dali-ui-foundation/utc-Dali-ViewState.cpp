@@ -20,20 +20,26 @@
 #include <tuple>
 #include <vector>
 
+#include <dali-ui-foundation/dali-ui-foundation.h>
+#include <dali-ui-foundation/extension-api/view.h>
+#include <dali-ui-foundation/integration-api/view-integ.h>
+#include <dali-ui-test-suite-utils.h>
 #include <dali.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali-ui-test-suite-utils.h>
-#include <dali-ui-foundation/dali-ui-foundation.h>
-#include <dali-ui-foundation/extension-api/view.h>
-#include <dali-ui-foundation/integration-api/view-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 
-namespace ExtensionView = Dali::Ui::Extension::View;
+namespace ExtensionView   = Dali::Ui::Extension::View;
 namespace IntegrationView = Dali::Ui::Integration::View;
 
 using namespace Dali;
 using namespace Dali::Ui;
+
+namespace Test
+{
+void EmitGlobalTimerSignal();
+}
 
 namespace
 {
@@ -41,10 +47,32 @@ namespace
 // A record of one StateChangedSignal (or SetNamedStateObserver) callback invocation.
 struct CallRecord
 {
-  std::string tag;    ///< Which handler was called (for ordering verification)
-  ViewState     prev;
-  ViewState     cur;
-  InputEvent    cause;
+  std::string tag; ///< Which handler was called (for ordering verification)
+  ViewState   prev;
+  ViewState   cur;
+  InputEvent  cause;
+};
+
+struct HoverCallRecord
+{
+  Actor            actor;
+  PointState::Type state;
+};
+
+struct HoverRecorder
+{
+  explicit HoverRecorder(std::vector<HoverCallRecord>& records)
+  : records(records)
+  {
+  }
+
+  bool operator()(Actor actor, HoverEvent event)
+  {
+    records.push_back({actor, event.GetState(0u)});
+    return true;
+  }
+
+  std::vector<HoverCallRecord>& records;
 };
 
 View CreateView(UiTestApplication& application)
@@ -124,18 +152,19 @@ void utc_dali_viewstate_cleanup(void)
 
 int UtcDaliViewStateBasicDispatchP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
-  ViewState receivedPrev, receivedCur;
+  ViewState  receivedPrev, receivedCur;
   InputEvent receivedCause;
   int        callCount = 0;
 
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e)
+  {
     ++callCount;
-    receivedPrev = e.GetPrev();
-    receivedCur  = e.GetCurrent();
+    receivedPrev  = e.GetPrev();
+    receivedCur   = e.GetCurrent();
     receivedCause = e.GetCause();
   });
 
@@ -156,12 +185,13 @@ int UtcDaliViewStateBasicDispatchP(void)
 
 int UtcDaliViewStateNoDispatchUnchangedN(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
   int               callCount = 0;
 
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent&) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent&)
+  {
     ++callCount;
   });
 
@@ -195,17 +225,19 @@ int UtcDaliViewStateNoDispatchUnchangedN(void)
 
 int UtcDaliViewStateDeferredNotificationOrderP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
   std::vector<CallRecord> log;
 
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "h1", &tracker, [&](View, const StateEvent& e) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "h1", &tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"h1", e.GetPrev(), e.GetCurrent()});
   });
 
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "h2", &tracker, [&](View v, const StateEvent& e) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "h2", &tracker, [&](View v, const StateEvent& e)
+  {
     log.push_back({"h2", e.GetPrev(), e.GetCurrent()});
     // Trigger a second state change from inside the handler
     if(e.Added(ViewState::FOCUSED))
@@ -214,7 +246,8 @@ int UtcDaliViewStateDeferredNotificationOrderP(void)
     }
   });
 
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "h3", &tracker, [&](View, const StateEvent& e) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "h3", &tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"h3", e.GetPrev(), e.GetCurrent()});
   });
 
@@ -236,7 +269,7 @@ int UtcDaliViewStateDeferredNotificationOrderP(void)
   DALI_TEST_CHECK(log[1].prev == stateA);
   DALI_TEST_CHECK(log[1].cur == stateB);
 
-  DALI_TEST_EQUALS(log[2].tag, std::string("h3"), TEST_LOCATION);  // h3 must NOT be skipped
+  DALI_TEST_EQUALS(log[2].tag, std::string("h3"), TEST_LOCATION); // h3 must NOT be skipped
   DALI_TEST_CHECK(log[2].prev == stateA);
   DALI_TEST_CHECK(log[2].cur == stateB);
 
@@ -263,14 +296,15 @@ int UtcDaliViewStateDeferredNotificationOrderP(void)
 
 int UtcDaliViewStateDeferredSignalOrderP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
   std::vector<CallRecord> log;
 
   // Signal connection that triggers a re-entrant state change
-  view.StateChangedSignal().Connect(&tracker, [&](View v, const StateEvent& e) {
+  view.StateChangedSignal().Connect(&tracker, [&](View v, const StateEvent& e)
+  {
     log.push_back({"signal-1", e.GetPrev(), e.GetCurrent()});
     if(e.Added(ViewState::FOCUSED))
     {
@@ -278,7 +312,8 @@ int UtcDaliViewStateDeferredSignalOrderP(void)
     }
   });
 
-  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e) {
+  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"signal-2", e.GetPrev(), e.GetCurrent()});
   });
 
@@ -311,7 +346,7 @@ int UtcDaliViewStateDeferredSignalOrderP(void)
 int UtcDaliViewStateDisabledClearsFocusedP(void)
 {
   UiTestApplication application;
-  View            view = CreateView(application);
+  View              view = CreateView(application);
 
   view.SetFocusable(true);
   FocusManager::Get().SetCurrentFocusView(view);
@@ -365,7 +400,7 @@ int UtcDaliViewStateSetEnabledKeepsOpacityP(void)
 int UtcDaliViewStateDisabledClearsPressedP(void)
 {
   UiTestApplication application;
-  View            view = CreateView(application);
+  View              view = CreateView(application);
 
   ExtensionView::SetState(GetImpl(view), ViewState::PRESSED, true);
   DALI_TEST_CHECK(GetImpl(view).GetState().Contains(ViewState::PRESSED));
@@ -385,7 +420,7 @@ int UtcDaliViewStateDisabledClearsPressedP(void)
 
 int UtcDaliViewStateDisabledOrthogonalSignalP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
@@ -409,14 +444,15 @@ int UtcDaliViewStateDisabledOrthogonalSignalP(void)
 
 int UtcDaliViewStateDisabledClearsPressedSingleEventP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
   ExtensionView::SetState(GetImpl(view), ViewState::PRESSED, true);
 
   std::vector<CallRecord> log;
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e) {
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"observer", e.GetPrev(), e.GetCurrent(), e.GetCause()});
   });
 
@@ -440,7 +476,7 @@ int UtcDaliViewStateDisabledClearsPressedSingleEventP(void)
 
 int UtcDaliViewStateDisabledClearsFocusedAndPressedP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
@@ -468,7 +504,7 @@ int UtcDaliViewStateDisabledClearsFocusedAndPressedP(void)
 
 int UtcDaliViewStateDisabledClearsInteractiveTraitPressedP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
@@ -476,7 +512,8 @@ int UtcDaliViewStateDisabledClearsInteractiveTraitPressedP(void)
   ExtensionView::SetState(GetImpl(view), ViewState::PRESSED, true);
 
   std::vector<CallRecord> log;
-  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e) {
+  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"signal", e.GetPrev(), e.GetCurrent()});
   });
 
@@ -499,7 +536,7 @@ int UtcDaliViewStateDisabledClearsInteractiveTraitPressedP(void)
 
 int UtcDaliViewStatePseudoDisabledClearsPressedKeepsFocusedP(void)
 {
-  UiTestApplication   application;
+  UiTestApplication application;
   View              view = CreateView(application);
   ConnectionTracker tracker;
 
@@ -508,7 +545,8 @@ int UtcDaliViewStatePseudoDisabledClearsPressedKeepsFocusedP(void)
   ExtensionView::SetState(GetImpl(view), ViewState::PRESSED, true);
 
   std::vector<CallRecord> log;
-  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e) {
+  view.StateChangedSignal().Connect(&tracker, [&](View, const StateEvent& e)
+  {
     log.push_back({"signal", e.GetPrev(), e.GetCurrent()});
   });
 
@@ -536,7 +574,7 @@ int UtcDaliViewStatePseudoDisabledClearsPressedKeepsFocusedP(void)
 int UtcDaliViewStatePseudoDisabledKeepsFocusedN(void)
 {
   UiTestApplication application;
-  View            view = CreateView(application);
+  View              view = CreateView(application);
 
   view.AsInteractive();
   ExtensionView::SetState(GetImpl(view), ViewState::FOCUSED, true);
@@ -558,7 +596,7 @@ int UtcDaliViewStatePseudoDisabledKeepsFocusedN(void)
 int UtcDaliViewIsEffectivelyEnabledSelfN(void)
 {
   UiTestApplication application;
-  View            view = CreateView(application);
+  View              view = CreateView(application);
 
   DALI_TEST_CHECK(view.IsEffectivelyEnabled());
 
@@ -576,8 +614,8 @@ int UtcDaliViewIsEffectivelyEnabledSelfN(void)
 int UtcDaliViewIsEffectivelyEnabledAncestorN(void)
 {
   UiTestApplication application;
-  View            parent = CreateView(application);
-  View            child  = CreateChildView(application, parent);
+  View              parent = CreateView(application);
+  View              child  = CreateChildView(application, parent);
 
   DALI_TEST_CHECK(child.IsEffectivelyEnabled());
 
@@ -596,8 +634,8 @@ int UtcDaliViewIsEffectivelyEnabledAncestorN(void)
 int UtcDaliViewIsEffectivelyEnabledAllEnabledP(void)
 {
   UiTestApplication application;
-  View            parent = CreateView(application);
-  View            child  = CreateChildView(application, parent);
+  View              parent = CreateView(application);
+  View              child  = CreateChildView(application, parent);
 
   DALI_TEST_CHECK(parent.IsEffectivelyEnabled());
   DALI_TEST_CHECK(child.IsEffectivelyEnabled());
@@ -612,9 +650,9 @@ int UtcDaliViewIsEffectivelyEnabledAllEnabledP(void)
 int UtcDaliViewIsEffectivelyEnabledGrandAncestorN(void)
 {
   UiTestApplication application;
-  View            grandparent = CreateView(application);
-  View            parent      = CreateChildView(application, grandparent);
-  View            child       = CreateChildView(application, parent);
+  View              grandparent = CreateView(application);
+  View              parent      = CreateChildView(application, grandparent);
+  View              child       = CreateChildView(application, parent);
 
   grandparent.SetEnabled(false);
 
@@ -630,7 +668,7 @@ int UtcDaliViewIsEffectivelyEnabledGrandAncestorN(void)
 int UtcDaliViewIsEffectivelyFocusedSelfP(void)
 {
   UiTestApplication application;
-  View            view = CreateView(application);
+  View              view = CreateView(application);
 
   DALI_TEST_CHECK(!view.IsEffectivelyFocused());
 
@@ -648,8 +686,8 @@ int UtcDaliViewIsEffectivelyFocusedSelfP(void)
 int UtcDaliViewIsEffectivelyFocusedAncestorP(void)
 {
   UiTestApplication application;
-  View            parent = CreateView(application);
-  View            child  = CreateChildView(application, parent);
+  View              parent = CreateView(application);
+  View              child  = CreateChildView(application, parent);
 
   DALI_TEST_CHECK(!child.IsEffectivelyFocused());
 
@@ -668,8 +706,8 @@ int UtcDaliViewIsEffectivelyFocusedAncestorP(void)
 int UtcDaliViewIsEffectivelyFocusedNoneN(void)
 {
   UiTestApplication application;
-  View            parent = CreateView(application);
-  View            child  = CreateChildView(application, parent);
+  View              parent = CreateView(application);
+  View              child  = CreateChildView(application, parent);
 
   DALI_TEST_CHECK(!parent.IsEffectivelyFocused());
   DALI_TEST_CHECK(!child.IsEffectivelyFocused());
@@ -688,8 +726,9 @@ int UtcDaliViewStateFocusedViaFocusManagerP(void)
   ConnectionTracker tracker;
 
   ViewState receivedCur;
-  int     callCount = 0;
-  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e) {
+  int       callCount = 0;
+  ExtensionView::SetNamedStateObserver(GetImpl(view), "observer", &tracker, [&](View, const StateEvent& e)
+  {
     ++callCount;
     receivedCur = e.GetCurrent();
   });
@@ -741,12 +780,13 @@ int UtcDaliViewStateFocusIndicatedProgrammaticCarryP(void)
 int UtcDaliViewStateFocusIndicatedClearedByTouchOutsideP(void)
 {
   UiTestApplication application;
-  View              view = CreateView(application);
+  View              view          = CreateView(application);
   View              touchReceiver = CreateView(application);
 
   MakeTopLeftHitTestView(application, view, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, touchReceiver, Vector2(200.0f, 200.0f));
-  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   view.SetFocusable(true);
   FocusManager::Get().SetCurrentFocusView(view);
   ExtensionView::SetState(GetImpl(view), ViewState::FOCUS_INDICATED, true);
@@ -766,7 +806,8 @@ int UtcDaliViewStateFocusIndicatedClearedByTouchOnFocusedViewP(void)
   View              view = CreateView(application);
 
   MakeTopLeftHitTestView(application, view, Vector2(0.0f, 0.0f));
-  view.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  view.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   view.SetFocusable(true);
   FocusManager::Get().SetCurrentFocusView(view);
   ExtensionView::SetState(GetImpl(view), ViewState::FOCUS_INDICATED, true);
@@ -788,7 +829,8 @@ int UtcDaliViewStateFocusIndicatedClearedByTouchOnFocusedDescendantP(void)
 
   MakeTopLeftHitTestView(application, parent, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, child, Vector2(0.0f, 0.0f));
-  child.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  child.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   parent.SetFocusable(true);
   FocusManager::Get().SetCurrentFocusView(parent);
   ExtensionView::SetState(GetImpl(parent), ViewState::FOCUS_INDICATED, true);
@@ -805,13 +847,14 @@ int UtcDaliViewStateFocusIndicatedClearedByTouchOnFocusedDescendantP(void)
 int UtcDaliViewStateFocusIndicatedPreservedByTouchOutsideWhenDisabledP(void)
 {
   UiTestApplication application;
-  View              view = CreateView(application);
+  View              view          = CreateView(application);
   View              touchReceiver = CreateView(application);
-  FocusManager      focusManager = FocusManager::Get();
+  FocusManager      focusManager  = FocusManager::Get();
 
   MakeTopLeftHitTestView(application, view, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, touchReceiver, Vector2(200.0f, 200.0f));
-  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   view.SetFocusable(true);
   focusManager.SetClearFocusIndicationOnTouch(false);
   focusManager.SetCurrentFocusView(view);
@@ -829,6 +872,71 @@ int UtcDaliViewStateFocusIndicatedPreservedByTouchOutsideWhenDisabledP(void)
 // =============================================================================
 // FocusManager integration: hover outside does not clear FOCUS_INDICATED by default
 // =============================================================================
+
+int UtcDaliUiConfigEnablesStationaryHoverTrackingByDefaultP(void)
+{
+  UiTestApplication application;
+
+  Actor content = Actor::New();
+  content.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  content.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  content.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+
+  Actor first = Actor::New();
+  first.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  first.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  first.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  first.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  content.Add(first);
+
+  Actor second = Actor::New();
+  second.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  second.SetProperty(Actor::Property::POSITION_Y, 100.0f);
+  second.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  second.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  second.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  content.Add(second);
+
+  application.GetScene().Add(content);
+  application.SendNotification();
+  application.Render();
+
+  std::vector<HoverCallRecord> records;
+  HoverRecorder                recorder(records);
+  first.HoverEventSignal().Connect(&application, recorder);
+  second.HoverEventSignal().Connect(&application, recorder);
+
+  application.ProcessEvent(GenerateHover(PointState::STARTED, Vector2(10.0f, 10.0f), 100u));
+  DALI_TEST_EQUALS(records.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[0].actor, first, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[0].state, PointState::STARTED, TEST_LOCATION);
+  records.clear();
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(content, Actor::Property::POSITION_Y), -100.0f);
+  animation.Play();
+  application.SendNotification();
+  application.Render(960u);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(records.size(), 0u, TEST_LOCATION);
+
+  Dali::Integration::WheelEvent wheelEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2(10.0f, 10.0f), 1, 120u);
+  application.ProcessEvent(wheelEvent);
+
+  DALI_TEST_EQUALS(records.size(), 0u, TEST_LOCATION);
+
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(records.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[0].actor, first, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[0].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[1].actor, second, TEST_LOCATION);
+  DALI_TEST_EQUALS(records[1].state, PointState::STARTED, TEST_LOCATION);
+
+  END_TEST;
+}
 
 int UtcDaliViewStateFocusIndicatedPreservedByHoverOutsideByDefaultP(void)
 {
@@ -851,7 +959,7 @@ int UtcDaliViewStateFocusIndicatedPreservedByHoverOutsideByDefaultP(void)
 int UtcDaliViewStateFocusIndicatedClearedByHoverOutsideWhenEnabledP(void)
 {
   UiTestApplication application;
-  View              view = CreateView(application);
+  View              view         = CreateView(application);
   FocusManager      focusManager = FocusManager::Get();
 
   view.SetFocusable(true);
@@ -875,12 +983,13 @@ int UtcDaliViewStateFocusIndicatedClearedByHoverOutsideWhenEnabledP(void)
 int UtcDaliViewStateFocusIndicatedRestoredByKeyP(void)
 {
   UiTestApplication application;
-  View              view = CreateView(application);
+  View              view          = CreateView(application);
   View              touchReceiver = CreateView(application);
 
   MakeTopLeftHitTestView(application, view, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, touchReceiver, Vector2(200.0f, 200.0f));
-  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  touchReceiver.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   view.SetFocusable(true);
   FocusManager::Get().SetCurrentFocusView(view);
   ExtensionView::SetState(GetImpl(view), ViewState::FOCUS_INDICATED, true);
@@ -988,7 +1097,8 @@ int UtcDaliViewStateTouchFocusableClearsFocusIndicationOnDownAndFocusesOnRelease
 
   MakeTopLeftHitTestView(application, view1, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, view2, Vector2(200.0f, 200.0f));
-  view2.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  view2.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   view1.SetFocusable(true);
   view2.SetFocusable(true);
   view2.SetFocusOnTouchEnabled(true);
@@ -1021,7 +1131,8 @@ int UtcDaliViewStateTouchFocusableDescendantClearsAncestorFocusIndicationAndFocu
 
   MakeTopLeftHitTestView(application, parent, Vector2(0.0f, 0.0f));
   MakeTopLeftHitTestView(application, child, Vector2(0.0f, 0.0f));
-  child.TouchEventSignal().Connect([](Actor, TouchEvent) { return false; });
+  child.TouchEventSignal().Connect([](Actor, TouchEvent)
+  { return false; });
   parent.SetFocusable(true);
   child.SetFocusable(true);
   child.SetFocusOnTouchEnabled(true);

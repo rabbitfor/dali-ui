@@ -559,6 +559,16 @@ public:
   Integration::FocusIndicationPolicy::Function GetFocusIndicationPolicy() const;
 
   /**
+   * @copydoc UiConfig::SetStationaryHoverTrackingEnabled()
+   */
+  void SetStationaryHoverTrackingEnabled(bool enabled);
+
+  /**
+   * @copydoc UiConfig::IsStationaryHoverTrackingEnabled()
+   */
+  bool IsStationaryHoverTrackingEnabled() const;
+
+  /**
    * @brief Called after this config is applied via UiConfig::Apply().
    *
    * Derived config implementations override this to register themselves

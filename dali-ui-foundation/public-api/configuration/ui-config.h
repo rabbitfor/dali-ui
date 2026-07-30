@@ -875,6 +875,29 @@ public: // Properties
    */
   WebEngineType GetWebEngineType() const;
 
+  /**
+   * @brief Enables or disables hover tracking while the pointing device remains stationary.
+   *
+   * When enabled, dali-ui scroll containers periodically re-evaluate hover
+   * while scrolling, and wheel input starts a bounded fallback for custom
+   * wheel-driven scrollers. Other geometry and animation changes do not
+   * trigger re-evaluation automatically. Entry and departure events may be
+   * generated without emitting a hover motion event.
+   *
+   * @pre The config must not be frozen.
+   * @param[in] enabled True to enable stationary hover tracking
+   * @note Enabled by default. This setting is applied once when the application
+   * is created and cannot be changed afterward.
+   */
+  void SetStationaryHoverTrackingEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether stationary hover tracking is enabled.
+   *
+   * @return True if stationary hover tracking is enabled
+   */
+  bool IsStationaryHoverTrackingEnabled() const;
+
 public: // Not intended for Application developers
   /**
    * @brief This constructor is used by extension config presets to wrap an implementation object.
