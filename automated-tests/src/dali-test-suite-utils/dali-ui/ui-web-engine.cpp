@@ -688,7 +688,8 @@ public:
 class MockWebEnginePolicyDecision : public Dali::WebEnginePolicyDecision
 {
 public:
-  MockWebEnginePolicyDecision()
+  explicit MockWebEnginePolicyDecision(Test::WebEngine::ResponsePolicyState* state = nullptr)
+  : mState(state)
   {
   }
 
@@ -714,7 +715,7 @@ public:
 
   int32_t GetResponseStatusCode() const override
   {
-    return 500;
+    return mState ? mState->statusCode : 500;
   }
 
   Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const override
@@ -734,11 +735,20 @@ public:
 
   bool Use() override
   {
+    if(mState)
+    {
+      ++mState->useCalls;
+    }
     return true;
   }
 
   bool Ignore() override
   {
+    if(mState)
+    {
+      ++mState->ignoreCalls;
+      return mState->ignoreResult;
+    }
     return true;
   }
 
@@ -749,12 +759,14 @@ public:
 
 private:
   MockWebEngineFrame mockWebFrame;
+  Test::WebEngine::ResponsePolicyState* mState;
 };
 
 class MockWebEngineConsoleMessage : public Dali::WebEngineConsoleMessage
 {
 public:
-  MockWebEngineConsoleMessage()
+  explicit MockWebEngineConsoleMessage(SeverityLevel level = SeverityLevel::EMPTY)
+  : mLevel(level)
   {
   }
 
@@ -770,13 +782,16 @@ public:
 
   SeverityLevel GetSeverityLevel() const override
   {
-    return SeverityLevel::EMPTY;
+    return mLevel;
   }
 
   std::string GetText() const override
   {
     return "This is a text.";
   }
+
+private:
+  SeverityLevel mLevel;
 };
 
 class MockWebEngineLoadError : public Dali::WebEngineLoadError
@@ -3538,6 +3553,25 @@ void WebEngine::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEn
 
 namespace Test::WebEngine
 {
+std::function<void(ResponsePolicyState&)> CaptureResponsePolicyCallback(Dali::WebEngine engine)
+{
+  auto callback = Dali::Internal::Adaptor::GetImplementation(engine).mResponsePolicyDecisionCallback;
+  return [callback = std::move(callback)](ResponsePolicyState& state)
+  {
+    callback(std::make_unique<Dali::Internal::Adaptor::MockWebEnginePolicyDecision>(&state));
+  };
+}
+
+std::function<void(int)> CaptureConsoleMessageCallback(Dali::WebEngine engine)
+{
+  auto callback = Dali::Internal::Adaptor::GetImplementation(engine).mConsoleMessageCallback;
+  return [callback = std::move(callback)](int level)
+  {
+    callback(std::make_unique<Dali::Internal::Adaptor::MockWebEngineConsoleMessage>(
+      static_cast<Dali::WebEngineConsoleMessage::SeverityLevel>(level)));
+  };
+}
+
 Dali::WebEnginePlugin::WebEnginePageLoadCallback GetPageLoadStartedCallback(Dali::WebEngine engine)
 {
   return Dali::Internal::Adaptor::GetImplementation(engine).mPageLoadStartedCallback;

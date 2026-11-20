@@ -19,8 +19,10 @@
 #include <dali-ui-foundation/public-api/views/image/image-view.h>
 #include <dali-ui-foundation/public-api/views/view.h>
 #include <dali-ui-foundation/public-api/views/web/web-back-forward-list.h>
+#include <dali-ui-foundation/public-api/views/web/web-console-message.h>
 #include <dali-ui-foundation/public-api/views/web/web-engine-type.h>
 #include <dali-ui-foundation/public-api/views/web/web-profile.h>
+#include <dali-ui-foundation/public-api/views/web/web-response-policy-decision.h>
 #include <dali-ui-foundation/public-api/views/web/web-settings.h>
 #include <dali-ui-foundation/public-api/views/web/web-view-page-load-error.h>
 #include <dali-ui-foundation/public-api/views/web/web-view-types.h>
@@ -105,6 +107,9 @@ public: // Callback types
   /// @SINCE_3_0.0
   using VideoPlayingCallback = Callback<void(bool)>;
 
+  /// @brief Synchronous response policy callback for the originating view. @SINCE_3_0.2
+  using ResponsePolicyCallback = Callback<void(WebView, WebResponsePolicyDecision&)>;
+
 public: // Signal types
   /// @brief Signal type for page load started events.
   /// @SINCE_3_0.0
@@ -149,6 +154,9 @@ public: // Signal types
   /// @brief Signal type for web process crash events.
   /// @SINCE_3_0.0
   using WebProcessCrashedSignalType = Signal<void(WebView)>;
+
+  /// @brief Console message notification. @SINCE_3_0.2
+  using ConsoleMessageReceivedSignalType = Signal<void(WebView, const WebConsoleMessage&)>;
 
 public: // Creation & Destruction
   /**
@@ -1011,6 +1019,27 @@ public:
    * @pre The profile is initialized.
    */
   static WebView New(const WebProfile& profile, RenderingMode renderingMode);
+
+  /**
+   * @brief Registers or replaces this view's synchronous response policy callback.
+   *
+   * Call on the DALi event thread. The callback is invoked on that thread when
+   * a supported backend asks for a response decision. Event coverage depends on
+   * the backend. The decision is valid only during the callback. If the callback
+   * leaves the response undecided, the engine applies its default policy.
+   * A callback already executing may finish after replacement or removal.
+   * @SINCE_3_0.2
+   * @param[in] callback Callback to take ownership of, or empty to unregister
+   */
+  void RegisterResponsePolicyCallback(ResponsePolicyCallback callback);
+
+  /**
+   * @brief Returns the signal emitted on the DALi event thread for a web console message.
+   * Copy the message to retain it beyond the signal handler.
+   * @SINCE_3_0.2
+   * @return The console message signal
+   */
+  ConsoleMessageReceivedSignalType& ConsoleMessageReceivedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

@@ -551,6 +551,8 @@ public: // Signal emission helpers (called by WebView to emit signals)
   void EmitPageLoadInProgress(const Dali::String& url);
   /// @brief Emits the PageLoadFinishedSignal
   void EmitPageLoadFinished(const Dali::String& url);
+  void RegisterResponsePolicyCallback(Ui::WebView::ResponsePolicyCallback callback);
+
   /// @brief Emits the PageLoadErrorSignal
   void EmitPageLoadError(const WebViewPageLoadError& error);
   /// @brief Emits the ScrollEdgeReachedSignal
@@ -612,7 +614,7 @@ private: // From CustomActorImpl
 private:
   // Engine notifications are delivered on the event thread. Keep the view alive
   // across application code, but cancel queued notifications once it is released.
-  template<typename Function>
+  template<bool DeferLastRelease = false, typename Function>
   auto GuardCallback(Function function)
   {
     return [this, lifetime = std::weak_ptr<int>(mCallbackLifetime), function = std::move(function)](auto&&... args) mutable
@@ -630,9 +632,20 @@ private:
         }
       }
       auto owner = Self();
-      return function(std::forward<decltype(args)>(args)...);
+      if constexpr(DeferLastRelease)
+      {
+        static_assert(std::is_void_v<Result>);
+        function(std::forward<decltype(args)>(args)...);
+        DeferViewReleaseIfLast(std::move(owner));
+      }
+      else
+      {
+        return function(std::forward<decltype(args)>(args)...);
+      }
     };
   }
+
+  static void DeferViewReleaseIfLast(Dali::CustomActor view);
 
 private: // Internal rendering callbacks
   /**
@@ -769,6 +782,11 @@ private:                                 // Data — Engine
   Dali::WebEnginePlugin::JavaScriptAlertCallback   mJavaScriptAlertCallback;
   Dali::WebEnginePlugin::JavaScriptConfirmCallback mJavaScriptConfirmCallback;
   Dali::WebEnginePlugin::JavaScriptPromptCallback  mJavaScriptPromptCallback;
+
+  std::shared_ptr<Ui::WebView::ResponsePolicyCallback> mResponsePolicyCallback;
+
+public:
+  Ui::WebView::ConsoleMessageReceivedSignalType mConsoleMessageReceivedSignal;
 };
 
 } // namespace Integration

@@ -145,6 +145,20 @@ enum class WebViewPageLoadErrorType
   PRINT,    ///< Print error. @SINCE_3_0.0
 };
 
+/**
+ * @brief The severity of a web console message.
+ * @SINCE_3_0.2
+ */
+enum class WebConsoleMessageLevel : uint32_t
+{
+  EMPTY,   ///< Severity unavailable or unrecognized. @SINCE_3_0.2
+  LOG,     ///< General log. @SINCE_3_0.2
+  WARNING, ///< Warning. @SINCE_3_0.2
+  ERROR,   ///< Error. @SINCE_3_0.2
+  DEBUG,   ///< Debug message. @SINCE_3_0.2
+  INFO,    ///< Informational message. @SINCE_3_0.2
+};
+
 } // namespace Ui
 
 } //namespace DALI_NAMESPACE
