@@ -15,6 +15,8 @@
  *
  */
 
+#include <type_traits>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -2459,5 +2461,99 @@ int UtcDaliWebCookieManagerWatchConcurrentDestructionP(void)
   DALI_TEST_CHECK(retainedWhileExecuting);
   DALI_TEST_CHECK(weak.expired());
   callback();
+  END_TEST;
+}
+
+int UtcDaliWebViewResponsePolicyCallbackP(void)
+{
+  static_assert(!std::is_copy_constructible_v<WebResponsePolicyDecision>);
+  static_assert(!std::is_move_constructible_v<WebResponsePolicyDecision>);
+
+  UiTestApplication application;
+  WebView view = WebView::New();
+  auto& impl = GetWebViewImpl(view);
+  auto emit = Test::WebEngine::CaptureResponsePolicyCallback(impl.mWebEngine);
+  std::weak_ptr<int> lifetime = impl.mCallbackLifetime;
+  Test::WebEngine::ResponsePolicyState state;
+  emit(state);
+  DALI_TEST_EQUALS(state.useCalls, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.ignoreCalls, 0, TEST_LOCATION);
+
+  int inspected = 0;
+  view.RegisterResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+    [&](WebView, WebResponsePolicyDecision&) { ++inspected; }));
+  emit(state);
+  DALI_TEST_EQUALS(inspected, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.useCalls, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.ignoreCalls, 0, TEST_LOCATION);
+
+  int callbacks = 0;
+  view.RegisterResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+    [&](WebView source, WebResponsePolicyDecision& decision)
+    {
+      DALI_TEST_EQUALS(source, view, TEST_LOCATION);
+      DALI_TEST_EQUALS(decision.GetUrl(), Dali::String("http://test.html"), TEST_LOCATION);
+      DALI_TEST_EQUALS(decision.GetStatusCode(), 500, TEST_LOCATION);
+      source.RegisterResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+        [&](WebView current, WebResponsePolicyDecision& nextDecision)
+        {
+          DALI_TEST_EQUALS(nextDecision.GetStatusCode(), -1, TEST_LOCATION);
+          current.RegisterResponsePolicyCallback({});
+          view.Reset();
+          DALI_TEST_CHECK(!nextDecision.Ignore());
+          ++callbacks;
+        }));
+      DALI_TEST_CHECK(decision.Use());
+      ++callbacks;
+    }));
+
+  emit(state);
+  DALI_TEST_EQUALS(state.useCalls, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbacks, 1, TEST_LOCATION);
+  state.statusCode = 0;
+  state.ignoreResult = false;
+  emit(state);
+  DALI_TEST_EQUALS(state.ignoreCalls, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbacks, 2, TEST_LOCATION);
+  DALI_TEST_CHECK(!view);
+  DALI_TEST_CHECK(!lifetime.expired());
+  application.RunIdles();
+  DALI_TEST_CHECK(lifetime.expired());
+  emit(state);
+  DALI_TEST_EQUALS(callbacks, 2, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewConsoleMessageSnapshotP(void)
+{
+  UiTestApplication application;
+  WebView view = WebView::New();
+  auto emit = Test::WebEngine::CaptureConsoleMessageCallback(GetWebViewImpl(view).mWebEngine);
+  using EngineLevel = Dali::WebEngineConsoleMessage::SeverityLevel;
+  WebConsoleMessage retained;
+  int notifications = 0;
+
+  view.ConsoleMessageReceivedSignal().Connect(&application, [&](WebView source, const WebConsoleMessage& message)
+  {
+    DALI_TEST_EQUALS(source, view, TEST_LOCATION);
+    retained = message;
+  });
+  view.ConsoleMessageReceivedSignal().Connect(&application, [&](WebView, const WebConsoleMessage&)
+  {
+    ++notifications;
+  });
+
+  emit(static_cast<int>(EngineLevel::WARNING));
+  WebConsoleMessage copy(retained);
+  emit(7); // Unrecognized value within the engine enum's range.
+  DALI_TEST_EQUALS(notifications, 2, TEST_LOCATION);
+  DALI_TEST_CHECK(retained.GetLevel() == WebConsoleMessageLevel::EMPTY);
+  view.Reset();
+  WebConsoleMessage moved(std::move(copy));
+  DALI_TEST_CHECK(copy.GetText().Empty());
+  DALI_TEST_EQUALS(moved.GetText(), Dali::String("This is a text."), TEST_LOCATION);
+  DALI_TEST_EQUALS(moved.GetSource(), Dali::String("source"), TEST_LOCATION);
+  DALI_TEST_EQUALS(moved.GetLine(), 10u, TEST_LOCATION);
+  DALI_TEST_CHECK(moved.GetLevel() == WebConsoleMessageLevel::WARNING);
   END_TEST;
 }
