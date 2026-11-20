@@ -33,11 +33,13 @@ struct WebViewPageLoadError::Impl
   Impl(Dali::String             errorUrl,
        WebViewPageLoadErrorCode errorCode,
        Dali::String             errorDescription,
-       WebViewPageLoadErrorType errorType)
+       WebViewPageLoadErrorType errorType,
+       bool                     isCancellation)
   : mUrl(std::move(errorUrl)),
     mCode(errorCode),
     mDescription(std::move(errorDescription)),
-    mType(errorType)
+    mType(errorType),
+    mIsCancellation(isCancellation)
   {
   }
 
@@ -45,6 +47,7 @@ struct WebViewPageLoadError::Impl
   WebViewPageLoadErrorCode mCode{WebViewPageLoadErrorCode::UNKNOWN};
   Dali::String             mDescription;
   WebViewPageLoadErrorType mType{WebViewPageLoadErrorType::NONE};
+  bool                     mIsCancellation{false};
 };
 
 WebViewPageLoadError::WebViewPageLoadError()
@@ -92,11 +95,25 @@ WebViewPageLoadErrorType WebViewPageLoadError::GetType() const
   return mImpl ? mImpl->mType : WebViewPageLoadErrorType::NONE;
 }
 
+bool WebViewPageLoadError::IsCancellation() const
+{
+  return mImpl && mImpl->mIsCancellation;
+}
+
 WebViewPageLoadError::WebViewPageLoadError(Dali::String             url,
                                            WebViewPageLoadErrorCode code,
                                            Dali::String             description,
                                            WebViewPageLoadErrorType type)
-: mImpl(new Impl(std::move(url), code, std::move(description), type))
+: WebViewPageLoadError(std::move(url), code, std::move(description), type, false)
+{
+}
+
+WebViewPageLoadError::WebViewPageLoadError(Dali::String             url,
+                                           WebViewPageLoadErrorCode code,
+                                           Dali::String             description,
+                                           WebViewPageLoadErrorType type,
+                                           bool                     isCancellation)
+: mImpl(new Impl(std::move(url), code, std::move(description), type, isCancellation))
 {
 }
 
