@@ -30,6 +30,11 @@ namespace DALI_NAMESPACE
 namespace Ui
 {
 
+namespace Integration DALI_INTERNAL
+{
+class WebViewImpl;
+} //namespace Integration DALI_INTERNAL
+
 /**
  * @brief Holds an immutable snapshot of a page load failure.
  *
@@ -101,6 +106,15 @@ public:
    */
   WebViewPageLoadErrorType GetType() const;
 
+  /**
+   * @brief Returns whether the backend classified the load error as a cancellation.
+   *
+   * The cancellation flag is independent of GetCode() and GetType().
+   * @SINCE_3_0.3
+   * @return True if cancellation was reported, false otherwise or if unavailable
+   */
+  bool IsCancellation() const;
+
 public: // Not intended for application developers
   /// @cond internal
   DALI_INTERNAL WebViewPageLoadError(Dali::String             url,
@@ -110,6 +124,14 @@ public: // Not intended for application developers
   /// @endcond
 
 private:
+  friend class Integration::WebViewImpl;
+
+  DALI_INTERNAL WebViewPageLoadError(Dali::String             url,
+                                     WebViewPageLoadErrorCode code,
+                                     Dali::String             description,
+                                     WebViewPageLoadErrorType type,
+                                     bool                     isCancellation);
+
   struct Impl;
   Dali::UniquePtr<Impl> mImpl;
 };
