@@ -386,10 +386,27 @@ private:
   float                              mockZoomFactor;
 };
 
-class MockConfiguredWebEngineContext : public MockWebEngineContext, public Dali::WebEngineContextConfiguration
+class MockConfiguredWebEngineContext : public MockWebEngineContext, public Dali::WebEngineContextConfiguration, public Dali::WebEngineAsyncRequestContext
 {
 public:
   Test::WebEngine::ContextConfigurationState configuration;
+  Test::WebEngine::AsyncRequestCallbacks asyncRequests;
+
+  bool SetRequestInterceptedCallback(InterceptedCallback callback) override
+  {
+    asyncRequests.intercepted = std::move(callback);
+    return true;
+  }
+  bool SetRequestCancelledCallback(CancelledCallback callback) override
+  {
+    asyncRequests.cancelled = std::move(callback);
+    return true;
+  }
+  void SetRequestOrigin(Dali::WebEnginePlugin*, uint32_t id) override
+  {
+    asyncRequests.viewId = id;
+  }
+
 
   bool SetMaxRefreshRate(int32_t rate) override
   {
@@ -690,7 +707,8 @@ public:
 class MockWebEnginePolicyDecision : public Dali::WebEnginePolicyDecision
 {
 public:
-  MockWebEnginePolicyDecision()
+  explicit MockWebEnginePolicyDecision(Test::WebEngine::ResponsePolicyState* state = nullptr)
+  : mState(state)
   {
   }
 
@@ -716,7 +734,7 @@ public:
 
   int32_t GetResponseStatusCode() const override
   {
-    return 500;
+    return mState ? mState->statusCode : 500;
   }
 
   Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const override
@@ -736,11 +754,20 @@ public:
 
   bool Use() override
   {
+    if(mState)
+    {
+      ++mState->useCalls;
+    }
     return true;
   }
 
   bool Ignore() override
   {
+    if(mState)
+    {
+      ++mState->ignoreCalls;
+      return mState->ignoreResult;
+    }
     return true;
   }
 
@@ -751,12 +778,14 @@ public:
 
 private:
   MockWebEngineFrame mockWebFrame;
+  Test::WebEngine::ResponsePolicyState* mState;
 };
 
 class MockWebEngineConsoleMessage : public Dali::WebEngineConsoleMessage
 {
 public:
-  MockWebEngineConsoleMessage()
+  explicit MockWebEngineConsoleMessage(SeverityLevel level = SeverityLevel::EMPTY)
+  : mLevel(level)
   {
   }
 
@@ -772,13 +801,16 @@ public:
 
   SeverityLevel GetSeverityLevel() const override
   {
-    return SeverityLevel::EMPTY;
+    return mLevel;
   }
 
   std::string GetText() const override
   {
     return "This is a text.";
   }
+
+private:
+  SeverityLevel mLevel;
 };
 
 class MockWebEngineLoadError : public Dali::WebEngineLoadError
@@ -811,6 +843,24 @@ public:
 
 private:
   std::string mockUrl;
+};
+
+class MockWebEngineLoadErrorWithCancellation : public MockWebEngineLoadError, public Dali::WebEngineLoadErrorCancellation
+{
+public:
+  explicit MockWebEngineLoadErrorWithCancellation(bool isCancellation)
+  : MockWebEngineLoadError("url"),
+    mIsCancellation(isCancellation)
+  {
+  }
+
+  bool IsCancellation() const override
+  {
+    return mIsCancellation;
+  }
+
+private:
+  bool mIsCancellation;
 };
 
 class MockWebEngineContextMenuItem : public Dali::WebEngineContextMenuItem
@@ -3540,6 +3590,41 @@ void WebEngine::RegisterPlaybackVideoPausedCallback(Dali::WebEnginePlugin::WebEn
 
 namespace Test::WebEngine
 {
+std::function<void(bool, bool)> CapturePageLoadErrorCallback(Dali::WebEngine engine)
+{
+  auto callback = Dali::Internal::Adaptor::GetImplementation(engine).mPageLoadErrorCallback;
+  return [callback = std::move(callback)](bool supportsCancellation, bool isCancellation)
+  {
+    if(supportsCancellation)
+    {
+      callback(std::make_unique<Dali::Internal::Adaptor::MockWebEngineLoadErrorWithCancellation>(isCancellation));
+    }
+    else
+    {
+      callback(std::make_unique<Dali::Internal::Adaptor::MockWebEngineLoadError>("url"));
+    }
+  };
+}
+
+std::function<void(ResponsePolicyState&)> CaptureResponsePolicyCallback(Dali::WebEngine engine)
+{
+  auto callback = Dali::Internal::Adaptor::GetImplementation(engine).mResponsePolicyDecisionCallback;
+  return [callback = std::move(callback)](ResponsePolicyState& state)
+  {
+    callback(std::make_unique<Dali::Internal::Adaptor::MockWebEnginePolicyDecision>(&state));
+  };
+}
+
+std::function<void(int)> CaptureConsoleMessageCallback(Dali::WebEngine engine)
+{
+  auto callback = Dali::Internal::Adaptor::GetImplementation(engine).mConsoleMessageCallback;
+  return [callback = std::move(callback)](int level)
+  {
+    callback(std::make_unique<Dali::Internal::Adaptor::MockWebEngineConsoleMessage>(
+      static_cast<Dali::WebEngineConsoleMessage::SeverityLevel>(level)));
+  };
+}
+
 Dali::WebEnginePlugin::WebEnginePageLoadCallback GetPageLoadStartedCallback(Dali::WebEngine engine)
 {
   return Dali::Internal::Adaptor::GetImplementation(engine).mPageLoadStartedCallback;
@@ -3674,6 +3759,11 @@ CookieState& GetCookieState(Dali::WebEngineCookieManager* manager)
 std::function<void()> CaptureCookieWatch(Dali::WebEngineCookieManager* manager)
 {
   return dynamic_cast<Dali::Internal::Adaptor::MockWebEngineCookieManager&>(*manager).mChangesWatchCallback;
+}
+
+AsyncRequestCallbacks& GetAsyncRequestCallbacks(Dali::WebEngineContext* context)
+{
+  return dynamic_cast<Dali::Internal::Adaptor::MockConfiguredWebEngineContext&>(*context).asyncRequests;
 }
 
 ContextConfigurationState& GetContextConfigurationState(Dali::WebEngineContext* context)

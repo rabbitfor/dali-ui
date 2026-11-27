@@ -15,8 +15,12 @@
  *
  */
 
+#include <dali-ui-foundation/extension-api/web-request.h>
+#include <dali-ui-foundation/extension-api/web-request-cancellation-info.h>
 #include <atomic>
 #include <thread>
+#include <type_traits>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
 #include <dali-ui-test-suite-utils.h>
 #include <test-native-image.h>
 #include <ui-event-thread-callback.h>
@@ -2484,5 +2488,194 @@ int UtcDaliWebCookieManagerSignalReleasesLastProfileHandleP(void)
   DALI_TEST_EQUALS(calls, 1, TEST_LOCATION);
   DALI_TEST_CHECK(!Test::WebEngine::CaptureCookieWatch(native));
   DALI_TEST_EQUALS(subscriber.GetConnectionCount(), 0u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewResponsePolicyCallbackP(void)
+{
+  static_assert(!std::is_copy_constructible_v<WebResponsePolicyDecision>);
+  static_assert(!std::is_move_constructible_v<WebResponsePolicyDecision>);
+
+  UiTestApplication application;
+  WebView view = WebView::New();
+  auto& impl = GetWebViewImpl(view);
+  auto emit = Test::WebEngine::CaptureResponsePolicyCallback(impl.mWebEngine);
+  std::weak_ptr<int> lifetime = impl.mCallbackLifetime;
+  Test::WebEngine::ResponsePolicyState state;
+  emit(state);
+  DALI_TEST_EQUALS(state.useCalls, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.ignoreCalls, 0, TEST_LOCATION);
+
+  int inspected = 0;
+  view.SetResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+    [&](WebView, WebResponsePolicyDecision&) { ++inspected; }));
+  emit(state);
+  DALI_TEST_EQUALS(inspected, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.useCalls, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(state.ignoreCalls, 0, TEST_LOCATION);
+
+  int callbacks = 0;
+  view.SetResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+    [&](WebView source, WebResponsePolicyDecision& decision)
+    {
+      DALI_TEST_EQUALS(source, view, TEST_LOCATION);
+      DALI_TEST_EQUALS(decision.GetUrl(), Dali::String("http://test.html"), TEST_LOCATION);
+      DALI_TEST_EQUALS(decision.GetStatusCode(), 500, TEST_LOCATION);
+      source.SetResponsePolicyCallback(WebView::ResponsePolicyCallback::New(
+        [&](WebView current, WebResponsePolicyDecision& nextDecision)
+        {
+          DALI_TEST_EQUALS(nextDecision.GetStatusCode(), -1, TEST_LOCATION);
+          current.SetResponsePolicyCallback({});
+          view.Reset();
+          DALI_TEST_CHECK(!nextDecision.Ignore());
+          ++callbacks;
+        }));
+      DALI_TEST_CHECK(decision.Use());
+      ++callbacks;
+    }));
+
+  emit(state);
+  DALI_TEST_EQUALS(state.useCalls, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbacks, 1, TEST_LOCATION);
+  state.statusCode = 0;
+  state.ignoreResult = false;
+  emit(state);
+  DALI_TEST_EQUALS(state.ignoreCalls, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(callbacks, 2, TEST_LOCATION);
+  DALI_TEST_CHECK(!view);
+  DALI_TEST_CHECK(!lifetime.expired());
+  application.RunIdles();
+  DALI_TEST_CHECK(lifetime.expired());
+  emit(state);
+  DALI_TEST_EQUALS(callbacks, 2, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliWebViewConsoleMessageSnapshotP(void)
+{
+  UiTestApplication application;
+  WebView view = WebView::New();
+  auto emit = Test::WebEngine::CaptureConsoleMessageCallback(GetWebViewImpl(view).mWebEngine);
+  using EngineLevel = Dali::WebEngineConsoleMessage::SeverityLevel;
+  WebConsoleMessage retained;
+  int notifications = 0;
+
+  view.ConsoleMessageReceivedSignal().Connect(&application, [&](WebView source, const WebConsoleMessage& message)
+  {
+    DALI_TEST_EQUALS(source, view, TEST_LOCATION);
+    retained = message;
+  });
+  view.ConsoleMessageReceivedSignal().Connect(&application, [&](WebView, const WebConsoleMessage&)
+  {
+    ++notifications;
+  });
+
+  emit(static_cast<int>(EngineLevel::WARNING));
+  WebConsoleMessage copy(retained);
+  emit(7); // Unrecognized value within the engine enum's range.
+  DALI_TEST_EQUALS(notifications, 2, TEST_LOCATION);
+  DALI_TEST_CHECK(retained.GetLevel() == WebConsoleMessageLevel::UNKNOWN);
+  view.Reset();
+  WebConsoleMessage moved(std::move(copy));
+  DALI_TEST_CHECK(copy.GetText().Empty());
+  DALI_TEST_EQUALS(moved.GetText(), Dali::String("This is a text."), TEST_LOCATION);
+  DALI_TEST_EQUALS(moved.GetSource(), Dali::String("source"), TEST_LOCATION);
+  DALI_TEST_EQUALS(moved.GetLineNumber(), 10u, TEST_LOCATION);
+  DALI_TEST_CHECK(moved.GetLevel() == WebConsoleMessageLevel::WARNING);
+  END_TEST;
+}
+
+int UtcDaliWebViewPageLoadErrorCancellationSnapshotP(void)
+{
+  UiTestApplication application;
+  WebView view = WebView::New();
+  auto emit = Test::WebEngine::CapturePageLoadErrorCallback(GetWebViewImpl(view).mWebEngine);
+  WebViewPageLoadError retained;
+  ConnectionTracker subscriber;
+  view.PageLoadErrorSignal().Connect(&subscriber, [&](WebView source, const WebViewPageLoadError& error)
+  {
+    DALI_TEST_EQUALS(source, view, TEST_LOCATION);
+    retained = error;
+  });
+
+  DALI_TEST_CHECK(!retained.IsCancellation());
+  emit(true, true);
+  DALI_TEST_CHECK(retained.GetCode() == WebViewPageLoadErrorCode::UNKNOWN);
+  DALI_TEST_CHECK(retained.IsCancellation());
+  WebViewPageLoadError cancelled(retained);
+
+  emit(true, false);
+  DALI_TEST_CHECK(!retained.IsCancellation());
+
+  emit(false, true);
+  DALI_TEST_CHECK(!retained.IsCancellation());
+
+  view.Reset();
+  DALI_TEST_CHECK(cancelled.IsCancellation());
+  END_TEST;
+}
+
+namespace
+{
+class TestAsyncRequest : public Dali::WebEngineAsyncRequest
+{
+public:
+  uint64_t GetRequestId() const override { return 42; }
+  uint32_t GetWebViewId() const override { return 123; }
+  std::string GetUrl() const override { return "url"; }
+  std::string GetMethod() const override { return "GET"; }
+  Dali::Property::Map GetHeaders() const override { return {}; }
+  bool Ignore() override { return false; }
+  bool SetResponseStatus(int32_t, const std::string&) override { return true; }
+  bool AddResponseHeader(const std::string&, const std::string&) override { return true; }
+  bool AddResponseHeaders(const Dali::Property::Map&) override { return true; }
+  bool SetResponse(const std::string&, const uint8_t*, size_t) override { return true; }
+  bool SetResponseBody(const uint8_t*, size_t) override { return true; }
+  bool WriteResponseChunk(const uint8_t*, size_t length) override { return length != 0; }
+};
+}
+
+int UtcDaliWebProfileAsyncRequestSnapshotsP(void)
+{
+  UiTestApplication application;
+  auto profile = WebProfile::New("Async");
+  auto view = WebView::New(profile);
+  auto* context = Dali::Ui::Integration::GetImpl(profile).GetEngineProfile()->GetContext();
+  auto& callbacks = Test::WebEngine::GetAsyncRequestCallbacks(context);
+  DALI_TEST_EQUALS(callbacks.viewId, view.GetId(), TEST_LOCATION);
+  Extension::WebRequest retained;
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestInterceptedCallback(profile,
+    Extension::WebProfile::RequestInterceptedCallback::New([&](Extension::WebRequest request)
+    {
+      retained = request;
+    })));
+  callbacks.intercepted(std::make_shared<TestAsyncRequest>());
+  DALI_TEST_EQUALS(retained.GetRequestId(), uint64_t(42), TEST_LOCATION);
+  Extension::WebRequest workerCopy(retained);
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestInterceptedCallback(profile, {}));
+  DALI_TEST_CHECK(!callbacks.intercepted);
+  std::thread worker([&]
+  {
+    DALI_TEST_EQUALS(workerCopy.GetUrl(), Dali::String("url"), TEST_LOCATION);
+    DALI_TEST_CHECK(workerCopy.SetResponse("headers", nullptr, 0));
+  });
+  worker.join();
+
+  Extension::WebRequestCancellationInfo saved;
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestCancelledCallback(profile,
+    Extension::WebProfile::RequestCancelledCallback::New([&](const Extension::WebRequestCancellationInfo& info)
+    {
+      saved = info;
+    })));
+  Dali::Property::Map headers;
+  headers.Insert("request", "snapshot");
+  callbacks.cancelled(42, 123, "url", "GET", headers);
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestCancelledCallback(profile, {}));
+  view.Reset();
+  profile.Reset();
+  DALI_TEST_EQUALS(saved.GetRequestId(), uint64_t(42), TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetWebViewId(), 123u, TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetMethod(), Dali::String("GET"), TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetHeaders().Count(), 1u, TEST_LOCATION);
   END_TEST;
 }

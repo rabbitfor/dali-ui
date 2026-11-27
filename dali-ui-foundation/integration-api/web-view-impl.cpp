@@ -17,14 +17,19 @@
 
 // CLASS HEADER
 #include "web-view-impl.h"
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-async-request.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/integration-api/scene.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-policy-decision.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/property-value-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/adaptor-framework/native-image.h>
@@ -68,6 +73,27 @@ namespace Integration
 
 namespace
 {
+
+WebConsoleMessageLevel ToUiConsoleMessageLevel(Dali::WebEngineConsoleMessage::SeverityLevel level)
+{
+  using EngineLevel = Dali::WebEngineConsoleMessage::SeverityLevel;
+  switch(level)
+  {
+    case EngineLevel::LOG:
+      return WebConsoleMessageLevel::LOG;
+    case EngineLevel::WARNING:
+      return WebConsoleMessageLevel::WARNING;
+    case EngineLevel::ERROR:
+      return WebConsoleMessageLevel::ERROR;
+    case EngineLevel::DEBUG:
+      return WebConsoleMessageLevel::DEBUG;
+    case EngineLevel::INFO:
+      return WebConsoleMessageLevel::INFO;
+    case EngineLevel::EMPTY:
+      return WebConsoleMessageLevel::UNKNOWN;
+  }
+  return WebConsoleMessageLevel::UNKNOWN;
+}
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gWebViewLogFilter = Debug::Filter::New(Debug::Verbose, false, "LOG_WEB_VIEW");
@@ -434,6 +460,10 @@ void WebViewImpl::OnInitialize()
   ViewImpl::OnInitialize();
 
   Actor self = Self();
+  if(auto* requests = dynamic_cast<Dali::WebEngineAsyncRequestContext*>(GetImpl(mWebProfile).GetEngineProfile()->GetContext()))
+  {
+    requests->SetRequestOrigin(mWebEngine.GetPlugin(), self.GetId());
+  }
 
   // Make the view keyboard-focusable so it can receive key events.
   self.SetProperty(Actor::Property::FOCUSABLE, true);
@@ -511,11 +541,42 @@ void WebViewImpl::OnInitialize()
       {
         return;
       }
+      const auto*          cancellation = dynamic_cast<const Dali::WebEngineLoadErrorCancellation*>(error.get());
       WebViewPageLoadError uiError(ToDaliString(error->GetUrl()),
                                    ToUiPageLoadErrorCode(error->GetCode()),
                                    ToDaliString(error->GetDescription()),
-                                   ToUiPageLoadErrorType(error->GetType()));
+                                   ToUiPageLoadErrorType(error->GetType()),
+                                   cancellation && cancellation->IsCancellation());
       EmitPageLoadError(uiError);
+    }));
+    mWebEngine.RegisterResponsePolicyDecidedCallback(GuardCallback<true>([this](std::unique_ptr<Dali::WebEnginePolicyDecision> policy)
+    {
+      auto callback = mResponsePolicyCallback;
+      if(!callback || !policy)
+      {
+        return;
+      }
+      const auto                statusCode = policy->GetResponseStatusCode();
+      WebResponsePolicyDecision decision(
+        ToDaliString(policy->GetUrl()),
+        statusCode > 0 ? statusCode : -1,
+        Callback<bool()>::New([&policy]
+      { return policy->Use(); }),
+        Callback<bool()>::New([&policy]
+      { return policy->Ignore(); }));
+      callback->Invoke(Ui::WebView::DownCast(Self()), decision);
+    }));
+    mWebEngine.RegisterConsoleMessageReceivedCallback(GuardCallback<true>([this](std::unique_ptr<Dali::WebEngineConsoleMessage> message)
+    {
+      if(!message || mConsoleMessageReceivedSignal.Empty())
+      {
+        return;
+      }
+      WebConsoleMessage snapshot(ToDaliString(message->GetText()),
+                                 ToDaliString(message->GetSource()),
+                                 message->GetLine(),
+                                 ToUiConsoleMessageLevel(message->GetSeverityLevel()));
+      mConsoleMessageReceivedSignal.Emit(Ui::WebView::DownCast(Self()), snapshot);
     }));
     mWebEngine.RegisterUrlChangedCallback(GuardCallback([this](const std::string& url)
     {
@@ -1560,6 +1621,24 @@ void WebViewImpl::EmitPageLoadFinished(const Dali::String& url)
 {
   if(mPageLoadFinishedSignal.Empty()) return;
   mPageLoadFinishedSignal.Emit(Ui::WebView::DownCast(Self()), url);
+}
+
+void WebViewImpl::DeferViewReleaseIfLast(Dali::CustomActor view)
+{
+  if(view.GetBaseObject().ReferenceCount() == 1 && Dali::Adaptor::IsAvailable())
+  {
+    // Finish native event dispatch before destroying the engine's view.
+    auto release = Dali::Callback<void()>::New([retainedView = std::move(view)]() mutable
+    {
+      retainedView.Reset();
+    });
+    Dali::Adaptor::Get().AddIdle(release.Release(), false);
+  }
+}
+
+void WebViewImpl::SetResponsePolicyCallback(Ui::WebView::ResponsePolicyCallback callback)
+{
+  mResponsePolicyCallback = callback ? std::make_shared<Ui::WebView::ResponsePolicyCallback>(std::move(callback)) : nullptr;
 }
 
 void WebViewImpl::EmitPageLoadError(const WebViewPageLoadError& error)

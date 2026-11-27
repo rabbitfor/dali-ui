@@ -499,6 +499,16 @@ WebView::PageLoadFinishedSignalType& WebView::PageLoadFinishedSignal()
   return GetImpl(*this).mPageLoadFinishedSignal;
 }
 
+void WebView::SetResponsePolicyCallback(ResponsePolicyCallback callback)
+{
+  GetImpl(*this).SetResponsePolicyCallback(std::move(callback));
+}
+
+WebView::ConsoleMessageReceivedSignalType& WebView::ConsoleMessageReceivedSignal()
+{
+  return GetImpl(*this).mConsoleMessageReceivedSignal;
+}
+
 WebView::PageLoadErrorSignalType& WebView::PageLoadErrorSignal()
 {
   return GetImpl(*this).mPageLoadErrorSignal;

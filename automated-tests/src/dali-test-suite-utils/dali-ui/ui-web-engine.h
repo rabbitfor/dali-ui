@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-async-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
@@ -28,6 +29,14 @@ namespace Test
 {
 namespace WebEngine
 {
+struct AsyncRequestCallbacks
+{
+  Dali::WebEngineAsyncRequestContext::InterceptedCallback intercepted;
+  Dali::WebEngineAsyncRequestContext::CancelledCallback cancelled;
+  uint32_t viewId{0};
+};
+AsyncRequestCallbacks& GetAsyncRequestCallbacks(Dali::WebEngineContext* context);
+
 struct ContextConfigurationState
 {
   bool result = true;
@@ -79,6 +88,17 @@ struct RuntimeState
 };
 RuntimeState& GetRuntimeState();
 void TerminateRuntime();
+
+struct ResponsePolicyState
+{
+  int32_t statusCode = 500;
+  int useCalls = 0;
+  int ignoreCalls = 0;
+  bool ignoreResult = true;
+};
+std::function<void(bool, bool)> CapturePageLoadErrorCallback(Dali::WebEngine engine);
+std::function<void(ResponsePolicyState&)> CaptureResponsePolicyCallback(Dali::WebEngine engine);
+std::function<void(int)> CaptureConsoleMessageCallback(Dali::WebEngine engine);
 
 Dali::WebEnginePlugin::WebEnginePageLoadCallback GetPageLoadStartedCallback(Dali::WebEngine engine);
 void SetCreationEnabled(bool enabled);
