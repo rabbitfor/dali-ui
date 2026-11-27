@@ -82,6 +82,16 @@ void RegisterUrlSchemesAsCorsEnabled(Ui::WebProfile profile, const Dali::Vector<
   Integration::GetImpl(profile).RegisterUrlSchemesAsCorsEnabled(schemes);
 }
 
+bool SetRequestInterceptedCallback(Ui::WebProfile profile, RequestInterceptedCallback callback)
+{
+  return Integration::GetImpl(profile).SetRequestInterceptedCallback(std::move(callback));
+}
+
+bool SetRequestCancelledCallback(Ui::WebProfile profile, RequestCancelledCallback callback)
+{
+  return Integration::GetImpl(profile).SetRequestCancelledCallback(std::move(callback));
+}
+
 } // namespace WebProfile
 } // namespace Extension
 } // namespace Ui

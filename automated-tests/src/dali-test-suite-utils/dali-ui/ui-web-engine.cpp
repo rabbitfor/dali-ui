@@ -386,10 +386,27 @@ private:
   float                              mockZoomFactor;
 };
 
-class MockConfiguredWebEngineContext : public MockWebEngineContext, public Dali::WebEngineContextConfiguration
+class MockConfiguredWebEngineContext : public MockWebEngineContext, public Dali::WebEngineContextConfiguration, public Dali::WebEngineAsyncRequestContext
 {
 public:
   Test::WebEngine::ContextConfigurationState configuration;
+  Test::WebEngine::AsyncRequestCallbacks asyncRequests;
+
+  bool SetRequestInterceptedCallback(InterceptedCallback callback) override
+  {
+    asyncRequests.intercepted = std::move(callback);
+    return true;
+  }
+  bool SetRequestCancelledCallback(CancelledCallback callback) override
+  {
+    asyncRequests.cancelled = std::move(callback);
+    return true;
+  }
+  void SetRequestOrigin(Dali::WebEnginePlugin*, uint32_t id) override
+  {
+    asyncRequests.viewId = id;
+  }
+
 
   bool SetMaxRefreshRate(int32_t rate) override
   {
@@ -3742,6 +3759,11 @@ CookieState& GetCookieState(Dali::WebEngineCookieManager* manager)
 std::function<void()> CaptureCookieWatch(Dali::WebEngineCookieManager* manager)
 {
   return dynamic_cast<Dali::Internal::Adaptor::MockWebEngineCookieManager&>(*manager).mChangesWatchCallback;
+}
+
+AsyncRequestCallbacks& GetAsyncRequestCallbacks(Dali::WebEngineContext* context)
+{
+  return dynamic_cast<Dali::Internal::Adaptor::MockConfiguredWebEngineContext&>(*context).asyncRequests;
 }
 
 ContextConfigurationState& GetContextConfigurationState(Dali::WebEngineContext* context)
