@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-async-request.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine.h>
 #include <dali/devel-api/atspi-interfaces/accessible.h>
@@ -28,6 +29,14 @@ namespace Test
 {
 namespace WebEngine
 {
+struct AsyncRequestCallbacks
+{
+  Dali::WebEngineAsyncRequestContext::InterceptedCallback intercepted;
+  Dali::WebEngineAsyncRequestContext::CancelledCallback cancelled;
+  uint32_t viewId{0};
+};
+AsyncRequestCallbacks& GetAsyncRequestCallbacks(Dali::WebEngineContext* context);
+
 struct ContextConfigurationState
 {
   bool result = true;

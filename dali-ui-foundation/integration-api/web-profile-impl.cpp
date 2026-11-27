@@ -19,7 +19,10 @@
 #include <dali-ui-foundation/integration-api/web-profile-impl.h>
 #include <dali-ui-foundation/integration-api/web-view-impl.h>
 #include <dali-ui-foundation/internal/web-profile-registry.h>
+#include <dali-ui-foundation/internal/web-request-cancellation-info-data.h>
+#include <dali-ui-foundation/internal/web-request-data.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace DALI_NAMESPACE
 {
@@ -36,6 +39,42 @@ Internal::WebProfileRegistry& Profiles()
   return profiles;
 }
 } //namespace
+
+bool WebProfileImpl::SetRequestInterceptedCallback(Extension::WebProfile::RequestInterceptedCallback callback)
+{
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread());
+  auto* context = dynamic_cast<Dali::WebEngineAsyncRequestContext*>(mProfile->GetContext());
+  if(!context) return false;
+  Dali::WebEngineAsyncRequestContext::InterceptedCallback bridge;
+  if(callback)
+  {
+    auto owned = std::make_shared<Extension::WebProfile::RequestInterceptedCallback>(std::move(callback));
+    bridge     = [owned](Dali::WebEngineAsyncRequestPtr request)
+    {
+      Extension::WebRequest value(new Extension::WebRequest::Impl{std::move(request)});
+      owned->Invoke(std::move(value));
+    };
+  }
+  return context->SetRequestInterceptedCallback(std::move(bridge));
+}
+
+bool WebProfileImpl::SetRequestCancelledCallback(Extension::WebProfile::RequestCancelledCallback callback)
+{
+  DALI_ASSERT_ALWAYS(Dali::Adaptor::IsEventThread());
+  auto* context = dynamic_cast<Dali::WebEngineAsyncRequestContext*>(mProfile->GetContext());
+  if(!context) return false;
+  Dali::WebEngineAsyncRequestContext::CancelledCallback bridge;
+  if(callback)
+  {
+    auto owned = std::make_shared<Extension::WebProfile::RequestCancelledCallback>(std::move(callback));
+    bridge     = [owned](uint64_t id, uint32_t viewId, const std::string& url, const std::string& method, const Dali::Property::Map& headers)
+    {
+      Extension::WebRequestCancellationInfo info(new Extension::WebRequestCancellationInfo::Impl{id, viewId, Dali::String(url.c_str()), Dali::String(method.c_str()), headers});
+      owned->Invoke(info);
+    };
+  }
+  return context->SetRequestCancelledCallback(std::move(bridge));
+}
 
 WebProfile WebProfileImpl::New(const Dali::String& name, bool incognito, const Dali::String& bundlePath)
 {

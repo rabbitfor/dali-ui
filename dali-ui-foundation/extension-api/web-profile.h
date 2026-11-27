@@ -17,8 +17,11 @@
  *
  */
 
+#include <dali-ui-foundation/extension-api/web-request-cancellation-info.h>
+#include <dali-ui-foundation/extension-api/web-request.h>
 #include <dali-ui-foundation/public-api/views/web/web-profile.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/signals/callback.h>
 #include <cstdint>
 
 namespace DALI_NAMESPACE
@@ -185,6 +188,48 @@ DALI_UI_API void SetMaxRefreshRate(Ui::WebProfile profile, int32_t rate);
  * @supported TIZEN_CHROMIUM
  */
 DALI_UI_API void RegisterUrlSchemesAsCorsEnabled(Ui::WebProfile profile, const Dali::Vector<Dali::String>& schemes);
+
+/**
+ * @brief Profile-wide request handler, invoked on engine IO.
+ * @SINCE_3_0.3
+ */
+using RequestInterceptedCallback = Dali::Callback<void(Extension::WebRequest)>;
+
+/**
+ * @brief Observer for pending work ended by native invalidation on engine IO.
+ * @SINCE_3_0.3
+ */
+using RequestCancelledCallback = Dali::Callback<void(const Extension::WebRequestCancellationInfo&)>;
+
+/**
+ * @brief Sets the profile-wide asynchronous request handler.
+ *
+ * Call on DALi UI, outside callbacks of this profile. Replacement/removal waits
+ * for admitted old callbacks to finish. IO handlers must not synchronously wait
+ * for UI work. No URL filter is added. Empty callback restores pass-through
+ * for new requests while existing requests keep their response capability.
+ * The callback receives a value to copy for worker responses. Do not access UI
+ * handles on IO. Request metadata and numeric view identity are snapshots.
+ * @SINCE_3_0.3
+ * @param[in] profile An initialized profile
+ * @param[in] callback Owning callback, or empty to remove
+ * @return True if supported and installed, false if unavailable or terminated
+ */
+DALI_UI_API bool SetRequestInterceptedCallback(Ui::WebProfile profile, RequestInterceptedCallback callback);
+
+/**
+ * @brief Sets the profile's pending-request cancellation observer.
+ *
+ * Same thread/removal restrictions as SetRequestInterceptedCallback().
+ * Removal leaves native invalidation tracking active. Notifications describe
+ * interrupted pending app work, without an engine reason or delivery result.
+ * Local full submission and explicit stream finish suppress cancellation.
+ * @SINCE_3_0.3
+ * @param[in] profile An initialized profile
+ * @param[in] callback Owning observer, or empty to remove
+ * @return True if supported and installed, false if unavailable or terminated
+ */
+DALI_UI_API bool SetRequestCancelledCallback(Ui::WebProfile profile, RequestCancelledCallback callback);
 
 } // namespace WebProfile
 } // namespace Extension

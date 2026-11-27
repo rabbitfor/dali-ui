@@ -17,6 +17,8 @@
 
 // CLASS HEADER
 #include "web-view-impl.h"
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-async-request.h>
+#include <dali/devel-api/adaptor-framework/web-engine/web-engine-context.h>
 #include <dali/integration-api/scene.h>
 
 // EXTERNAL INCLUDES
@@ -458,6 +460,10 @@ void WebViewImpl::OnInitialize()
   ViewImpl::OnInitialize();
 
   Actor self = Self();
+  if(auto* requests = dynamic_cast<Dali::WebEngineAsyncRequestContext*>(GetImpl(mWebProfile).GetEngineProfile()->GetContext()))
+  {
+    requests->SetRequestOrigin(mWebEngine.GetPlugin(), self.GetId());
+  }
 
   // Make the view keyboard-focusable so it can receive key events.
   self.SetProperty(Actor::Property::FOCUSABLE, true);

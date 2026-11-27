@@ -15,6 +15,8 @@
  *
  */
 
+#include <dali-ui-foundation/extension-api/web-request.h>
+#include <dali-ui-foundation/extension-api/web-request-cancellation-info.h>
 #include <atomic>
 #include <thread>
 #include <type_traits>
@@ -2610,5 +2612,70 @@ int UtcDaliWebViewPageLoadErrorCancellationSnapshotP(void)
 
   view.Reset();
   DALI_TEST_CHECK(cancelled.IsCancellation());
+  END_TEST;
+}
+
+namespace
+{
+class TestAsyncRequest : public Dali::WebEngineAsyncRequest
+{
+public:
+  uint64_t GetRequestId() const override { return 42; }
+  uint32_t GetWebViewId() const override { return 123; }
+  std::string GetUrl() const override { return "url"; }
+  std::string GetMethod() const override { return "GET"; }
+  Dali::Property::Map GetHeaders() const override { return {}; }
+  bool Ignore() override { return false; }
+  bool SetResponseStatus(int32_t, const std::string&) override { return true; }
+  bool AddResponseHeader(const std::string&, const std::string&) override { return true; }
+  bool AddResponseHeaders(const Dali::Property::Map&) override { return true; }
+  bool SetResponse(const std::string&, const uint8_t*, size_t) override { return true; }
+  bool SetResponseBody(const uint8_t*, size_t) override { return true; }
+  bool WriteResponseChunk(const uint8_t*, size_t length) override { return length != 0; }
+};
+}
+
+int UtcDaliWebProfileAsyncRequestSnapshotsP(void)
+{
+  UiTestApplication application;
+  auto profile = WebProfile::New("Async");
+  auto view = WebView::New(profile);
+  auto* context = Dali::Ui::Integration::GetImpl(profile).GetEngineProfile()->GetContext();
+  auto& callbacks = Test::WebEngine::GetAsyncRequestCallbacks(context);
+  DALI_TEST_EQUALS(callbacks.viewId, view.GetId(), TEST_LOCATION);
+  Extension::WebRequest retained;
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestInterceptedCallback(profile,
+    Extension::WebProfile::RequestInterceptedCallback::New([&](Extension::WebRequest request)
+    {
+      retained = request;
+    })));
+  callbacks.intercepted(std::make_shared<TestAsyncRequest>());
+  DALI_TEST_EQUALS(retained.GetRequestId(), uint64_t(42), TEST_LOCATION);
+  Extension::WebRequest workerCopy(retained);
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestInterceptedCallback(profile, {}));
+  DALI_TEST_CHECK(!callbacks.intercepted);
+  std::thread worker([&]
+  {
+    DALI_TEST_EQUALS(workerCopy.GetUrl(), Dali::String("url"), TEST_LOCATION);
+    DALI_TEST_CHECK(workerCopy.SetResponse("headers", nullptr, 0));
+  });
+  worker.join();
+
+  Extension::WebRequestCancellationInfo saved;
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestCancelledCallback(profile,
+    Extension::WebProfile::RequestCancelledCallback::New([&](const Extension::WebRequestCancellationInfo& info)
+    {
+      saved = info;
+    })));
+  Dali::Property::Map headers;
+  headers.Insert("request", "snapshot");
+  callbacks.cancelled(42, 123, "url", "GET", headers);
+  DALI_TEST_CHECK(Extension::WebProfile::SetRequestCancelledCallback(profile, {}));
+  view.Reset();
+  profile.Reset();
+  DALI_TEST_EQUALS(saved.GetRequestId(), uint64_t(42), TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetWebViewId(), 123u, TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetMethod(), Dali::String("GET"), TEST_LOCATION);
+  DALI_TEST_EQUALS(saved.GetHeaders().Count(), 1u, TEST_LOCATION);
   END_TEST;
 }

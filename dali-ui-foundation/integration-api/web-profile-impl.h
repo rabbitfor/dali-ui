@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali-ui-foundation/extension-api/web-profile.h>
 #include <dali-ui-foundation/public-api/views/web/web-cookie-manager.h>
 #include <dali-ui-foundation/public-api/views/web/web-profile.h>
 #include <dali/devel-api/adaptor-framework/web-engine/web-engine-profile.h>
@@ -64,6 +65,9 @@ public:
   bool DeleteAllWebIndexedDatabase();
   void SetMaxRefreshRate(int32_t rate);
   void RegisterUrlSchemesAsCorsEnabled(const Dali::Vector<Dali::String>& schemes);
+
+  bool SetRequestInterceptedCallback(Extension::WebProfile::RequestInterceptedCallback callback);
+  bool SetRequestCancelledCallback(Extension::WebProfile::RequestCancelledCallback callback);
 
 protected:
   WebProfileImpl(const Dali::String& name, bool incognito, Dali::WebEngineProfilePtr profile);
